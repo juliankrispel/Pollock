@@ -35,7 +35,7 @@
     var images = [];
     var imagesLoaded = 0;
 
-    for(var i = 1; i < 8; i++){
+    for(var i = 3; i < 7; i++){
         var image = new Image();
         image.src = 'img/0' + i + '.jpg';
         image.imageCanvas = document.createElement('canvas');
@@ -66,7 +66,7 @@
     }
 
     function generatePixels(){
-        for(var i = 0; i < 10; i++){
+        for(var i = 0; i < 5; i++){
             var pixel = new Pixel({
                 canvas: canvas,
                 imageCanvas: images 
@@ -88,8 +88,8 @@
             ydir: 1,
             canvas: null,
             imageCanvas: null,
-            brushWidth: 1,
-            brushHeight: 1
+            brushWidth: 10,
+            brushHeight: 10
         },
 
         init: function(config){
@@ -135,9 +135,15 @@
 
             //Get imageData from .imageCanvas and put it on canvas
             var imageData = this.imageCanvas.getImageData(this.x, this.y, this.brushWidth, this.brushHeight);
+            for(var i = 3; i < imageData.data.length; i+=4){
+                imageData.data[i] = 100;
+            }
             this.canvas.putImageData(imageData, this.x, this.y);
         },
 
+        makeTransparent: function(imageData){
+            console.log(image)
+        },
 
         resetCoordinates: function(){
             this.x = getRandomInt(1, w);
