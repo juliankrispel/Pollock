@@ -1,3 +1,10 @@
+var itemName = window.location.hash;
+var storageName = 'julians-portrait';
+if(window.location.hash && itemname) storageName = storageName + '#' + itemName;
+var cache = window.localStorage.getItem(storagename) || null;
+var currentTime = new Date();
+currentTime.setMinutes(currentTime.getMinutes() + 1);
+
 (function() {
     var lastTime = 0;
     var vendors = ['webkit', 'moz'];
@@ -62,6 +69,13 @@
         _(pixels).each(function(pixel){
             pixel.move();
         });
+        //setTimeout(100, draw);
+        var date = new Date();
+        if(date > currentTime){
+            currentTime = date;
+            currentTime.setMinutes( currentTime.getMinutes() + 1 );
+            window.localStorage.setItem(storageName, JSON.stringify(canvas.data));
+        }
         requestAnimationFrame(draw);
     }
 
@@ -135,8 +149,11 @@
 
             //Get imageData from .imageCanvas and put it on canvas
             var imageData = this.imageCanvas.getImageData(this.x, this.y, this.brushWidth, this.brushHeight);
-            for(var i = 3; i < imageData.data.length; i+=4){
-                imageData.data[i] = 100;
+            var destImageData = this.canvas.getImageData(this.x, this.y, this.brushWidth, this.brushHeight);
+            for(var i = 0; i < imageData.data.length; i+=4){
+                imageData.data[i] = destImageData.data[i] < 255 ? Math.abs((destImageData.data[i] + imageData.data[i]) / 2) : imageData.data[i];
+                imageData.data[i+1] = destImageData.data[i] < 255 ? Math.abs((destImageData.data[i+1] + imageData.data[i+1]) / 2) : imageData.data[i];
+                imageData.data[i+2] = destImageData.data[i] < 255 ? Math.abs((destImageData.data[i+2] + imageData.data[i+2]) / 2) : imageData.data[i];
             }
             this.canvas.putImageData(imageData, this.x, this.y);
         },
