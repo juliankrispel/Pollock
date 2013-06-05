@@ -104,12 +104,12 @@ currentTime.setSeconds(currentTime.getSeconds() + 5);
     }
 
     function blend(under, over, mode){
-        return Math.round((over + under) / 2);
+        return Math.round((over * .5) + (under * .5));
     }
 
     function composite(under, over, mode) {
-        for(var i = 0; i < under.length; i+=4) {
-            console.log(under[i], over[i]);
+        for(var i = 0; i < under.length; i+=4){
+            //console.log(under[i], over[i]);
             //if(i % 10) brakadak;
             under[i] = blend(under[i], over[i]);
             under[i+1] = blend(under[i+1], over[i+1]);
@@ -130,8 +130,8 @@ currentTime.setSeconds(currentTime.getSeconds() + 5);
             ydir: 1,
             canvas: null,
             imageCanvas: null,
-            brushWidth: 10,
-            brushHeight: 10
+            brushWidth: 2,
+            brushHeight: 2
         },
 
         init: function(config){
@@ -192,8 +192,8 @@ currentTime.setSeconds(currentTime.getSeconds() + 5);
         },
 
         resetDirection: function(){
-            this.xdir = getRandomInt(-2, 2);
-            this.ydir = getRandomInt(-2, 2);
+            this.xdir = getRandomInt(-1, 1) * this.brushWidth;
+            this.ydir = getRandomInt(-1, 1) * this.brushHeight;
         },
 
         resetBrush: function(){

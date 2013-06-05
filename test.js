@@ -18,7 +18,6 @@ function _composite(under, over) {
 
 
     function blend(under, over, mode){
-        return Math.round(Math.abs(over - under) / 2);
         if(mode == 'difference')
             return Math.round(Math.abs(over - under) / 2);
         else
