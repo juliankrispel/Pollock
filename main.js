@@ -1,9 +1,9 @@
 var itemName = window.location.hash;
 var storageName = 'julians-portrait';
 if(window.location.hash && itemname) storageName = storageName + '#' + itemName;
-var cache = window.localStorage.getItem(storagename) || null;
+var cache = window.localStorage.getItem(storageName) || null;
 var currentTime = new Date();
-currentTime.setMinutes(currentTime.getMinutes() + 1);
+currentTime.setSeconds(currentTime.getSeconds() + 5);
 
 (function() {
     var lastTime = 0;
@@ -32,12 +32,16 @@ currentTime.setMinutes(currentTime.getMinutes() + 1);
 
 
 (function(){
-    var canvas = document.getElementById('canvas');
+    var canvasElement = document.getElementById('canvas');
     var w = canvas.width;
     var h = canvas.height;
     var pixels = [];
 
-    canvas = canvas.getContext('2d');
+    canvas = canvasElement.getContext('2d');
+
+    if(cache && cache !== 'undefined'){
+        cache = cache;
+    }
 
     var images = [];
     var imagesLoaded = 0;
@@ -46,12 +50,12 @@ currentTime.setMinutes(currentTime.getMinutes() + 1);
         var image = new Image();
         image.src = 'img/0' + i + '.jpg';
         image.imageCanvas = document.createElement('canvas');
-        image.imageCanvas.width = 1400;
-        image.imageCanvas.height = 1600;
+        image.imageCanvas.width = 400;
+        image.imageCanvas.height = 600;
         image.context = image.imageCanvas.getContext('2d');
 
         image.onload = function(){
-            this.context.drawImage(this, 0, 0 );
+            this.context.drawImage(this, -400, -400 );
             imagesLoaded++;
             images.push(this.context);
 
@@ -60,10 +64,20 @@ currentTime.setMinutes(currentTime.getMinutes() + 1);
         }
 
     }
+
     function init(){
+        loadImageFromLocalStorage();
         generatePixels();
         draw();
-    };
+    }
+
+    function loadImageFromLocalStorage(){
+        var localImage = new Image();
+        localImage.src = cache;
+        localImage.onload = function(){
+            canvas.drawImage(localImage, 0, 0);
+        }
+    }
 
     function draw(){
         _(pixels).each(function(pixel){
@@ -73,8 +87,9 @@ currentTime.setMinutes(currentTime.getMinutes() + 1);
         var date = new Date();
         if(date > currentTime){
             currentTime = date;
-            currentTime.setMinutes( currentTime.getMinutes() + 1 );
-            window.localStorage.setItem(storageName, JSON.stringify(canvas.data));
+            currentTime.setSeconds( currentTime.getSeconds() + 5 );
+            var canvasImage = canvasElement.toDataURL("image/png");
+            window.localStorage.setItem(storageName, canvasImage);
         }
         requestAnimationFrame(draw);
     }
@@ -86,6 +101,18 @@ currentTime.setMinutes(currentTime.getMinutes() + 1);
                 imageCanvas: images 
             })
             pixels.push(pixel);
+        }
+    }
+
+    function blend(under, over, mode){
+        return Math.round((over + under) / 2);
+    }
+
+    function composite(under, over, mode) {
+        for(var i = 0; i < under.length; i+=4) {
+            under[i] = blend(under[i], over[i]);
+            under[i+1] = blend(under[i+1], over[i+1]);
+            under[i+2] = blend(under[i+2], over[i+2]);
         }
     }
 
@@ -150,11 +177,7 @@ currentTime.setMinutes(currentTime.getMinutes() + 1);
             //Get imageData from .imageCanvas and put it on canvas
             var imageData = this.imageCanvas.getImageData(this.x, this.y, this.brushWidth, this.brushHeight);
             var destImageData = this.canvas.getImageData(this.x, this.y, this.brushWidth, this.brushHeight);
-            for(var i = 0; i < imageData.data.length; i+=4){
-                imageData.data[i] = destImageData.data[i] < 255 ? Math.abs((destImageData.data[i] + imageData.data[i]) / 2) : imageData.data[i];
-                imageData.data[i+1] = destImageData.data[i] < 255 ? Math.abs((destImageData.data[i+1] + imageData.data[i+1]) / 2) : imageData.data[i];
-                imageData.data[i+2] = destImageData.data[i] < 255 ? Math.abs((destImageData.data[i+2] + imageData.data[i+2]) / 2) : imageData.data[i];
-            }
+            composite(imageData.data, destImageData.data);
             this.canvas.putImageData(imageData, this.x, this.y);
         },
 
