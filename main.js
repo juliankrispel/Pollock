@@ -83,7 +83,6 @@ currentTime.setSeconds(currentTime.getSeconds() + 5);
         _(pixels).each(function(pixel){
             pixel.move();
         });
-        //setTimeout(100, draw);
         var date = new Date();
         if(date > currentTime){
             currentTime = date;
@@ -110,6 +109,8 @@ currentTime.setSeconds(currentTime.getSeconds() + 5);
 
     function composite(under, over, mode) {
         for(var i = 0; i < under.length; i+=4) {
+            console.log(under[i], over[i]);
+            //if(i % 10) brakadak;
             under[i] = blend(under[i], over[i]);
             under[i+1] = blend(under[i+1], over[i+1]);
             under[i+2] = blend(under[i+2], over[i+2]);
