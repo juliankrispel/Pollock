@@ -3,7 +3,7 @@ var storageName = 'julians-portrait';
 if(window.location.hash && itemname) storageName = storageName + '#' + itemName;
 var cache = window.localStorage.getItem(storageName) || null;
 var currentTime = new Date();
-currentTime.setSeconds(currentTime.getSeconds() + 5);
+currentTime.setSeconds(currentTime.getSeconds() + 30);
 
 (function() {
     var lastTime = 0;
@@ -50,19 +50,18 @@ currentTime.setSeconds(currentTime.getSeconds() + 5);
         var image = new Image();
         image.src = 'img/0' + i + '.jpg';
         image.imageCanvas = document.createElement('canvas');
-        image.imageCanvas.width = 400;
-        image.imageCanvas.height = 600;
+        image.imageCanvas.width = 770;
+        image.imageCanvas.height = 1027;
         image.context = image.imageCanvas.getContext('2d');
 
         image.onload = function(){
-            this.context.drawImage(this, -400, -400 );
+            this.context.drawImage(this, 0, 0 );
             imagesLoaded++;
             images.push(this.context);
 
             if(imagesLoaded == images.length)
                 init();
         }
-
     }
 
     function init(){
@@ -86,11 +85,19 @@ currentTime.setSeconds(currentTime.getSeconds() + 5);
         var date = new Date();
         if(date > currentTime){
             currentTime = date;
-            currentTime.setSeconds( currentTime.getSeconds() + 5 );
+            currentTime.setSeconds( currentTime.getSeconds() + 30 );
             var canvasImage = canvasElement.toDataURL("image/png");
-            window.localStorage.setItem(storageName, canvasImage);
+            saveToLocalStorage();
         }
         requestAnimationFrame(draw);
+    }
+
+    function saveToLocalStorage(){
+        try {
+            window.localStorage.setItem(storageName, canvasImage);
+        }catch(er){
+            console.log(er);
+        }
     }
 
     function generatePixels(){
@@ -109,11 +116,16 @@ currentTime.setSeconds(currentTime.getSeconds() + 5);
 
     function composite(under, over, mode) {
         for(var i = 0; i < under.length; i+=4){
-            //console.log(under[i], over[i]);
-            //if(i % 10) brakadak;
             under[i] = blend(under[i], over[i]);
             under[i+1] = blend(under[i+1], over[i+1]);
             under[i+2] = blend(under[i+2], over[i+2]);
+        }
+    }
+
+    function saturate(data, amount){
+        for(var i = 0; i < data.length; i+=4){
+            var max = _(data).max(function(color){ return color.})
+        
         }
     }
 
@@ -145,6 +157,7 @@ currentTime.setSeconds(currentTime.getSeconds() + 5);
 
             this.resetCoordinates();
             this.resetDirection();
+            this.resetImageData();
         },
 
         storeImageCanvasArray: function(){
@@ -176,14 +189,22 @@ currentTime.setSeconds(currentTime.getSeconds() + 5);
                 this.resetDirection();               
 
             //Get imageData from .imageCanvas and put it on canvas
-            var imageData = this.imageCanvas.getImageData(this.x, this.y, this.brushWidth, this.brushHeight);
-            var destImageData = this.canvas.getImageData(this.x, this.y, this.brushWidth, this.brushHeight);
-            composite(imageData.data, destImageData.data);
-            this.canvas.putImageData(imageData, this.x, this.y);
+            if(percentTrue(10))
+                this.resetImageData();
+
+
+            composite(this.imageData.data, destImageData.data);
+//            saturate(this.imageData.data, 30);
+            this.canvas.putImageData(this.imageData, this.x, this.y);
         },
 
         makeTransparent: function(imageData){
             console.log(image)
+        },
+
+        resetImageData: function(){
+            this.imageData = this.imageCanvas.getImageData(this.x, this.y, this.brushWidth, this.brushHeight);
+            var destImageData = this.canvas.getImageData(this.x, this.y, this.brushWidth, this.brushHeight);
         },
 
         resetCoordinates: function(){
