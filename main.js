@@ -147,8 +147,8 @@ function CanvasSaver(url) {
             var image = new Image();
             image.src = 'img/0' + i + '.jpg';
             image.imageCanvas = document.createElement('canvas');
-            image.imageCanvas.width = 1540;
-            image.imageCanvas.height = 2054;
+            image.imageCanvas.width = 840;
+            image.imageCanvas.height = 480;
             image.context = image.imageCanvas.getContext('2d');
 
             image.onload = function(){
@@ -250,8 +250,8 @@ function CanvasSaver(url) {
             ydir: 1,
             canvas: null,
             imageCanvas: null,
-            brushWidth: 20,
-            brushHeight: 20
+            brushWidth: 1,
+            brushHeight: 1
         },
 
         init: function(config){
@@ -297,7 +297,7 @@ function CanvasSaver(url) {
                 this.resetDirection();               
 
             //Get imageData from .imageCanvas and put it on canvas
-            if(percentTrue(100))
+            if(percentTrue(10))
                 this.resetImageData();
 
 
