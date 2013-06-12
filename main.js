@@ -90,31 +90,85 @@ function CanvasSaver(url) {
     var imagesLoaded = 0;
     var allImages = 6;
 
-    for(var i = 1; i < 7; i++){
-        var image = new Image();
-        image.src = 'img/0' + i + '.jpg';
-        image.imageCanvas = document.createElement('canvas');
-        image.imageCanvas.width = 1540;
-        image.imageCanvas.height = 2054;
-        image.context = image.imageCanvas.getContext('2d');
+//    loadLocalImages(init);
+    loadCameraImage();
 
-        image.onload = function(){
-            this.context.drawImage(this, 0, 0, w, h );
-            imagesLoaded++;
-            images.push(this.context);
 
-            if(allImages == images.length){
-                init();
+    function Camera(){
+         var videoObj = { "video": true },
+            errBack = function(error) {
+                console.log("Video capture error: ", error.code); 
+            };
+
+        this.canvas = document.createElement("canvas")
+        this.canvas.width = 840;
+        this.canvas.height = 480;
+        this.context = this.canvas.getContext("2d"),
+
+        this.video = document.createElement("video"),
+        this.video.width = 840;
+        this.video.height = 480;
+
+        var that = this;
+        // Put video listeners into place
+        if(navigator.getUserMedia) { // Standard
+            navigator.getUserMedia(videoObj, function(stream) {
+                that.video.src = stream;
+                that.video.play();
+            }, errBack);
+        } else if(navigator.webkitGetUserMedia) { // WebKit-prefixed
+            navigator.webkitGetUserMedia(videoObj, function(stream){
+                that.video.src = window.webkitURL.createObjectURL(stream);
+                that.video.play();
+            }, errBack);
+        }
+
+        this.video.addEventListener('play', function(){
+            that.context.drawImage(that.video, 0, 0, 840, 480);
+            setInterval(function(){
+                that.context.drawImage(that.video, 0, 0, 840, 480);
+            },3000);
+            that.onPlay();
+        }, false);
+
+    }
+
+    Camera.prototype.onPlay = function(){ console.log('playing'); }
+
+    function loadCameraImage(){
+        var cam = new Camera();
+        cam.onPlay = function(){
+            init(cam.context);
+        };
+    }
+
+    function loadLocalImages(callback){
+        for(var i = 1; i < 7; i++){
+            var image = new Image();
+            image.src = 'img/0' + i + '.jpg';
+            image.imageCanvas = document.createElement('canvas');
+            image.imageCanvas.width = 1540;
+            image.imageCanvas.height = 2054;
+            image.context = image.imageCanvas.getContext('2d');
+
+            image.onload = function(){
+                this.context.drawImage(this, 0, 0, w, h );
+                imagesLoaded++;
+                images.push(this.context);
+
+                if(allImages == images.length){
+                    callback();
+                }
             }
         }
     }
 
-    function init(){
+    function init(context){
         canvas.fillStyle = "rgb(255,255,255)";  
         canvas.fillRect(0, 0, w, h);
         domEvents();
         loadImageFromLocalStorage();
-        generatePixels();
+        generatePixels(context);
         draw();
     }
 
@@ -140,8 +194,8 @@ function CanvasSaver(url) {
         if(date > currentTime){
             currentTime = date;
             currentTime.setSeconds( currentTime.getSeconds() + 30 );
-            var canvasImage = canvasElement.toDataURL("image/png");
-            saveToLocalStorage();
+            //var canvasImage = canvasElement.toDataURL("image/png");
+            //saveToLocalStorage();
         }
         requestAnimationFrame(draw);
     }
@@ -154,11 +208,11 @@ function CanvasSaver(url) {
         }
     }
 
-    function generatePixels(){
+    function generatePixels(context){
         for(var i = 0; i < 100; i++){
             var pixel = new Pixel({
                 canvas: canvas,
-                imageCanvas: images 
+                imageCanvas: context || images 
             })
             pixels.push(pixel);
         }
@@ -196,8 +250,8 @@ function CanvasSaver(url) {
             ydir: 1,
             canvas: null,
             imageCanvas: null,
-            brushWidth: 1,
-            brushHeight: 1
+            brushWidth: 20,
+            brushHeight: 20
         },
 
         init: function(config){
@@ -243,7 +297,7 @@ function CanvasSaver(url) {
                 this.resetDirection();               
 
             //Get imageData from .imageCanvas and put it on canvas
-            if(percentTrue(10))
+            if(percentTrue(100))
                 this.resetImageData();
 
 
