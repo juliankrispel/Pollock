@@ -50,12 +50,12 @@ currentTime.setSeconds(currentTime.getSeconds() + 30);
         var image = new Image();
         image.src = 'img/0' + i + '.jpg';
         image.imageCanvas = document.createElement('canvas');
-        image.imageCanvas.width = 770;
-        image.imageCanvas.height = 1027;
+        image.imageCanvas.width = 1540;
+        image.imageCanvas.height = 2054;
         image.context = image.imageCanvas.getContext('2d');
 
         image.onload = function(){
-            this.context.drawImage(this, 0, 0 );
+            this.context.drawImage(this, 0, 0, w, h );
             imagesLoaded++;
             images.push(this.context);
 
@@ -65,9 +65,19 @@ currentTime.setSeconds(currentTime.getSeconds() + 30);
     }
 
     function init(){
+        canvas.fillStyle = "rgb(255,255,255)";  
+        canvas.fillRect(0, 0, w, h);
+        domEvents();
         loadImageFromLocalStorage();
         generatePixels();
         draw();
+    }
+
+    function domEvents(){
+        var el = document.getElementById('save');
+        el.addEventListener('click', function(){
+            Canvas2Image.saveAsJPEG(canvasElement);
+        });
     }
 
     function loadImageFromLocalStorage(){
@@ -111,7 +121,7 @@ currentTime.setSeconds(currentTime.getSeconds() + 30);
     }
 
     function blend(under, over, mode){
-        return Math.round((over * .5) + (under * .5));
+        return Math.round((over * .4) + (under * .6));
     }
 
     function composite(under, over, mode) {
@@ -122,12 +132,12 @@ currentTime.setSeconds(currentTime.getSeconds() + 30);
         }
     }
 
-    function saturate(data, amount){
-        for(var i = 0; i < data.length; i+=4){
-            var max = _(data).max(function(color){ return color.})
-        
-        }
-    }
+//    function saturate(data, amount){
+//        for(var i = 0; i < data.length; i+=4){
+//            var max = _(data).max(function(color){ return color.})
+//        
+//        }
+//    }
 
     var Pixel = function(config){
         this.init(config);
@@ -142,8 +152,8 @@ currentTime.setSeconds(currentTime.getSeconds() + 30);
             ydir: 1,
             canvas: null,
             imageCanvas: null,
-            brushWidth: 2,
-            brushHeight: 2
+            brushWidth: 1,
+            brushHeight: 1
         },
 
         init: function(config){
@@ -193,7 +203,6 @@ currentTime.setSeconds(currentTime.getSeconds() + 30);
                 this.resetImageData();
 
 
-            composite(this.imageData.data, destImageData.data);
 //            saturate(this.imageData.data, 30);
             this.canvas.putImageData(this.imageData, this.x, this.y);
         },
@@ -205,6 +214,7 @@ currentTime.setSeconds(currentTime.getSeconds() + 30);
         resetImageData: function(){
             this.imageData = this.imageCanvas.getImageData(this.x, this.y, this.brushWidth, this.brushHeight);
             var destImageData = this.canvas.getImageData(this.x, this.y, this.brushWidth, this.brushHeight);
+            composite(this.imageData.data, destImageData.data);
         },
 
         resetCoordinates: function(){
