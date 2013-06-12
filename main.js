@@ -5,6 +5,49 @@ var cache = window.localStorage.getItem(storageName) || null;
 var currentTime = new Date();
 currentTime.setSeconds(currentTime.getSeconds() + 30);
 
+function CanvasSaver(url) {
+     
+    this.url = url;
+     
+    this.savePNG = function(cnvs, fname) {
+        if(!cnvs || !url) return;
+        fname = fname || 'picture';
+         
+        var data = cnvs.toDataURL("image/png");
+        data = data.substr(data.indexOf(',') + 1).toString();
+         
+        var dataInput = document.createElement("input") ;
+        dataInput.setAttribute("name", 'imgdata') ;
+        dataInput.setAttribute("value", data);
+        dataInput.setAttribute("type", "hidden");
+         
+        var nameInput = document.createElement("input") ;
+        nameInput.setAttribute("name", 'name') ;
+        nameInput.setAttribute("value", fname + '.png');
+         
+        var myForm = document.createElement("form");
+        myForm.method = 'post';
+        myForm.action = url;
+        myForm.appendChild(dataInput);
+        myForm.appendChild(nameInput);
+         
+        document.body.appendChild(myForm) ;
+        myForm.submit() ;
+        document.body.removeChild(myForm) ;
+    };
+     
+    this.generateButton = function (label, cnvs, fname) {
+        var btn = document.createElement('button'), scope = this;
+        btn.innerHTML = label;
+        btn.style['class'] = 'canvassaver';
+        btn.addEventListener('click', function(){scope.savePNG(cnvs, fname);}, false);
+         
+        document.body.appendChild(btn);
+         
+        return btn;
+    };
+}
+
 (function() {
     var lastTime = 0;
     var vendors = ['webkit', 'moz'];
@@ -45,8 +88,9 @@ currentTime.setSeconds(currentTime.getSeconds() + 30);
 
     var images = [];
     var imagesLoaded = 0;
+    var allImages = 6;
 
-    for(var i = 3; i < 7; i++){
+    for(var i = 1; i < 7; i++){
         var image = new Image();
         image.src = 'img/0' + i + '.jpg';
         image.imageCanvas = document.createElement('canvas');
@@ -59,8 +103,9 @@ currentTime.setSeconds(currentTime.getSeconds() + 30);
             imagesLoaded++;
             images.push(this.context);
 
-            if(imagesLoaded == images.length)
+            if(allImages == images.length){
                 init();
+            }
         }
     }
 
@@ -75,9 +120,8 @@ currentTime.setSeconds(currentTime.getSeconds() + 30);
 
     function domEvents(){
         var el = document.getElementById('save');
-        el.addEventListener('click', function(){
-            Canvas2Image.saveAsJPEG(canvasElement);
-        });
+        var cs = new CanvasSaver('saveme.php')
+        cs.generateButton('save an image!', canvasElement, 'myimage');
     }
 
     function loadImageFromLocalStorage(){
@@ -111,7 +155,7 @@ currentTime.setSeconds(currentTime.getSeconds() + 30);
     }
 
     function generatePixels(){
-        for(var i = 0; i < 5; i++){
+        for(var i = 0; i < 100; i++){
             var pixel = new Pixel({
                 canvas: canvas,
                 imageCanvas: images 
