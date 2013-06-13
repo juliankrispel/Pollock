@@ -78,7 +78,7 @@ function CanvasSaver(url) {
     var canvasElement = document.getElementById('canvas');
     var w = canvas.width;
     var h = canvas.height;
-    var pixels = [];
+    var brushes = [];
 
     canvas = canvasElement.getContext('2d');
 
@@ -168,7 +168,7 @@ function CanvasSaver(url) {
         canvas.fillRect(0, 0, w, h);
         domEvents();
         loadImageFromLocalStorage();
-        generatePixels(context);
+        generateBrushs(context);
         draw();
     }
 
@@ -187,8 +187,8 @@ function CanvasSaver(url) {
     }
 
     function draw(){
-        _(pixels).each(function(pixel){
-            pixel.move();
+        _(brushes).each(function(brush){
+            brush.move();
         });
         var date = new Date();
         if(date > currentTime){
@@ -208,13 +208,13 @@ function CanvasSaver(url) {
         }
     }
 
-    function generatePixels(context){
+    function generateBrushs(context){
         for(var i = 0; i < 100; i++){
-            var pixel = new Pixel({
+            var brush = new Brush({
                 canvas: canvas,
                 imageCanvas: context || images 
             })
-            pixels.push(pixel);
+            brushes.push(brush);
         }
     }
 
@@ -237,11 +237,11 @@ function CanvasSaver(url) {
 //        }
 //    }
 
-    var Pixel = function(config){
+    var Brush = function(config){
         this.init(config);
     }
 
-    _(Pixel.prototype).extend({
+    _(Brush.prototype).extend({
         //Defaults
         defaults: {
             x: 0,
@@ -255,7 +255,7 @@ function CanvasSaver(url) {
         },
 
         init: function(config){
-            //Extend new pixel with passed parameters
+            //Extend new brush with passed parameters
             _(this).extend(this.defaults, config);
 
             if(_.isArray(this.imageCanvas)){
