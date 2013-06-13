@@ -285,19 +285,19 @@ function CanvasSaver(url) {
             this.y = this.y + this.ydir;
 
             //Reset brush every now and then
-//            if(percentTrue(3))
-//                this.resetBrush();
+            if(percentTrue(30))
+                this.resetBrush();
 
             //Respawn every now and then
             if(percentTrue(1))
                 this.resetCoordinates();
 
             //Change direction every now and then
-            if(percentTrue(30))
+            if(percentTrue(50))
                 this.resetDirection();               
 
             //Get imageData from .imageCanvas and put it on canvas
-            if(percentTrue(10))
+            if(percentTrue(75))
                 this.resetImageData();
 
 
@@ -326,8 +326,9 @@ function CanvasSaver(url) {
         },
 
         resetBrush: function(){
-            this.brushWidth = getRandom(1, 2);
-            this.brushHeight = getRandom(1, 2);
+            var num = getRandom(1, 5);
+            this.brushWidth = num;
+            this.brushHeight = num;
         }
     
     });
