@@ -297,7 +297,7 @@ function CanvasSaver(url) {
                 this.resetDirection();               
 
             //Get imageData from .imageCanvas and put it on canvas
-            if(percentTrue(75))
+            if(percentTrue(30))
                 this.resetImageData();
 
 
