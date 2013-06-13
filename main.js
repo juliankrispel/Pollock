@@ -289,11 +289,11 @@ function CanvasSaver(url) {
                 this.resetBrush();
 
             //Respawn every now and then
-            if(percentTrue(1))
+            if(percentTrue(.3))
                 this.resetCoordinates();
 
             //Change direction every now and then
-            if(percentTrue(50))
+            if(percentTrue(80))
                 this.resetDirection();               
 
             //Get imageData from .imageCanvas and put it on canvas
@@ -326,7 +326,7 @@ function CanvasSaver(url) {
         },
 
         resetBrush: function(){
-            var num = getRandom(1, 5);
+            var num = getRandom(1, 3);
             this.brushWidth = num;
             this.brushHeight = num;
         }
