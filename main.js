@@ -6,7 +6,6 @@ var currentTime = new Date();
 currentTime.setSeconds(currentTime.getSeconds() + 30);
 
 function CanvasSaver(url) {
-     
     this.url = url;
      
     this.savePNG = function(cnvs, fname) {
@@ -90,8 +89,8 @@ function CanvasSaver(url) {
     var imagesLoaded = 0;
     var allImages = 6;
 
-//    loadLocalImages(init);
-    loadCameraImage();
+    loadLocalImages(init);
+//    loadCameraImage();
 
 
     function Camera(){
@@ -147,8 +146,8 @@ function CanvasSaver(url) {
             var image = new Image();
             image.src = 'img/0' + i + '.jpg';
             image.imageCanvas = document.createElement('canvas');
-            image.imageCanvas.width = 840;
-            image.imageCanvas.height = 480;
+            image.imageCanvas.width = 910;
+            image.imageCanvas.height = 1040;
             image.context = image.imageCanvas.getContext('2d');
 
             image.onload = function(){
@@ -285,8 +284,8 @@ function CanvasSaver(url) {
             this.y = this.y + this.ydir;
 
             //Reset brush every now and then
-            if(percentTrue(30))
-                this.resetBrush();
+//            if(percentTrue(30))
+//                this.resetBrush();
 
             //Respawn every now and then
             if(percentTrue(.3))
