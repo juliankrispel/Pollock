@@ -90,8 +90,8 @@ function CanvasSaver(url) {
     var imagesLoaded = 0;
     var allImages = 6;
 
-//    loadLocalImages(init);
-    loadCameraImage();
+    loadLocalImages(init);
+//    loadCameraImage();
 
 
     function Camera(){
@@ -236,6 +236,95 @@ function CanvasSaver(url) {
 //        
 //        }
 //    }
+
+    // -----------------------------------------------------------------------------
+
+    var Brush = {
+        x : 0,
+        y : 0,
+        size : 0,
+        shape : 0,
+        setState : function(bx,by,bsize,bform) {
+            this.x = bx;
+            this.y = by;
+            this.size = bsize;
+            this.bform = bform;
+        }
+    }
+
+    // a stroke generates a sequence of brushes
+    var Stroke = {
+        // get an array of brushes for painting
+        getBrushes : function()
+        {
+        }
+    }
+
+   var ImageSource = {
+        getWidth : function() {}
+        getHeight : function() {}
+   }
+
+    var Painter = {
+        imgSrc : null;
+        setImageSource : function(input) { 
+            this.imgSrc = input; 
+        }
+        // the Painter interface
+        init  : function() {}
+        paint : function(renderer) {}
+        update : function() {}
+    }
+
+    var MovingSquarePainter = _(Painter).extend({
+        myBrushes : null,
+        N : 10,
+        // painter interface
+        init : function() {
+            this.myBrushes = [];
+            for (i=0;i<this.N;++i) {
+                this.myBrushes.push(new Brush());
+            }
+            _(this.myBrushes).each(function(brush) {
+                brush.dx = 1;
+                brush.dy = 1;                
+                brush.setState(0,0,5,'square');
+            });
+        },
+
+        paint : function(renderer) {
+            _(this.myBrushes).each(function(brush) {
+                renderer.renderBrush(brush);
+            }
+        },
+
+        update : function(renderer) {
+            _(this.myBrushes).each(function(brush))
+            {
+                //Reset brush every now and then
+                if(percentTrue(30))
+                {
+                    brush.size=getRandom(1,3);
+                }
+
+                //Respawn every now and then
+                if(percentTrue(.3))
+                {
+                    brush.x = getRandom(1,imgSrc.getWidth());
+                    brush.y = getRandom(1,imgSrc.getHeight());
+                }
+
+                //Change direction every now and then
+                if(percentTrue(80)) {
+                    brush.dx = getRandomInt(-1, 1) * brush.size;
+                    brush.dy = getRandomInt(-1, 1) * brush.size;
+                }
+            }
+        }
+    });
+   
+    // -----------------------------------------------------------------------------
+
 
     var Brush = function(config){
         this.init(config);
