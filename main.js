@@ -35,44 +35,35 @@ var Brush = {
         this.bform = bform;
     }
 }
- 
-//// a stroke generates a sequence of brushes
-//var Stroke = {
-//     get an array of brushes for painting
-//    getBrushes : function()
-//    {
-//    }
-//}
-
 
 // ImageSource abstracts a set of images, accesible by index
 // width and height of ImageSource correspond to 
 // the maximal width and height of images it contains
-var ImageSource = {
-    images: Array(),
-    W: 0,
-    H: 0,
+var ImageSource = function() {
+    this.images = Array();
+    this.W = 0;
+    this.H = 0;
 
-    getWidth : function() {},
-    getHeight : function() {},
-    getNumImages : function() { return 0; },
-    getImage : function(index) {},
+    this.getWidth = function() {};
+    this.getHeight = function() {};
+    this.getNumImages = function() { return 0; };
+    this.getImage = function(index) {};
     
-    addImage : function(img) {
-       images.push(img);
-       if (img.width > W) W=img.width;
-       if (img.height > H) H=img.height;
-    }
+    this.addImage = function(img) {
+       this.images.push(img);
+       if (img.width > this.W) this.W=img.width;
+       if (img.height > this.H) this.H=img.height;
+    };
 };
 
 // a Painter is responsible for what is going to get drawn where
-var Painter = {
-    imgSrc : null,
-    setImageSource : function(input) {  this.imgSrc = input;  },
+var Painter = function() {
+    this.imgSrc = null;
+    this.setImageSource = function(input) {  this.imgSrc = input;  };
     // the Painter interface
-    init  : function() {},
-    paint : function(renderer, destination) {},
-    update : function() {}
+    this.init   = function() {};
+    this.paint  = function(renderer, destination) {};
+    this.update = function() {};
 }
 
 
@@ -147,24 +138,24 @@ var MovingSquarePainter = _(Painter).extend({
 var ImageLoader = function(imageFiles, callback){
     var images = [];
     for(var i = 0; i < imageFiles.length; i++){
-        var image = new Image();
-        image.src = imageFiles[i];
-        image.onload = function(){
-            images.push(this.context);
+        var img = new Image();
+        img.onload = function(){
+            images.push(img);
 
             // Call callback when done loading images and pass images as argument
-            if(i + 1 == imageFiles.length){
+            if(images.length == imageFiles.length){
                 callback(images);
             }
-        }
+        }        
+        img.src = imageFiles[i];
     }
 };
 
 // the renderer is actually responsible for copying pixels
 
-var SimpleRenderer = {
+var SimpleRenderer = function(){
 
-   composite: function(src, dst, mode)
+   this.composite = function(src, dst, mode)
    {
       for (var i=0; i<src.length; i+=4)
       {
@@ -175,7 +166,7 @@ var SimpleRenderer = {
       }
    },
    
-   renderBrush: function (brush, source, destination) {
+   this.renderBrush = function (brush, source, destination) {
      if (brush.shape=='square') 
      {
         var srcData = source.getImageData(brush.x, brush.y, brush.size, brush.size);
@@ -184,20 +175,25 @@ var SimpleRenderer = {
         destination.putImageData(imageData, this.x, this.y);
      }
    }
-}
+};
 
 var MainLoop = function(images){
-    var myPainter = MovingSquarePainter();
-    myPainter.setImageSource( ImageSource() );
+   
+    imgSource = new ImageSource();
+    for(i=0;i<images.length;++i)
+        imgSource.addImage(images[i]);
+
+    myPainter = new MovingSquarePainter();
+    myPainter.setImageSource( ImageSource );
     
-    var myRenderer = SimpleRenderer();
-    
+    myRenderer = new SimpleRenderer();
+
     // - start main loop
     window.requestAnimationFrame(function(){
        myPainter.paint(myRenderer, dstCanvas);
        myPainter.update();
     });
-}
+};
 
 var dstCanvas = null;
 
@@ -205,6 +201,6 @@ var dstCanvas = null;
 var StartApp = function(renderTarget){
     dstCanvas = renderTarget;
     ImageLoader( new Array("img/01.jpg","img/02.jpg","img/03.jpg","img/04.jpg"), MainLoop );
-}
+};
 
 StartApp(document.getElementById('canvas'));
