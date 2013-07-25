@@ -53,27 +53,25 @@ var ImageSource = {
     W: 0,
     H: 0,
 
-    getWidth : function() {}
-    getHeight : function() {}
-    getNumImages : function() { return 0; }
-    getImage : function(index) {}
+    getWidth : function() {},
+    getHeight : function() {},
+    getNumImages : function() { return 0; },
+    getImage : function(index) {},
     
     addImage : function(img) {
        images.push(img);
        if (img.width > W) W=img.width;
        if (img.height > H) H=img.height;
     }
-}
+};
 
 // a Painter is responsible for what is going to get drawn where
 var Painter = {
-    imgSrc : null;
-    setImageSource : function(input) { 
-        this.imgSrc = input; 
-    }
+    imgSrc : null,
+    setImageSource : function(input) {  this.imgSrc = input;  },
     // the Painter interface
-    init  : function() {}
-    paint : function(renderer, destination) {}
+    init  : function() {},
+    paint : function(renderer, destination) {},
     update : function() {}
 }
 
@@ -84,10 +82,7 @@ var MovingSquarePainter = _(Painter).extend({
     myBrushes : null,
     N : 10,                 // number of images
     
-    setBrushes: function(num) {
-        this.N = num;
-        init();
-    }
+    setBrushes: function(num) { this.N = num; this.init(); },
     
     // implements painter interface
     init : function() {
@@ -112,12 +107,12 @@ var MovingSquarePainter = _(Painter).extend({
             if (imgIndex == imgSrc.getNumImages) {
                imgIndex = 0;
             }
-        }
+        });
     },
 
     update : function() {
         // update the state of each brush
-        _(this.myBrushes).each(function(brush))
+        _(this.myBrushes).each(function(brush)
         {
             // move brush within image area limits
             this.x = this.x + this.dx;
@@ -145,7 +140,7 @@ var MovingSquarePainter = _(Painter).extend({
                 brush.dx = getRandomInt(-1, 1) * (brush.size/2);
                 brush.dy = getRandomInt(-1, 1) * (brush.size/2);
             }
-        }
+        });
     }
 });
 
@@ -163,12 +158,13 @@ var ImageLoader = function(imageFiles, callback){
             }
         }
     }
-}
+};
 
 // the renderer is actually responsible for copying pixels
+
 var SimpleRenderer = {
-   
-   composite: function(src, dst, mode='copy')
+
+   composite: function(src, dst, mode)
    {
       for (var i=0; i<src.length; i+=4)
       {
@@ -177,15 +173,16 @@ var SimpleRenderer = {
          dst[i+1] = src[i+1];
          dst[i+2] = src[i+2];
       }
-   }
+   },
    
    renderBrush: function (brush, source, destination) {
-   if (brush.shape=='square') 
-   {
-      var srcData = source.getImageData(brush.x, brush.y, brush.size, brush.size);
-      var destImageData = this.canvas.getImageData(brush.x, brush.y, brush.size, brush.size);
-      composite(imageData.data, destImageData.data);
-      destination.putImageData(imageData, this.x, this.y);
+     if (brush.shape=='square') 
+     {
+        var srcData = source.getImageData(brush.x, brush.y, brush.size, brush.size);
+        var destImageData = this.canvas.getImageData(brush.x, brush.y, brush.size, brush.size);
+        composite(imageData.data, destImageData.data, 'copy');
+        destination.putImageData(imageData, this.x, this.y);
+     }
    }
 }
 
@@ -196,12 +193,12 @@ var Main = function(dstCanvas){
     // - load images <TODO>: call imageloader here
 
     var myPainter = MovingSquarePainter();
-    myPainter.setImageSource( <TODO> );
+    myPainter.setImageSource( ImageSource() );
     
     var myRenderer = SimpleRenderer();
     
     // - start main loop
-    window.requestAnimationFrame(function(0){
+    window.requestAnimationFrame(function(){
        myPainter.paint(myRenderer, dstCanvas);
        myPainter.update();
     });
