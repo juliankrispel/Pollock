@@ -186,12 +186,7 @@ var SimpleRenderer = {
    }
 }
 
-// main application
-
-var Main = function(dstCanvas){
-    
-    // - load images <TODO>: call imageloader here
-
+var MainLoop = function(images){
     var myPainter = MovingSquarePainter();
     myPainter.setImageSource( ImageSource() );
     
@@ -203,3 +198,13 @@ var Main = function(dstCanvas){
        myPainter.update();
     });
 }
+
+var dstCanvas = null;
+
+// main application
+var StartApp = function(renderTarget){
+    dstCanvas = renderTarget;
+    ImageLoader( new Array("img/01.jpg","img/02.jpg","img/03.jpg","img/04.jpg"), MainLoop );
+}
+
+StartApp(document.getElementById('canvas'));
