@@ -35,7 +35,7 @@ var percentTrue = function(p) {
 
 var getRandomInt = function(lo,hi)
 {
-    Math.round(getRandom(lo,hi));
+    return Math.round(getRandom(lo,hi));
 }
 
 // ---------------------------------
@@ -169,6 +169,10 @@ var MovingSquarePainter =  {
                     brush.dx = getRandom(-1, 1) * (brush.size/2);
                     brush.dy = getRandom(-1, 1) * (brush.size/2);
                 }
+                if (brush.x == NaN || brush.y == NaN || brush.dx == NaN || brush.dy == NaN || brush.size==NaN)
+                {
+                    alert(brush);
+                }
             }
         };
 
@@ -211,12 +215,19 @@ var SimpleRenderer = {
               }
         };
 
+        renderer.getBrushData = function (brush, context)
+        {
+            return context.getImageData(Math.round(brush.x), Math.round(brush.y), Math.round(brush.size), Math.round(brush.size));
+        }
+
         renderer.renderBrush = function (brush, source, destination) 
         {
             if (brush.shape=='square') 
             {
-                var srcData = source.getImageData(brush.x, brush.y, brush.size, brush.size);
-                var destData = destination.getImageData(brush.x, brush.y, brush.size, brush.size);
+                var srcContext = source.imca.getContext('2d');
+                //var dstContext = destination.imca.getContext('2d');
+                var srcData = this.getBrushData(brush, srcContext);
+                var destData = this.getBrushData(brush, destination)
                 this.composite(srcData.data, destData.data, 'copy');
                 destination.putImageData(destData, brush.x, brush.y);
             }
@@ -230,14 +241,14 @@ var MainLoop = function(images){
    
     var imgSource = ImageSource.createNew();
     imgSource.setSize(images[0].width, images[0].height);
-    for(i=0;i<images.length;++i)
+    for(var i=0;i<images.length;++i)
     {
-        var imca    = document.createElement('canvas');
-        imca.width  = images[i].width;
-        imca.height = images[i].height;
-        var context = imca.getContext('2d');
+        images[i].imca    = document.createElement('canvas');
+        images[i].imca.width  = images[i].width;
+        images[i].imca.height = images[i].height;
+        context = images[i].imca.getContext('2d');
         context.drawImage (images[i],0,0)
-        imgSource.addImage(context);
+        imgSource.addImage(images[i]);
     }
 
     myPainter = MovingSquarePainter.createNew();
