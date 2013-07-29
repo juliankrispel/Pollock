@@ -265,7 +265,7 @@ var MainLoop = function(images){
     //    myPainter.paint(myRenderer, dstCanvas);
     //    myPainter.update();
     // });
-    //testPos = 0;
+    // testPos = 0;
 
     var Loop = function()
     {
@@ -273,9 +273,9 @@ var MainLoop = function(images){
         //testPos++;
           myPainter.paint(myRenderer, dstContext);
           myPainter.update();
-          window.setTimeout(Loop,1000/10)
+          window.setTimeout(Loop,1000/100)
     };
-    window.setTimeout(Loop, 1000/10);
+    window.setTimeout(Loop, 1000/100);
 
 };
 
