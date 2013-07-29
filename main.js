@@ -119,7 +119,7 @@ var MovingSquarePainter =  {
                 this.myBrushes[i].setState(
                     getRandom(0,this.imgSrc.W-1),
                     getRandom(0,this.imgSrc.H-1),
-                    10,'square');
+                    10,'circle');
             }
         };
         // ------------------------------- paint
@@ -150,19 +150,22 @@ var MovingSquarePainter =  {
                 if (brush.x > this.imgSrc.W) { brush.x = this.imgSrc.W; }
                 brush.y = brush.y + brush.dy;            
                 if (brush.y < 0) { brush.y = 0; }
-                if (brush.y > this.imgSrc.W) { brush.y = this.imgSrc.H; }
+                if (brush.y > this.imgSrc.H) { brush.y = this.imgSrc.H; }
                 
                 //Reset brush every now and then
                 if(percentTrue(30))
                 {
-                    brush.size=getRandomInt(5,10);
+                    brush.size=getRandomInt(7,15);
                 }
 
                 //Respawn every now and then
                 if(percentTrue(5))
                 {
-                    brush.x = getRandom(1,this.imgSrc.W);
-                    brush.y = getRandom(1,this.imgSrc.H);
+                    var i=0;
+                    while (i<100) {
+                        brush.x = getRandom(1,this.imgSrc.W);
+                        brush.y = getRandom(1,this.imgSrc.H);
+                    }
                 }
 
                 //Change direction every now and then
@@ -205,14 +208,14 @@ var SimpleRenderer = {
 
     createNew : function() {
         var renderer = {};
-        renderer.composite = function(src, dst, mode)
+        renderer.blendBlock = function(src, dst)
         {
               for (var i=0; i<src.length; i+=4)
               {
-                 // just copy for now
-                 dst[i] = src[i];
-                 dst[i+1] = src[i+1];
-                 dst[i+2] = src[i+2];
+                 // simple blend: use dst[i] for everyone for a interesting effect
+                 dst[i] = (src[i]+dst[i])/2;
+                 dst[i+1] = (src[i+1]+dst[i+1])/2;
+                 dst[i+2] = (src[i+2]+dst[i+2])/2;
               }
         };
 
@@ -221,19 +224,45 @@ var SimpleRenderer = {
             return context.getImageData(Math.round(brush.x), Math.round(brush.y), Math.round(brush.size), Math.round(brush.size));
         }
 
-        renderer.renderBrush = function (brush, source, destination) 
+        renderer.blend = function(src, dst, alpha)
         {
-            if (brush.shape=='square') 
-            {
-                var srcContext = source.imca.getContext('2d');
-                //var dstContext = destination.imca.getContext('2d');
-                var srcData = this.getBrushData(brush, srcContext);
-                var destData = this.getBrushData(brush, destination)
-                this.composite(srcData.data, destData.data, 'copy');
-                destination.putImageData(destData, brush.x, brush.y);
-            }
+            return Math.round(alpha * src + (1-alpha) * dst);
         }
 
+        renderer.renderBrush = function (brush, source, destination) 
+        {
+            var srcContext = source.imca.getContext('2d');
+            var srcData = this.getBrushData(brush, srcContext);
+            var dstData = this.getBrushData(brush, destination)
+
+            if (brush.shape=='square') 
+            {
+                this.blendBlock(srcData.data, dstData.data);
+            }
+            if (brush.shape=='circle')
+            {
+                var x=0,y=0,cnt=brush.size/2;
+                var i=0;
+                for (var y=0;y<brush.size;++y)
+                    for (var x=0;x<brush.size;++x)
+                    {
+                        var dx = x-cnt;
+                        var dy = y-cnt;
+                        var d = Math.sqrt(dx*dx+dy*dy);
+                        var alpha = (cnt-d)/cnt;
+                        if (alpha < 0) alpha=0;
+
+                        var r = this.blend(srcData.data[i],dstData.data[i],alpha);
+                        var g = this.blend(srcData.data[i+1],dstData.data[i+1],alpha);
+                        var b = this.blend(srcData.data[i+2],dstData.data[i+2],alpha);
+                        dstData.data[i] = r;
+                        dstData.data[i+1]= g;
+                        dstData.data[i+2] = b;
+                        i+=4;
+                    }
+            }
+            destination.putImageData(dstData, brush.x, brush.y);
+        }
         return renderer;
     }
 };
@@ -284,7 +313,7 @@ var dstCanvas = null;
 // main application
 var StartApp = function(renderTarget){
     dstCanvas = renderTarget;
-    ImageLoader( new Array("img/01.jpg","img/02.jpg","img/03.jpg","img/04.jpg"), MainLoop );
+    ImageLoader( new Array("img/03.jpg","img/04.jpg","img/05.jpg"), MainLoop );
 };
 
 StartApp(document.getElementById('canvas'));
