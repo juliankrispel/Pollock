@@ -119,18 +119,18 @@ var MovingSquarePainter =  {
                 this.myBrushes[i].setState(
                     getRandom(0,this.imgSrc.W-1),
                     getRandom(0,this.imgSrc.H-1),
-                    5,'square');
+                    10,'square');
             }
         };
         // ------------------------------- paint
         painter.paint = function(renderer, dest) {
-            var imgIndex = 0;
+            var imgIndex = getRandomInt(0,this.imgSrc.getNumImages()-1);
             // render each brush, cycling through input images
             for (i=0;i<this.N;++i)
             {
                 var src = this.imgSrc.getImage(imgIndex);
                 renderer.renderBrush(this.myBrushes[i], src , dest);
-                imgIndex = imgIndex + 1;
+                imgIndex++;
                 if (imgIndex == this.imgSrc.getNumImages()) {
                    imgIndex = 0;
                 }
@@ -154,11 +154,11 @@ var MovingSquarePainter =  {
                 //Reset brush every now and then
                 if(percentTrue(30))
                 {
-                    brush.size=getRandomInt(3,7);
+                    brush.size=getRandomInt(5,10);
                 }
 
                 //Respawn every now and then
-                if(percentTrue(.3))
+                if(percentTrue(5))
                 {
                     brush.x = getRandom(1,this.imgSrc.W);
                     brush.y = getRandom(1,this.imgSrc.H);
@@ -258,14 +258,18 @@ var MainLoop = function(images){
     myRenderer = SimpleRenderer.createNew();
 
     dstContext = dstCanvas.getContext('2d');
-
+    dstContext.fillRect(0,0,dstCanvas.width, dstCanvas.height);
     // // - start main loop
     // window.requestAnimationFrame(function(){
     //    myPainter.paint(myRenderer, dstCanvas);
     //    myPainter.update();
     // });
+    //testPos = 0;
+
     var Loop = function()
     {
+        //dstContext.fillRect(testPos,testPos,testPos+10,testPos+10);
+        //testPos++;
           myPainter.paint(myRenderer, dstContext);
           myPainter.update();
           window.setTimeout(Loop,1000/10)
