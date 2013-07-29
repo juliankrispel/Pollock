@@ -124,7 +124,8 @@ var MovingSquarePainter =  {
         };
         // ------------------------------- paint
         painter.paint = function(renderer, dest) {
-            var imgIndex = getRandomInt(0,this.imgSrc.getNumImages()-1);
+            //var imgIndex = getRandomInt(0,this.imgSrc.getNumImages()-1);
+            var imgIndex = 0;
             // render each brush, cycling through input images
             for (i=0;i<this.N;++i)
             {
@@ -187,7 +188,7 @@ var ImageLoader = function(imageFiles, callback){
     for(var i = 0; i < imageFiles.length; i++){
         var img = new Image();
         img.onload = function(){
-            images.push(img);
+            images.push(this);
 
             // Call callback when done loading images and pass images as argument
             if(images.length == imageFiles.length){
