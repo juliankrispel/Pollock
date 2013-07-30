@@ -161,11 +161,8 @@ var MovingSquarePainter =  {
                 //Respawn every now and then
                 if(percentTrue(5))
                 {
-                    var i=0;
-                    while (i<100) {
-                        brush.x = getRandom(1,this.imgSrc.W);
-                        brush.y = getRandom(1,this.imgSrc.H);
-                    }
+                    brush.x = getRandom(1,this.imgSrc.W);
+                    brush.y = getRandom(1,this.imgSrc.H);
                 }
 
                 //Change direction every now and then
