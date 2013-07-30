@@ -1,52 +1,3 @@
-var itemName = window.location.hash;
-var storageName = 'julians-portrait';
-if(window.location.hash && itemname) storageName = storageName + '#' + itemName;
-var cache = window.localStorage.getItem(storageName) || null;
-var currentTime = new Date();
-currentTime.setSeconds(currentTime.getSeconds() + 30);
-
-function CanvasSaver(url) {
-    this.url = url;
-     
-    this.savePNG = function(cnvs, fname) {
-        if(!cnvs || !url) return;
-        fname = fname || 'picture';
-         
-        var data = cnvs.toDataURL("image/png");
-        data = data.substr(data.indexOf(',') + 1).toString();
-         
-        var dataInput = document.createElement("input") ;
-        dataInput.setAttribute("name", 'imgdata') ;
-        dataInput.setAttribute("value", data);
-        dataInput.setAttribute("type", "hidden");
-         
-        var nameInput = document.createElement("input") ;
-        nameInput.setAttribute("name", 'name') ;
-        nameInput.setAttribute("value", fname + '.png');
-         
-        var myForm = document.createElement("form");
-        myForm.method = 'post';
-        myForm.action = url;
-        myForm.appendChild(dataInput);
-        myForm.appendChild(nameInput);
-         
-        document.body.appendChild(myForm) ;
-        myForm.submit() ;
-        document.body.removeChild(myForm) ;
-    };
-     
-    this.generateButton = function (label, cnvs, fname) {
-        var btn = document.createElement('button'), scope = this;
-        btn.innerHTML = label;
-        btn.style['class'] = 'canvassaver';
-        btn.addEventListener('click', function(){scope.savePNG(cnvs, fname);}, false);
-         
-        document.body.appendChild(btn);
-         
-        return btn;
-    };
-}
-
 (function() {
     var lastTime = 0;
     var vendors = ['webkit', 'moz'];
@@ -72,291 +23,295 @@ function CanvasSaver(url) {
         };
 }());
 
+// ----------------------- utility
 
-(function(){
-    var canvasElement = document.getElementById('canvas');
-    var w = canvas.width;
-    var h = canvas.height;
-    var brushes = [];
+var getRandom = function(lo,hi) {
+    return Math.random()*(hi-lo)+lo;
+}
 
-    canvas = canvasElement.getContext('2d');
+var percentTrue = function(p) {
+    return (Math.random() < (p/100.0))
+}
 
-    if(cache && cache !== 'undefined'){
-        cache = cache;
-    }
+var getRandomInt = function(lo,hi)
+{
+    return Math.round(getRandom(lo,hi));
+}
 
-    var images = [];
-    var imagesLoaded = 0;
-    var allImages = 6;
-
-    loadLocalImages(init);
-//    loadCameraImage();
+// ---------------------------------
 
 
-    function Camera(){
-         var videoObj = { "video": true },
-            errBack = function(error) {
-                console.log("Video capture error: ", error.code); 
-            };
-
-        this.canvas = document.createElement("canvas")
-        this.canvas.width = 840;
-        this.canvas.height = 480;
-        this.context = this.canvas.getContext("2d"),
-
-        this.video = document.createElement("video"),
-        this.video.width = 840;
-        this.video.height = 480;
-
-        var that = this;
-        // Put video listeners into place
-        if(navigator.getUserMedia) { // Standard
-            navigator.getUserMedia(videoObj, function(stream) {
-                that.video.src = stream;
-                that.video.play();
-            }, errBack);
-        } else if(navigator.webkitGetUserMedia) { // WebKit-prefixed
-            navigator.webkitGetUserMedia(videoObj, function(stream){
-                that.video.src = window.webkitURL.createObjectURL(stream);
-                that.video.play();
-            }, errBack);
+var Brush = {
+    createNew : function() {
+        var brush={};
+        brush.x = 0;
+        brush.y = 0;
+        brush.size = 0;
+        brush.shape = 0;
+        brush.setState = function(bx,by,bsize,bform) {
+            this.x = bx;
+            this.y = by;
+            this.size = bsize;
+            this.shape = bform;
         }
-
-        this.video.addEventListener('play', function(){
-            that.context.drawImage(that.video, 0, 0, 840, 480);
-            setInterval(function(){
-                that.context.drawImage(that.video, 0, 0, 840, 480);
-            },3000);
-            that.onPlay();
-        }, false);
-
+        return brush;
     }
+}
 
-    Camera.prototype.onPlay = function(){ console.log('playing'); }
-
-    function loadCameraImage(){
-        var cam = new Camera();
-        cam.onPlay = function(){
-            init(cam.context);
+// ImageSource abstracts a set of images, accesible by index
+// width and height of ImageSource correspond to 
+// the maximal width and height of images it contains
+var ImageSource = {
+    createNew : function(){
+        var imgSrc = {};
+        imgSrc.images = Array();
+        imgSrc.W = 0;
+        imgSrc.H = 0;
+        imgSrc.setSize = function(width,height) {
+            this.W = width;
+            this.H = height;
+        }
+        imgSrc.getNumImages = function() { return this.images.length; };
+        imgSrc.getImage = function(index) { return this.images[index]; };
+        imgSrc.addImage = function(img) {
+           this.images.push(img);
         };
+
+        return imgSrc;
     }
+};
 
-    function loadLocalImages(callback){
-        for(var i = 1; i < 7; i++){
-            var image = new Image();
-            image.src = 'img/0' + i + '.jpg';
-            image.imageCanvas = document.createElement('canvas');
-            image.imageCanvas.width = 910;
-            image.imageCanvas.height = 1040;
-            image.context = image.imageCanvas.getContext('2d');
+// a Painter is responsible for what is going to get drawn where
+// this object just defines the interface
+var Painter = {
+    createNew: function() {
+        var painter = {};
+        painter.imgSrc = null;
+        painter.setImageSource = function(input) {  this.imgSrc = input;  };
+        // the Painter interface
+        painter.init   = function() {};
+        painter.paint  = function(renderer, destination) { };
+        painter.update = function() {};
+        return painter;
+    }
+}
 
-            image.onload = function(){
-                this.context.drawImage(this, 0, 0, w, h );
-                imagesLoaded++;
-                images.push(this.context);
 
-                if(allImages == images.length){
-                    callback();
+// the Movingsquarepainter is a simple panter that just copies
+// rectangular parts from multiple input images to a destination image
+var MovingSquarePainter =  { 
+    createNew: function() {
+        var painter = Painter.createNew();
+        painter.myBrushes = null;
+        painter.N = 10;
+
+        painter.setBrushes = function(num) { this.N = num; this.init(); },
+
+        // implements painter interface
+        // ------------------------------- init
+        painter.init = function() {
+            // initialize brushes
+            this.myBrushes = [];
+            for (i=0;i<this.N;++i) { 
+                this.myBrushes.push(Brush.createNew()); 
+                this.myBrushes[i].dx = 1;
+                this.myBrushes[i].dy = 1;
+                this.myBrushes[i].setState(
+                    getRandom(0,this.imgSrc.W-1),
+                    getRandom(0,this.imgSrc.H-1),
+                    10,'circle');
+            }
+        };
+        // ------------------------------- paint
+        painter.paint = function(renderer, dest) {
+            //var imgIndex = getRandomInt(0,this.imgSrc.getNumImages()-1);
+            var imgIndex = 0;
+            // render each brush, cycling through input images
+            for (i=0;i<this.N;++i)
+            {
+                var src = this.imgSrc.getImage(imgIndex);
+                renderer.renderBrush(this.myBrushes[i], src , dest);
+                imgIndex++;
+                if (imgIndex == this.imgSrc.getNumImages()) {
+                   imgIndex = 0;
                 }
             }
+        };
+        // ------------------------------- update
+
+       painter.update = function() {
+            // update the state of each brush
+            for (i=0;i<this.N;++i)
+            {
+                var brush=this.myBrushes[i];
+                // move brush within image area limits
+                brush.x = brush.x + brush.dx;
+                if (brush.x < 0) { brush.x = 0; }
+                if (brush.x > this.imgSrc.W) { brush.x = this.imgSrc.W; }
+                brush.y = brush.y + brush.dy;            
+                if (brush.y < 0) { brush.y = 0; }
+                if (brush.y > this.imgSrc.H) { brush.y = this.imgSrc.H; }
+                
+                //Reset brush every now and then
+                if(percentTrue(30))
+                {
+                    brush.size=getRandomInt(7,15);
+                }
+
+                //Respawn every now and then
+                if(percentTrue(5))
+                {
+                    brush.x = getRandom(1,this.imgSrc.W);
+                    brush.y = getRandom(1,this.imgSrc.H);
+                }
+
+                //Change direction every now and then
+                if(percentTrue(80)) {
+                    brush.dx = getRandom(-1, 1) * (brush.size/2);
+                    brush.dy = getRandom(-1, 1) * (brush.size/2);
+                }
+                if (brush.x == NaN || brush.y == NaN || brush.dx == NaN || brush.dy == NaN || brush.size==NaN)
+                {
+                    alert(brush);
+                }
+            }
+        };
+
+        return painter;
+    }
+};
+
+
+
+var ImageLoader = function(imageFiles, callback){
+    var images = [];
+    for(var i = 0; i < imageFiles.length; i++){
+        var img = new Image();
+        img.onload = function(){
+            images.push(this);
+
+            // Call callback when done loading images and pass images as argument
+            if(images.length == imageFiles.length){
+                callback(images);
+            }
+        }        
+        img.src = imageFiles[i];
+    }
+};
+
+// the renderer is actually responsible for copying pixels
+
+var SimpleRenderer = {
+
+    createNew : function() {
+        var renderer = {};
+        renderer.blendBlock = function(src, dst)
+        {
+              for (var i=0; i<src.length; i+=4)
+              {
+                 // simple blend: use dst[i] for everyone for a interesting effect
+                 dst[i] = (src[i]+dst[i])/2;
+                 dst[i+1] = (src[i+1]+dst[i+1])/2;
+                 dst[i+2] = (src[i+2]+dst[i+2])/2;
+              }
+        };
+
+        renderer.getBrushData = function (brush, context)
+        {
+            return context.getImageData(Math.round(brush.x), Math.round(brush.y), Math.round(brush.size), Math.round(brush.size));
         }
-    }
 
-    function init(context){
-        canvas.fillStyle = "rgb(255,255,255)";  
-        canvas.fillRect(0, 0, w, h);
-        domEvents();
-        loadImageFromLocalStorage();
-        generateBrushs(context);
-        draw();
-    }
-
-    function domEvents(){
-        var el = document.getElementById('save');
-        var cs = new CanvasSaver('saveme.php')
-        cs.generateButton('save an image!', canvasElement, 'myimage');
-    }
-
-    function loadImageFromLocalStorage(){
-        var localImage = new Image();
-        localImage.src = cache;
-        localImage.onload = function(){
-            canvas.drawImage(localImage, 0, 0);
+        renderer.blend = function(src, dst, alpha)
+        {
+            return Math.round(alpha * src + (1-alpha) * dst);
         }
-    }
 
-    function draw(){
-        _(brushes).each(function(brush){
-            brush.move();
-        });
-        var date = new Date();
-        if(date > currentTime){
-            currentTime = date;
-            currentTime.setSeconds( currentTime.getSeconds() + 30 );
-            //var canvasImage = canvasElement.toDataURL("image/png");
-            //saveToLocalStorage();
-        }
-        requestAnimationFrame(draw);
-    }
+        renderer.renderBrush = function (brush, source, destination) 
+        {
+            var srcContext = source.imca.getContext('2d');
+            var srcData = this.getBrushData(brush, srcContext);
+            var dstData = this.getBrushData(brush, destination)
 
-    function saveToLocalStorage(){
-        try {
-            window.localStorage.setItem(storageName, canvasImage);
-        }catch(er){
-            console.log(er);
-        }
-    }
-
-    function generateBrushs(context){
-        for(var i = 0; i < 100; i++){
-            var brush = new Brush({
-                canvas: canvas,
-                imageCanvas: context || images 
-            })
-            brushes.push(brush);
-        }
-    }
-
-    function blend(under, over, mode){
-        return Math.round((over * .4) + (under * .6));
-    }
-
-    function composite(under, over, mode) {
-        for(var i = 0; i < under.length; i+=4){
-            under[i] = blend(under[i], over[i]);
-            under[i+1] = blend(under[i+1], over[i+1]);
-            under[i+2] = blend(under[i+2], over[i+2]);
-        }
-    }
-
-//    function saturate(data, amount){
-//        for(var i = 0; i < data.length; i+=4){
-//            var max = _(data).max(function(color){ return color.})
-//        
-//        }
-//    }
-
-    var Brush = function(config){
-        this.init(config);
-    }
-
-    _(Brush.prototype).extend({
-        //Defaults
-        defaults: {
-            x: 0,
-            y: 0,
-            xir: 1,
-            ydir: 1,
-            canvas: null,
-            imageCanvas: null,
-            brushWidth: 1,
-            brushHeight: 1
-        },
-
-        init: function(config){
-            //Extend new brush with passed parameters
-            _(this).extend(this.defaults, config);
-
-            if(_.isArray(this.imageCanvas)){
-                this.storeImageCanvasArray();
-                this.pickImageCanvas();
+            if (brush.shape=='square') 
+            {
+                this.blendBlock(srcData.data, dstData.data);
             }
 
-            this.resetCoordinates();
-            this.resetDirection();
-            this.resetImageData();
-        },
+            if (brush.shape=='circle')
+            {
+                var x=0,y=0,cnt=brush.size/2;
+                var i=0;
+                for (var y=0;y<brush.size;++y)
+                    for (var x=0;x<brush.size;++x)
+                    {
+                        var dx = x-cnt;
+                        var dy = y-cnt;
+                        var d = Math.sqrt(dx*dx+dy*dy);
+                        var alpha = (cnt-d)/cnt;
+                        if (alpha < 0) alpha=0;
 
-        storeImageCanvasArray: function(){
-            if(_.isArray(this.imageCanvas))
-                this.imageCanvasArray = this.imageCanvas;
-        },
-
-        pickImageCanvas: function(){
-            var max = this.imageCanvasArray.length;
-            var index = getRandomInt(0, max - 1);
-            this.imageCanvas = this.imageCanvasArray[index];
-        },
-
-        move: function(){
-            // Change the coordinates to move in the right direction
-            this.x = this.x + this.xdir;
-            this.y = this.y + this.ydir;
-
-            //Reset brush every now and then
-//            if(percentTrue(30))
-//                this.resetBrush();
-
-            //Respawn every now and then
-            if(percentTrue(.3))
-                this.resetCoordinates();
-
-            //Change direction every now and then
-            if(percentTrue(80))
-                this.resetDirection();               
-
-            //Get imageData from .imageCanvas and put it on canvas
-            if(percentTrue(30))
-                this.resetImageData();
-
-
-//            saturate(this.imageData.data, 30);
-            this.canvas.putImageData(this.imageData, this.x, this.y);
-        },
-
-        makeTransparent: function(imageData){
-            console.log(image)
-        },
-
-        resetImageData: function(){
-            this.imageData = this.imageCanvas.getImageData(this.x, this.y, this.brushWidth, this.brushHeight);
-            var destImageData = this.canvas.getImageData(this.x, this.y, this.brushWidth, this.brushHeight);
-            composite(this.imageData.data, destImageData.data);
-        },
-
-        resetCoordinates: function(){
-            this.x = getRandomInt(1, w);
-            this.y = getRandomInt(1, h);
-        },
-
-        resetDirection: function(){
-            this.xdir = getRandomInt(-1, 1) * this.brushWidth;
-            this.ydir = getRandomInt(-1, 1) * this.brushHeight;
-        },
-
-        resetBrush: function(){
-            var num = getRandom(1, 3);
-            this.brushWidth = num;
-            this.brushHeight = num;
+                        var r = this.blend(srcData.data[i],dstData.data[i],alpha);
+                        var g = this.blend(srcData.data[i+1],dstData.data[i+1],alpha);
+                        var b = this.blend(srcData.data[i+2],dstData.data[i+2],alpha);
+                        dstData.data[i] = r;
+                        dstData.data[i+1]= g;
+                        dstData.data[i+2] = b;
+                        i+=4;
+                    }
+            }
+            destination.putImageData(dstData, brush.x, brush.y);
         }
-    
-    });
+        return renderer;
+    }
+};
 
-    // Get Image Data
-    function getImageData(context, w,h){
-        //Set defaults for width and height
-        if(!w) w = 1;
-        if(!h) h = 1;
-
-        return context.getImageData(0, 0, w, h);
+var MainLoop = function(images){
+   
+    var imgSource = ImageSource.createNew();
+    imgSource.setSize(images[0].width, images[0].height);
+    for(var i=0;i<images.length;++i)
+    {
+        images[i].imca    = document.createElement('canvas');
+        images[i].imca.width  = images[i].width;
+        images[i].imca.height = images[i].height;
+        context = images[i].imca.getContext('2d');
+        context.drawImage (images[i],0,0)
+        imgSource.addImage(images[i]);
     }
 
-    // Generate random point
-    function generateRandomCoordinates(){
-        return [ getRandomInt(1, w), getRandomInt(1, h) ];
-    }
+    myPainter = MovingSquarePainter.createNew();
+    myPainter.setImageSource( imgSource );
+    myPainter.init();
 
-    function getRandomInt(min, max){
-        return Math.round(Math.random() * (max - min) + min);
-    }
+    myRenderer = SimpleRenderer.createNew();
 
-    function getRandom(min, max){
-        var num = Math.random() * (max - min) + min;
-        return num;
-    }
+    dstContext = dstCanvas.getContext('2d');
+    dstContext.fillRect(0,0,dstCanvas.width, dstCanvas.height);
+    // // - start main loop
+    // window.requestAnimationFrame(function(){
+    //    myPainter.paint(myRenderer, dstCanvas);
+    //    myPainter.update();
+    // });
+    // testPos = 0;
 
-    function percentTrue(percent){
-        return (getRandomInt(1, 100) <= percent);
-    }
+    var Loop = function()
+    {
+        //dstContext.fillRect(testPos,testPos,testPos+10,testPos+10);
+        //testPos++;
+          myPainter.paint(myRenderer, dstContext);
+          myPainter.update();
+          window.setTimeout(Loop,1000/100)
+    };
+    window.setTimeout(Loop, 1000/100);
 
-})();
+};
+
+var dstCanvas = null;
+
+// main application
+var StartApp = function(renderTarget){
+    dstCanvas = renderTarget;
+    ImageLoader( new Array("img/03.jpg","img/04.jpg","img/05.jpg"), MainLoop );
+};
+
+StartApp(document.getElementById('canvas'));
