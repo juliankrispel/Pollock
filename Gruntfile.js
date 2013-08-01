@@ -1,12 +1,18 @@
 module.exports = function(grunt){
+    grunt.loadNpmTasks('grunt-contrib-coffee');
     grunt.initConfig({
-        glob_to_multiple: {
-            expand: true,
-            flatten: true,
-            cwd: '.',
-            src: ['./*.coffee'],
-            dest: './js/',
-            ext: '.js'
+        coffee:{
+            compileJoined: {
+                options: {
+                    join: true
+                },
+                files: {
+                    'js/main.js': 'coffee/*.coffee' // concat then compile into single file
+                }
+            },
         }
     });
+    grunt.registerTask('default',[
+        'coffee'
+    ]);
 }

@@ -1,5 +1,0 @@
-
-- better registration of input images: manually match feature points (eyes, nose, mouth) and use either triangulation/quadrangulation and bilinear coordinate transformation, or something more sophisticated:
-http://cs.brown.edu/courses/csci1950-g/results/proj5/edwallac/
-
-- when creating a new (random) position of a brush, prefer "empty" regions on the image

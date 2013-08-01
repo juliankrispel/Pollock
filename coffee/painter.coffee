@@ -12,7 +12,7 @@ getRandomInt = (lo, hi) ->
 
 # Extend function taken from underscore
 extend = (obj) ->
-  each Array::slice.call(arguments_, 1), (source) ->
+  for source in Array::slice.call(arguments, 1)
     if source
       for prop of source
         obj[prop] = source[prop]
@@ -21,18 +21,18 @@ extend = (obj) ->
 # Base Class
 class Base
   constructor: (options) -> 
-    extend @config, options
+    extend @state, options
 
 # Brush Class
 class Brush extends Base
-  config: 
+  state: 
     x: 0
     y: 0
     size: 0
     shape: 0
 
   setState: () =>
-    extend @config, arguments
+    extend @state, arguments
     @
 
 
@@ -40,121 +40,106 @@ class Brush extends Base
 # width and height of ImageSource correspond to 
 # the maximal width and height of images it contains
 class ImageSource extends Base
-  config: 
-    w: 0
-    h: 0
+  state: 
+    width: 0
+    height: 0
     images: []
 
   setSize: (width, height) =>
-    @config.w = width
-    @config.h = height
+    @state.width = width
+    @state.height = height
 
-  getNumImages: =>
-    @config.images.length
+  getImageCount: =>
+    @state.images.length
 
   getImage: (index) ->
-    @images[index]
+    @state.images[index]
 
   addImage: (img) ->
-    @images.push img
+    @state.images.push img
 
 # a Painter is responsible for what is going to get drawn where
 # this object just defines the interface
-Painter = Base.extend(
-  
+class Painter extends Base
   # the Painter interface
-  config:
-    
+  state:
     #Defaults
     imgSrc: null
+    brushes: null
+    brushCount: 10
 
   init: ->
-
   paint: (renderer, destination) ->
-
   update: ->
-
-  setImageSource: (input) ->
-    @imgSrc = input
-)
+  setImageSource: (@imgSrc) ->
 
 # the MovingBrushPainter is a simple painter that just copies
 # brushes from multiple input images to a destination image
-MovingBrushPainer = createNew: ->
-  painter = new Painter
-  painter.myBrushes = null
-  painter.N = 10
-  painter.setBrushes = (num) ->
-    @N = num
-    @init()
+class MovingBrushPainter extends Painter
+  setBrushes: (num) ->
+    @state.brushCount
+    @init
 
-  
-  # implements painter interface
-  # ------------------------------- init
-  painter.init = ->
-    
+  init: =>
     # initialize brushes
-    @myBrushes = []
+    @brushes = []
     i = 0
-    while i < @N
-      @myBrushes.push Brush.createNew()
-      @myBrushes[i].dx = 1
-      @myBrushes[i].dy = 1
-      @myBrushes[i].setState getRandom(0, @imgSrc.W - 1), getRandom(0, @imgSrc.H - 1), 10, "circle"
+    while i <= @state.brushCount
+      @brushes.push new Brush
+        dx: .5
+        dy: .5
+        x: getRandom(0, @imgSrc.state.width - 1)
+        y: getRandom(0, @imgSrc.state.height - 1)
+        size: 3
+        shape: 'circle'
       ++i
 
-
-  
-  # ------------------------------- paint
-  painter.paint = (renderer, dest) ->
-    
-    #var imgIndex = getRandomInt(0,this.imgSrc.getNumImages()-1);
+  paint: (renderer, dest) =>
     imgIndex = 0
-    
+    imgCount = @imgSrc.getImageCount()
+
     # render each brush, cycling through input images
     i = 0
-    while i < @N
+    while i < @state.brushCount
       src = @imgSrc.getImage(imgIndex)
-      renderer.renderBrush @myBrushes[i], src, dest
+      renderer.renderBrush @brushes[i].state, src, dest
       imgIndex++
-      imgIndex = 0  if imgIndex is @imgSrc.getNumImages()
+      imgIndex = 0 if imgIndex is imgCount
       ++i
 
-  
-  # ------------------------------- update
-  painter.update = ->
-    
+  update: ->
     # update the state of each brush
     i = 0
-    while i < @N
-      brush = @myBrushes[i]
-      
+    while i < @state.brushCount
+      brushState = @brushes[i].state
+      imgState = @imgSrc.state
+
       # move brush within image area limits
-      brush.x = brush.x + brush.dx
-      brush.x = 0  if brush.x < 0
-      brush.x = @imgSrc.W  if brush.x > @imgSrc.W
-      brush.y = brush.y + brush.dy
-      brush.y = 0  if brush.y < 0
-      brush.y = @imgSrc.H  if brush.y > @imgSrc.H
-      
-      #Reset brush every now and then
-      brush.size = getRandomInt(7, 15)  if percentTrue(30)
-      
+      brushState.x = brushState.x + brushState.dx
+      brushState.x = 0 if brushState.x < 0
+      brushState.x = imgState.width if brushState.x > imgState.width
+
+      brushState.y = brushState.y + brushState.dy
+      brushState.y = 0 if brushState.y < 0
+      brushState.y = imgState.height if brushState.y > imgState.height
+
+      #Reset brushState every now and then
+      brushState.size = getRandomInt(2, 15) if percentTrue(30)
+
       #Respawn every now and then
-      if percentTrue(5)
-        brush.x = getRandom(1, @imgSrc.W)
-        brush.y = getRandom(1, @imgSrc.H)
-      
+      if percentTrue(.5)
+        brushState.x = getRandom(1, imgState.width)
+        brushState.y = getRandom(1, imgState.height)
+
       #Change direction every now and then
       if percentTrue(80)
-        brush.dx = getRandom(-1, 1) * (brush.size / 2)
-        brush.dy = getRandom(-1, 1) * (brush.size / 2)
-      alert brush  if brush.x is NaN or brush.y is NaN or brush.dx is NaN or brush.dy is NaN or brush.size is NaN
+        brushState.dx = getRandom(-1, 1) * (brushState.size / 2)
+        brushState.dy = getRandom(-1, 1) * (brushState.size / 2)
+      alert brushState  if brushState.x is NaN or brushState.y is NaN or brushState.dx is NaN or brushState.dy is NaN or brushState.size is NaN
       ++i
+    @
 
-  painter
-
-ImageLoader = (imageFiles, callback) ->
+loadImages = (imageFiles, callback) ->
   images = []
   i = 0
 
@@ -164,16 +149,15 @@ ImageLoader = (imageFiles, callback) ->
       images.push this
       
       # Call callback when done loading images and pass images as argument
-      callback images  if images.length is imageFiles.length
+      callback images if images.length is imageFiles.length
 
     img.src = imageFiles[i]
     i++
 
 
 # the renderer is actually responsible for copying pixels
-SimpleRenderer = createNew: ->
-  renderer = {}
-  renderer.blendBlock = (src, dst) ->
+class SimpleRenderer extends Base
+  blendBlock: (src, dst) ->
     i = 0
 
     while i < src.length
@@ -184,13 +168,16 @@ SimpleRenderer = createNew: ->
       dst[i + 2] = (src[i + 2] + dst[i + 2]) / 2
       i += 4
 
-  renderer.getBrushData = (brush, context) ->
-    context.getImageData Math.round(brush.x), Math.round(brush.y), Math.round(brush.size), Math.round(brush.size)
+  getBrushData: (brush, context) ->
+    context.getImageData Math.round(brush.x), 
+      Math.round(brush.y), 
+      Math.round(brush.size), 
+      Math.round(brush.size)
 
-  renderer.blend = (src, dst, alpha) ->
+  blend: (src, dst, alpha) ->
     Math.round alpha * src + (1 - alpha) * dst
 
-  renderer.renderBrush = (brush, source, destination) ->
+  renderBrush: (brush, source, destination) ->
     srcContext = source.imca.getContext("2d")
     srcData = @getBrushData(brush, srcContext)
     dstData = @getBrushData(brush, destination)
@@ -221,11 +208,10 @@ SimpleRenderer = createNew: ->
           ++x
         ++y
     destination.putImageData dstData, brush.x, brush.y
+    @
 
-  renderer
-
-MainLoop = (images) ->
-  imgSource = ImageSource.createNew()
+mainLoop = (images) ->
+  imgSource = new ImageSource
   imgSource.setSize images[0].width, images[0].height
   i = 0
 
@@ -237,34 +223,30 @@ MainLoop = (images) ->
     context.drawImage images[i], 0, 0
     imgSource.addImage images[i]
     ++i
-  myPainter = MovingBrushPainter.createNew()
+  myPainter = new MovingBrushPainter
   myPainter.setImageSource imgSource
   myPainter.init()
-  myRenderer = SimpleRenderer.createNew()
+
+  myRenderer = new SimpleRenderer
   dstContext = dstCanvas.getContext("2d")
   dstContext.fillRect 0, 0, dstCanvas.width, dstCanvas.height
   
-  # // - start main loop
-  # window.requestAnimationFrame(function(){
-  #    myPainter.paint(myRenderer, dstCanvas);
-  #    myPainter.update();
-  # });
-  # testPos = 0;
-  Loop = ->
+  iterate = =>
     
     #dstContext.fillRect(testPos,testPos,testPos+10,testPos+10);
     #testPos++;
     myPainter.paint myRenderer, dstContext
     myPainter.update()
-    window.requestAnimationFrame Loop
+    window.requestAnimationFrame iterate
 
-  window.requestAnimationFrame Loop
+  window.requestAnimationFrame iterate
+  null
 
 dstCanvas = null
 
 # main application
-StartApp = (renderTarget) ->
+startApp = (renderTarget) ->
   dstCanvas = renderTarget
-  ImageLoader new Array("img/03.jpg", "img/04.jpg", "img/05.jpg"), MainLoop
+  loadImages ["img/03.jpg", "img/04.jpg", "img/05.jpg"], mainLoop
 
-StartApp document.getElementById("canvas")
+startApp document.getElementById("canvas")

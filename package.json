@@ -3,5 +3,8 @@
         "bower": "*",
         "grunt": "*",
         "grunt-contrib-coffee": "*"
-    }    
+    },
+    "scripts": {
+        "build": "npm install && bower install && grunt"
+    }
 }
