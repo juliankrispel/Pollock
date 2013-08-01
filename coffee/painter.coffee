@@ -62,8 +62,8 @@ class MovingBrushPainter extends Painter
       @brushes.push new Brush
         dx: .5
         dy: .5
-        x: getRandom(0, @imgSrc.state.width - 1)
-        y: getRandom(0, @imgSrc.state.height - 1)
+        x: getRandom 0, @imgSrc.state.width - 1
+        y: getRandom 0, @imgSrc.state.height - 1
         size: 3
         shape: 'circle'
       ++i
@@ -75,7 +75,7 @@ class MovingBrushPainter extends Painter
     # render each brush, cycling through input images
     i = 0
     while i < @state.brushCount
-      src = @imgSrc.getImage(imgIndex)
+      src = @imgSrc.getImage imgIndex
       renderer.renderBrush @brushes[i].state, src, dest
       imgIndex++
       imgIndex = 0 if imgIndex is imgCount
@@ -101,14 +101,14 @@ class MovingBrushPainter extends Painter
       brushState.size = getRandomInt(2, 15) if percentTrue(30)
 
       #Respawn every now and then
-      if percentTrue(.5)
-        brushState.x = getRandom(1, imgState.width)
-        brushState.y = getRandom(1, imgState.height)
+      if percentTrue .5
+        brushState.x = getRandom 1, imgState.width
+        brushState.y = getRandom 1, imgState.height
 
       #Change direction every now and then
-      if percentTrue(80)
+      if percentTrue 80
         brushState.dx = getRandom(-1, 1) * (brushState.size / 2)
         brushState.dy = getRandom(-1, 1) * (brushState.size / 2)
-      alert brushState  if brushState.x is NaN or brushState.y is NaN or brushState.dx is NaN or brushState.dy is NaN or brushState.size is NaN
+      throw 'Brushstate has NAN - ' + brushState if brushState.x is NaN or brushState.y is NaN or brushState.dx is NaN or brushState.dy is NaN or brushState.size is NaN
       ++i
     @
