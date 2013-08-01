@@ -3,6 +3,7 @@
         "coffee-script": "*",
         "bower": "*",
         "grunt": "*",
+        "grunt-cli": "*",
         "grunt-contrib-coffee": "*",
         "grunt-contrib-watch": "*"
     },
