@@ -22,3 +22,29 @@ unless window.requestAnimationFrame
 unless window.cancelAnimationFrame
     window.cancelAnimationFrame = (id) ->
         clearTimeout id
+
+# Get a random number
+getRandom = (lo, hi) ->
+  Math.random() * (hi - lo) + lo
+
+# Return True on a @p percent chance
+percentTrue = (p) ->
+  Math.random() < (p / 100.0)
+
+# Returns a random integer
+getRandomInt = (lo, hi) ->
+  Math.round getRandom(lo, hi)
+
+# Extend function taken from underscore
+extend = (obj) ->
+  for source in Array::slice.call(arguments, 1)
+    if source
+      for prop of source
+        obj[prop] = source[prop]
+  obj
+
+# Base Class
+class Base
+  constructor: (options) -> 
+    extend @state, options
+

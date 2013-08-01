@@ -8,7 +8,12 @@ module.exports = function(grunt){
                     join: true
                 },
                 files: {
-                    'js/main.js': 'coffee/*.coffee' // concat then compile into single file
+                    'js/main.js': [
+                        'coffee/util.coffee', 
+                        'coffee/painter.coffee',
+                        'coffee/renderer.coffee',
+                        'coffee/loop.coffee',
+                    ] // concat then compile into single file
                 }
             },
         },
