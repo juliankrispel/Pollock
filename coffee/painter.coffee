@@ -43,9 +43,14 @@ class Painter extends Base
     brushes: null
     brushCount: 10
     brushShape: 'circle'
+    minBrushSize: 3
+    maxBrushSize: 10
     brushSize: 3
     brushDx: 1
     brushDy: 1
+    chanceDirection: 20
+    chanceSize: 20
+    chanceRespawn: 20
 
   init: ->
   paint: (renderer, destination) ->
@@ -102,16 +107,18 @@ class MovingBrushPainter extends Painter
       @brushes[i].state.y = 0 if @brushes[i].state.y < 0
       @brushes[i].state.y = imgState.height if @brushes[i].state.y > imgState.height
 
-      #Reset @brushes[i].state every now and then
-      @brushes[i].state.size = getRandomInt(2, 15) if percentTrue(30)
+      @brushes[i].state.shape = @state.brushShape
+
+      #Reset brushsize every now and then
+      @brushes[i].state.size = getRandomInt(@state.minBrushSize, @state.maxBrushSize) if percentTrue @state.chanceSize
 
       #Respawn every now and then
-      if percentTrue .5
+      if percentTrue @state.chanceRespawn
         @brushes[i].state.x = getRandom 1, imgState.width
         @brushes[i].state.y = getRandom 1, imgState.height
 
       #Change direction every now and then
-      if percentTrue 80
+      if percentTrue @state.chanceDirection
         @brushes[i].state.dx = getRandom(-1, 1) * (@brushes[i].state.size / 2)
         @brushes[i].state.dy = getRandom(-1, 1) * (@brushes[i].state.size / 2)
       throw 'Brushstate has NAN - ' + @brushes[i].state if @brushes[i].state.x is NaN or @brushes[i].state.y is NaN or @brushes[i].state.dx is NaN or @brushes[i].state.dy is NaN or @brushes[i].state.size is NaN

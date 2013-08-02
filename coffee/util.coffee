@@ -45,5 +45,5 @@ extend = (obj) ->
 
 # Base Class
 class Base
-  constructor: (options) -> 
+  constructor: (options) ->
     @state = extend _(@defaults).clone(), options
