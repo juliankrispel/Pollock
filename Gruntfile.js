@@ -14,8 +14,8 @@ module.exports = function(grunt){
                         'coffee/renderer.coffee',
                         'coffee/loop.coffee',
                     ],
-                    'example/js/main.js': [
-                        'example/coffee/main.coffee'
+                    'js/ui.js': [
+                        'coffee/ui.coffee'
                     ]
                 }
             },
