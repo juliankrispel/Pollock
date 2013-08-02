@@ -1,0 +1,39 @@
+<!DOCTYPE HTML>
+<html lang="en" ng-app="PainterApp">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        body{
+            background: #eee;
+        }
+
+        canvas{
+            background: #fff;
+            -webkit-box-shadow: 2px 2px 5px #ccc;
+        }
+    </style>
+</head>
+<body ng-controller="PainterCtrl">
+    <form>
+        <label for="size">Brush Size</label>
+        <input id="size" ng-model="size" type="text"/>
+        <label for="shape">Brush Shape</label>
+        <select id="shape" ng-model="shape">
+            <option>Circle</option>
+            <option>Square</option>
+        </select>
+        <label for="directionchange">Chance for a change of direction</label>
+        <input id="directionchange" ng-model="chanceDirectionChange"/>
+        <label for="chanceRespawn">Chance for a respawn</label>
+        <input id="chanceRespawn" ng-model="chanceRespawn"/>
+        <label for="chanceChangeSize">Chance for changing brushsize</label>
+        <input id="chanceChangeSize" ng-model="chanceRespawn"/>
+    </form>
+    <canvas canvas-painter id="canvas" width="770" height="1024">
+</body>
+<script src="bower_components/underscore/underscore-min.js"></script>
+<script src="js/painter.js"></script>
+<script src="bower_components/angular/angular.min.js"></script>
+<script src="example/js/main.js"></script>
+</html>

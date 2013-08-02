@@ -46,5 +46,4 @@ extend = (obj) ->
 # Base Class
 class Base
   constructor: (options) -> 
-    extend @state, options
-
+    @state = extend @defaults, options

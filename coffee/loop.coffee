@@ -1,3 +1,5 @@
+myPainter = new MovingBrushPainter
+
 loadImages = (imageFiles, callback) ->
   images = []
   i = 0
@@ -28,16 +30,16 @@ mainLoop = (images) ->
     context.drawImage images[i], 0, 0
     imgSource.addImage images[i]
     ++i
-  myPainter = new MovingBrushPainter
+
   myPainter.setImageSource imgSource
   myPainter.init()
 
   myRenderer = new SimpleRenderer
   dstContext = dstCanvas.getContext("2d")
   dstContext.fillRect 0, 0, dstCanvas.width, dstCanvas.height
-  
+
   iterate = =>
-    
+
     #dstContext.fillRect(testPos,testPos,testPos+10,testPos+10);
     #testPos++;
     myPainter.paint myRenderer, dstContext
@@ -50,8 +52,10 @@ mainLoop = (images) ->
 dstCanvas = null
 
 # main application
-startApp = (renderTarget) ->
+window.startPainter = (renderTarget, callback) ->
   dstCanvas = renderTarget
-  loadImages ["img/03.jpg", "img/04.jpg", "img/05.jpg"], mainLoop
-
-startApp document.getElementById("canvas")
+  loadImages ["img/03.jpg", "img/04.jpg", "img/05.jpg"], 
+    (images) -> 
+        mainLoop images
+        # Pass the reference to myPainter back to UI
+        callback myPainter if callback
