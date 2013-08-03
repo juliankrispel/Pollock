@@ -78,6 +78,7 @@ class MovingBrushPainter extends Painter
         size: @state.brushSize
         shape: @state.brushShape
       ++i
+  @
 
   paint: (renderer, dest) =>
     imgIndex = 0
@@ -93,34 +94,36 @@ class MovingBrushPainter extends Painter
       ++i
 
   update: ->
-    # update the state of each brush
-    i = 0
-    while i < @state.brushCount
+
+    clamp = (val, delta, min, max) ->
+       v = val + delta
+       v = min if v < min
+       v = max if v > max
+       v
+
+    for br in @brushes
+      brush = br.state
       imgState = @state.imgSrc.state
-
+      
       # move brush within image area limits
-      @brushes[i].state.x = @brushes[i].state.x + @brushes[i].state.dx
-      @brushes[i].state.x = 0 if @brushes[i].state.x < 0
-      @brushes[i].state.x = imgState.width if @brushes[i].state.x > imgState.width
+      brush.x = clamp(brush.x,brush.dx,0,imgState.width)
+      brush.y = clamp(brush.y,brush.dy,0,imgState.height)
+      
+      brush.shape = @state.brushShape
+      
+      # Reset brushsize every now and then
+      if percentTrue @state.chanceSize
+        brush.size = getRandomInt(@state.minBrushSize, @state.maxBrushSize) 
 
-      @brushes[i].state.y = @brushes[i].state.y + @brushes[i].state.dy
-      @brushes[i].state.y = 0 if @brushes[i].state.y < 0
-      @brushes[i].state.y = imgState.height if @brushes[i].state.y > imgState.height
-
-      @brushes[i].state.shape = @state.brushShape
-
-      #Reset brushsize every now and then
-      @brushes[i].state.size = getRandomInt(@state.minBrushSize, @state.maxBrushSize) if percentTrue @state.chanceSize
-
-      #Respawn every now and then
+      # Respawn every now and then
       if percentTrue @state.chanceRespawn
-        @brushes[i].state.x = getRandom 1, imgState.width
-        @brushes[i].state.y = getRandom 1, imgState.height
+        brush.x = getRandom 1, imgState.width
+        brush.y = getRandom 1, imgState.height
 
-      #Change direction every now and then
+      # Change direction every now and then
       if percentTrue @state.chanceDirection
-        @brushes[i].state.dx = getRandom(-1, 1) * (@brushes[i].state.size / 2)
-        @brushes[i].state.dy = getRandom(-1, 1) * (@brushes[i].state.size / 2)
-      throw 'Brushstate has NAN - ' + @brushes[i].state if @brushes[i].state.x is NaN or @brushes[i].state.y is NaN or @brushes[i].state.dx is NaN or @brushes[i].state.dy is NaN or @brushes[i].state.size is NaN
-      ++i
+        brush.dx = getRandom(-1, 1) * (brush.size / 2)
+        brush.dy = getRandom(-1, 1) * (brush.size / 2)
     @
+
+
