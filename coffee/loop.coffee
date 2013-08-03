@@ -39,9 +39,6 @@ mainLoop = (images) ->
   dstContext.fillRect 0, 0, dstCanvas.width, dstCanvas.height
 
   iterate = =>
-
-    #dstContext.fillRect(testPos,testPos,testPos+10,testPos+10);
-    #testPos++;
     myPainter.paint myRenderer, dstContext
     myPainter.update()
     window.requestAnimationFrame iterate
@@ -54,7 +51,7 @@ dstCanvas = null
 # main application
 window.startPainter = (renderTarget, callback) ->
   dstCanvas = renderTarget
-  loadImages ["img/03.jpg", "img/04.jpg", "img/05.jpg"], 
+  loadImages ["img/02.jpg", "img/03.jpg", "img/04.jpg", "img/05.jpg", "img/07.jpg", "img/08.jpg"], 
     (images) -> 
         mainLoop images
         # Pass the reference to myPainter back to UI

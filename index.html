@@ -18,10 +18,11 @@
     <form>
         <label for="size">Brush Size</label>
         <input type="number" id="size" ng-model="painter.size" type="text"/><br />
-        <label for="shape">Brush Shape</label>
-        <select id="shape" ng-model="painter.brushShape">
+        <label for="type">Brush Shape</label>
+        <select id="type" ng-model="painter.brushType">
             <option value="circle">Circle</option>
             <option value="square">Square</option>
+            <option value="weird">Weird</option>
         </select><br />
         <label for="minBrushSize">Minimum Brush Size</label>
         <input id="minBrushSize" type="number" ng-model="painter.minBrushSize"/><br />

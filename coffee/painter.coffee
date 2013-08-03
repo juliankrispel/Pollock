@@ -5,11 +5,7 @@ class Brush extends Base
     x: 0
     y: 0
     size: 0
-    shape: 0
-
-  setState: () =>
-    @state = extend @defaults, arguments
-    @
+    type: 0
 
 # ImageSource abstracts a set of images, accesible by index
 # width and height of ImageSource correspond to 
@@ -42,9 +38,10 @@ class Painter extends Base
     imgSrc: null
     brushes: null
     brushCount: 10
-    brushShape: 'circle'
-    minBrushSize: 3
-    maxBrushSize: 10
+    brushType: 'circle'
+    brushBlend: 'alpha'
+    minBrushSize: 1
+    maxBrushSize: 15
     brushSize: 3
     brushDx: 1
     brushDy: 1
@@ -76,7 +73,7 @@ class MovingBrushPainter extends Painter
         x: getRandom 0, @state.imgSrc.state.width - 1
         y: getRandom 0, @state.imgSrc.state.height - 1
         size: @state.brushSize
-        shape: @state.brushShape
+        type: @state.brushType
       ++i
   @
 
@@ -104,12 +101,12 @@ class MovingBrushPainter extends Painter
     for br in @brushes
       brush = br.state
       imgState = @state.imgSrc.state
-      
+
       # move brush within image area limits
       brush.x = clamp(brush.x,brush.dx,0,imgState.width)
       brush.y = clamp(brush.y,brush.dy,0,imgState.height)
       
-      brush.shape = @state.brushShape
+      brush.type = @state.brushType
       
       # Reset brushsize every now and then
       if percentTrue @state.chanceSize
