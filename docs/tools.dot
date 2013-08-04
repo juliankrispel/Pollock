@@ -1,0 +1,15 @@
+digraph G {
+	Tool [shape=record,label="Tool|{top|left|width|height|opacity|blend}|getAlphaField()"];
+	Brush [shape=record,label="Brush"];
+	Line [shape=record,label="Line|{x1,y1|x2,y2}"];
+	Curve [shape=record,label="Curve|{x1,y1|x2,y2|x3,y3}"];
+	SquareBrush [shape=record]
+	CircleBrush [shape=record]
+
+	Tool -> Brush;
+	Tool -> Line;
+	Tool -> Curve;
+ 
+    Brush -> SquareBrush;                           
+    Brush -> CircleBrush;
+}
