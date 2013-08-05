@@ -1,6 +1,6 @@
 digraph G {
-	Tool [shape=record,label="Tool|{top|left|width|height|opacity|blend}|getAlphaField()"];
-	Brush [shape=record,label="Brush"];
+	Tool [shape=record,label="Tool|{top|left|width|height|opacity|blend}"];
+	Brush [shape=record,label="Brush|getAlphaField()"];
 	Line [shape=record,label="Line|{x1,y1|x2,y2}"];
 	Curve [shape=record,label="Curve|{x1,y1|x2,y2|x3,y3}"];
 	SquareBrush [shape=record]
@@ -10,6 +10,13 @@ digraph G {
 	Tool -> Line;
 	Tool -> Curve;
  
-    Brush -> SquareBrush;                           
-    Brush -> CircleBrush;
+  Brush -> SquareBrush;                           
+  Brush -> CircleBrush;
+  
+  Mutare [shape=record,label="Mutare|{min|max|default|mode}|{update()|getValue()}"];
+  MutareReal [shape=record]
+  MutareInteger [shape=record]
+  
+  Mutare -> MutareReal;
+  Mutare -> MutareInteger;
 }
