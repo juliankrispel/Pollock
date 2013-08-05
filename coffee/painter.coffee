@@ -1,4 +1,62 @@
-l = 0;
+
+# alterable properties
+# mode is one of
+# - discrete : 
+class Mutare
+  min: 0
+  max: 10
+
+  value: 5
+  current: 5
+  target: 5
+
+  ctr: 1
+  cycleLength: 10
+  cycleMin: 5
+  cycleMax: 20
+  mode: 'discrete'
+  cycle: 'regular'
+
+  initialize : (mi,ma,de) =>
+    @min = mi
+    @max = ma
+    @def = de
+
+  update : =>
+    switch(mode)
+      when "discrete" 
+        --@ctr
+        if @ctr 0
+          @newValue()
+          @ctr = @cycleLength
+          @current = @target
+      when "linp" 
+        --@ctr
+        if @ctr 0
+          @newValue()
+          @ctr = @cycleLength
+        @current = @value + (@target-@value)*(@ctr/@cycleLength);
+    @
+
+  newValue : =>
+    @value=@target
+    @target=getRandom(min,max)
+
+  newCycle : =>
+    switch(cycle)
+      when "irregular"
+        @cycleLength = getRandomInt(cycleMin,cycleMax);
+
+    @ctr = @cycleLength
+
+  valueOf : =>
+    @current
+
+class MutareInteger extends Mutare
+  valueOf : =>
+    Math.round(@current)
+
+
 # Brush Class
 class Brush extends Base
   defaults: 

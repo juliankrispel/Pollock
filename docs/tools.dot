@@ -13,7 +13,7 @@ digraph G {
   Brush -> SquareBrush;                           
   Brush -> CircleBrush;
   
-  Mutare [shape=record,label="Mutare|{min|max|default|mode}|{update()|getValue()}"];
+  Mutare [shape=record,label="Mutare|{min|max|default|mode=[disc,linp]}|{update()|getValue()}"];
   MutareReal [shape=record]
   MutareInteger [shape=record]
   
