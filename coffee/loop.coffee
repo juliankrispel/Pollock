@@ -48,6 +48,12 @@ mainLoop = (images) ->
 
 dstCanvas = null
 
+#test = new MutableTest()
+#test.runTest()
+
+#window.startPainter = ->
+  
+
 # main application
 window.startPainter = (renderTarget, callback) ->
   dstCanvas = renderTarget

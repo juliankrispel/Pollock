@@ -2,37 +2,32 @@
 # alterable properties
 # mode is one of
 # - discrete : 
-class Mutare
-  min: 0
-  max: 10
+class Mutable
 
-  value: 5
-  current: 5
-  target: 5
-
-  ctr: 1
-  cycleLength: 10
-  cycleMin: 5
-  cycleMax: 20
-  mode: 'discrete'
-  cycle: 'regular'
-
-  initialize : (mi,ma,de) =>
-    @min = mi
-    @max = ma
-    @def = de
+  constructor: (min, max, val) ->
+     @min = min
+     @max = max
+     @value = val
+     @current = val
+     @target  = val
+     @ctr = 1
+     @cycleLength = 3
+     @cycleMin = 5
+     @cycleMax = 20
+     @mode = 'discrete'
+     @cycle = 'regular'
 
   update : =>
-    switch(mode)
+    switch(@mode)
       when "discrete" 
         --@ctr
-        if @ctr 0
+        if @ctr == 0
           @newValue()
           @ctr = @cycleLength
           @current = @target
       when "linp" 
         --@ctr
-        if @ctr 0
+        if @ctr == 0
           @newValue()
           @ctr = @cycleLength
         @current = @value + (@target-@value)*(@ctr/@cycleLength);
@@ -40,21 +35,34 @@ class Mutare
 
   newValue : =>
     @value=@target
-    @target=getRandom(min,max)
+    @target=getRandom(@min,@max)
 
   newCycle : =>
     switch(cycle)
       when "irregular"
-        @cycleLength = getRandomInt(cycleMin,cycleMax);
+        @cycleLength = getRandomInt(@cycleMin,@cycleMax);
 
     @ctr = @cycleLength
 
   valueOf : =>
     @current
 
-class MutareInteger extends Mutare
+class MutableInteger extends Mutable
   valueOf : =>
     Math.round(@current)
+
+
+class MutableTest
+  constructor: ->
+    @A = new Mutable(1,10,5)
+    @B = new MutableInteger(1,10,5)
+
+  runTest: ->
+    for run in [1..10]
+      @A.update()
+      console.log(0+@A)
+      @B.update()
+      console.log(0+@B)
 
 
 # Brush Class
