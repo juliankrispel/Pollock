@@ -17,7 +17,7 @@ class Mutable
      @mode = 'discrete'
      @cycle = 'regular'
 
-  update : =>
+  update : ->
     switch(@mode)
       when "discrete" 
         --@ctr
@@ -33,23 +33,37 @@ class Mutable
         @current = @value + (@target-@value)*(@ctr/@cycleLength);
     @
 
-  newValue : =>
+  newValue : ->
     @value=@target
     @target=getRandom(@min,@max)
 
-  newCycle : =>
+  newCycle : ->
     switch(cycle)
       when "irregular"
         @cycleLength = getRandomInt(@cycleMin,@cycleMax);
 
     @ctr = @cycleLength
 
-  valueOf : =>
+  valueOf : ->
     @current
 
 class MutableInteger extends Mutable
-  valueOf : =>
+  valueOf : ->
     Math.round(@current)
+
+# MutableController is global
+class MutableController
+   mutables : []
+
+   registerMutable: ( m ) ->
+      @mutables.push(m)
+
+   removeMutable:   ( m ) ->
+      i = @mutables.indexOf(m)
+      @mutables.splice(i, 1) if i != -1
+
+   update : ->
+      m.update() for m in mutables
 
 
 class MutableTest
@@ -63,7 +77,6 @@ class MutableTest
       console.log(0+@A)
       @B.update()
       console.log(0+@B)
-
 
 # Brush Class
 class Brush extends Base
