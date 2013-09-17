@@ -16,6 +16,15 @@
 </head>
 <body ng-controller="PainterCtrl">
     <form>
+        <small>Images</small><br />
+        <ul>
+            <li ng-repeat="img in painter.images">
+            <input ng-model="img.url" type="text"/><img height="50" src="{{img.url}}"/><button ng-click="removeImage($index)">x</button>
+            </li>
+            <li><button ng-click="addImage()">add_image</button></li>
+        </ul>
+        <button ng-click="start()">Start</button>
+        <button ng-click="stop()">Stop</button><br />
         <label for="size">Brush Size</label>
         <input type="number" id="size" ng-model="painter.size" type="text"/><br />
         <label for="type">Brush Shape</label>

@@ -12,7 +12,7 @@ loadImages = (imageFiles, callback) ->
       # Call callback when done loading images and pass images as argument
       callback images if images.length is imageFiles.length
 
-    img.src = imageFiles[i]
+    img.src = imageFiles[i].url
     i++
 
   null
@@ -48,17 +48,11 @@ mainLoop = (images) ->
 
 dstCanvas = null
 
-#test = new MutableTest()
-#test.runTest()
-
-#window.startPainter = ->
-  
-
 # main application
-window.startPainter = (renderTarget, callback) ->
+window.startPainter = (renderTarget, images, callback) ->
   dstCanvas = renderTarget
-  loadImages ["img/02.jpg", "img/03.jpg", "img/04.jpg", "img/05.jpg", "img/07.jpg", "img/08.jpg"], 
-    (images) -> 
+  loadImages images, 
+    (images) ->
         mainLoop images
         # Pass the reference to myPainter back to UI
         callback myPainter if callback
