@@ -62,19 +62,23 @@ class MutableController
       @mutables.splice(i, 1) if i != -1
 
    update : ->
-      m.update() for m in mutables
+      m.update() for m in @mutables
 
 
 class MutableTest
   constructor: ->
 
   runTest: ->
+    @mc = new MutableController()
     @A = new Mutable(1,10,5)
+    @A.cycleLength = 3
     @B = new MutableInteger(1,10,5)
-    MutableController.registerMutable(@A)
-    MutableController.registerMutable(@B)
+    @B.cycleLength = 4
+    @mc.registerMutable(@A)
+    @mc.registerMutable(@B)
 
     for i in [1..10]
-      MutableController.update()
+      @mc.update()
+      console.log("A:" + @A.valueOf() + " B:" + @B.valueOf())
 
 window.MutableTest = new MutableTest()
