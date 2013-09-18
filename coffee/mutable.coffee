@@ -10,7 +10,7 @@ class RandomIntervalNumber
   newValue : ->
     @val = getRandom(@min, @max)
   
-  interpolate : (target, t)
+  interpolate : (target, t) ->
     @val*(1-t) + (target.val)*t
 
   valueOf : ->
@@ -26,14 +26,16 @@ class RandomPosition
     @x.newValue()
     @y.newValue()
     
-  interpolate : (target,t)
-    @
+  interpolate : (target,t) ->
+    # TODO: insert interpolation here
     
   valueOf : ->
     { x: @x, y: @y }
     
 # ----------------------------------------------------
-
+# TODO: extend RandomIntervalnumber and RandomPosition
+#       with Mutable, remove min/max/value from mutable
+#       update testcases
 class Mutable
 
   constructor: (min, max, val) ->
