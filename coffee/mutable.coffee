@@ -1,6 +1,39 @@
 # alterable properties
-# mode is one of
-# - discrete : 
+
+class RandomIntervalNumber
+  
+  constructor : (min, max) ->
+    @min = min
+    @max = max
+    newValue()
+  
+  newValue : ->
+    @val = getRandom(@min, @max)
+  
+  interpolate : (target, t)
+    @val*(1-t) + (target.val)*t
+
+  valueOf : ->
+    @val
+
+class RandomPosition
+
+  constructor : (t,l,b,r) ->
+    @x = new RandomIntervalNumber(l,r)
+    @y = new RandomIntervalNumber(t,b)
+    
+  newValue : ->
+    @x.newValue()
+    @y.newValue()
+    
+  interpolate : (target,t)
+    @
+    
+  valueOf : ->
+    { x: @x, age: @y }
+    
+# ----------------------------------------------------
+
 class Mutable
 
   constructor: (min, max, val) ->
