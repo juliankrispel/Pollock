@@ -1,10 +1,10 @@
 # helpers
-extendOBJ = (obj, mixin) ->
-  obj[name] = method for name, method of mixin        
-  obj
-
-includePROT = (klass, mixin) ->
-  extend klass.prototype, mixin
+#extendOBJ = (obj, mixin) ->
+#  obj[name] = method for name, method of mixin        
+#  obj
+#
+#includePROT = (klass, mixin) ->
+#  extend klass.prototype, mixin
 
 
 class Module
@@ -38,6 +38,7 @@ class RandomIntervalNumber
   
   constructor : () ->
     @myClass = RandomIntervalNumber
+    @val = 0
 
   assign : (from) ->
     @setRange(from.min,from.max)
@@ -71,17 +72,19 @@ class RandomPosition
     @myClass = RandomPosition
   
   setRange : (l,r,t,b) ->
-    @x = new RandomIntervalNumber(l,r)
-    @y = new RandomIntervalNumber(t,b)
+    @x = new RandomIntervalNumber().setRange(l,r)
+    @y = new RandomIntervalNumber().setRange(t,b)
     @
 
   assign : (from) ->
-    @x.assign(from.x)
-    @y.assign(from.y)
+    @setRange(from.x.min,from.x.max,from.y.min,from.y.max)
+    @x.val = from.x.val;
+    @y.val = from.y.val;
 
   newValue : ->
     @x.newValue()
     @y.newValue()
+    @
   
   #interpolate between two positions
   interpolate : (from, to, t) ->
@@ -138,7 +141,7 @@ class Mutable
       when 'discrete'
         v = @value.valueOf()
       when 'linp'
-        v = currentValue.interpolate(@lastValue.val, @value.val, @ctr/@cycle.val)
+        v = @currentValue.interpolate(@lastValue, @value, @ctr/@cycle.val)
     v
 
 # --------------------------------------------------------
@@ -175,10 +178,23 @@ class MutableTest
     @B = new Mutable().setType(new RandomIntervalNumber().setRange(0,10))
     @B.cycle.setValue(2)
     @mc.registerMutable(@B)
+    @C = new Mutable().setType(new RandomPosition().setRange(0,20,10,30))
+    @C.cycle.setRange(1,4)
+    @C.cymode = 'irregular'
+    @mc.registerMutable(@C)
+    @D = new Mutable().setType(new RandomIntervalNumber().setRange(0,1))
+    @D.cycle.setValue(3)
+    @D.upmode = 'linp'
+    @mc.registerMutable(@D)
+
+    console.log('A: regular cycle [3], B: regular cycle[2], C: irregular cycle[1-4], D interpolating regular cycle[3]')
 
     for i in [1..10]
       @mc.update()
 #      @mc.log()
-      console.log("A:" + @A.valueOf() + " B:" + @B.valueOf())
+      console.log("A:" + @A.valueOf() + " B:" + @B.valueOf() + 
+                " C:" + @C.value.x.valueOf() + "," + @C.value.y.valueOf() +
+                " D:" + @D.valueOf() )
+
 
 window.MutableTest = new MutableTest()
