@@ -6,23 +6,6 @@
 #includePROT = (klass, mixin) ->
 #  extend klass.prototype, mixin
 
-
-class Module
-  @extend: (obj) ->
-    for key, value of obj when key not in moduleKeywords
-      @[key] = value
-
-    obj.extended?.apply(@)
-    this
-
-  @include: (obj) ->
-    for key, value of obj when key not in moduleKeywords
-      # Assign properties to the prototype
-      @::[key] = value
-
-    obj.included?.apply(@)
-    this
-
 # TODO: maybe also make a normaldistributed number?
 # TODO: maybe implement exchangeable number type in position?
 
@@ -35,7 +18,7 @@ class Module
 #     given t=0..1
 
 class RandomIntervalNumber
-  
+
   constructor : () ->
     @myClass = RandomIntervalNumber
     @val = 0
@@ -48,13 +31,13 @@ class RandomIntervalNumber
     @min = min
     @max = max
     @
-  
+
   newValue : ->
     @val = getRandom(@min, @max)
 
   setValue : (v) ->
     @val = v
-  
+
   # t=1..0, from..to
   interpolate : (from, to, t) ->
     @setValue(from.val*(t) + to.val*(1-t))
@@ -70,7 +53,7 @@ class RandomPosition
 
   constructor : () ->
     @myClass = RandomPosition
-  
+
   setRange : (l,r,t,b) ->
     @x = new RandomIntervalNumber().setRange(l,r)
     @y = new RandomIntervalNumber().setRange(t,b)
@@ -78,14 +61,14 @@ class RandomPosition
 
   assign : (from) ->
     @setRange(from.x.min,from.x.max,from.y.min,from.y.max)
-    @x.val = from.x.val;
-    @y.val = from.y.val;
+    @x.val = from.x.val
+    @y.val = from.y.val
 
   newValue : ->
     @x.newValue()
     @y.newValue()
     @
-  
+
   #interpolate between two positions
   interpolate : (from, to, t) ->
     @x.interpolate(from.x.val, to.x.val, t)
@@ -94,7 +77,7 @@ class RandomPosition
 
   valueOf : ->
     { x: @x.val, y: @y.val }
-    
+
 # ----------------------------------------------------
 # "Mutable" abstracts a changing behavior over time.
 # it features the following "change" modes:
@@ -110,12 +93,12 @@ class Mutable
     @cycle.setValue(10)         # default
     @upmode = 'discrete'        # default update mode
     @cymode = 'regular'         # default cycle mode
-    @value = NaN;
-    @lastValue = NaN;          
+    @value = NaN
+    @lastValue = NaN
 
   # setType has to be called until mutable is valid!
   setType: ( val ) ->
-    @value = val;
+    @value = val
     @lastValue = new @value.myClass()
     @lastValue.assign(@value)
     @currentValue = new @value.myClass()
@@ -162,8 +145,6 @@ class MutableController
    log : ->
       for m in @mutables
         console.log(m.constructor.name + ":" + m.valueOf())
-      #console.log(@mutables)
-        
 
 # --------------------------------------------------------
 # simple test case
@@ -191,10 +172,8 @@ class MutableTest
 
     for i in [1..10]
       @mc.update()
-#      @mc.log()
       console.log("A:" + @A.valueOf() + " B:" + @B.valueOf() + 
                 " C:" + @C.value.x.valueOf() + "," + @C.value.y.valueOf() +
                 " D:" + @D.valueOf() )
-
 
 window.MutableTest = new MutableTest()
