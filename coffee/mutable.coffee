@@ -87,32 +87,23 @@ class RandomPosition
 
 class Mutable
   # members:
-  constructor : () ->
+  constructor: () ->
     @ctr = 1       # will trigger evaluation on first update
     @cycle = new RandomIntervalNumber().setRange(5,20)
     @cycle.setValue(10)         # default
     @upmode = 'discrete'        # default update mode
     @cymode = 'regular'         # default cycle mode
-    @value = {}
-    @lastValue = {}
+    @value = NaN
+    @lastValue = NaN
 
   # setType has to be called until mutable is valid!
-  setType : ( val ) ->
+  setType: ( val ) ->
     @value = val
     @lastValue = new @value.myClass()
     @lastValue.assign(@value)
     @currentValue = new @value.myClass()
     @currentValue.assign(@value)
     @
-
-  setIrregular : (cyclemin, cyclemax, updmod) ->
-    @cymode = 'irregular'
-    @upmode = updmod
-    @cycle.setRange(cyclemin, cyclemax)
-
-  setRegular : (cycle) ->
-    @cymode = 'regular'
-    @cycle.val = cycle
 
   update : ->
     --@ctr
