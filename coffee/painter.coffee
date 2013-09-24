@@ -9,15 +9,26 @@
 
 class Brush 
   constructor : (l,r,t,b,typ) ->
-    @pos = new Mutable().setType(RandomPosition().setRange(l,r,t,b))
+    @pos = new Mutable().setType(new RandomPosition().setRange(l,r,t,b))
     @pos.setIrregular(20,100,'linp')
-    @size = new Mutable().setType(RandomInterValNumber().setRange(1,5))
-    @size.setIrregular(20,100,'linp')
+    @bsize = new Mutable().setType(new RandomIntervalNumber().setRange(10,20))
+    @bsize.value.setValue(1)
+    @bsize.setIrregular(20,100,'linp')
     @type = typ
 
   update : ->
     @pos.update()
-    @size.update()
+    @bsize.update()
+    @
+
+  x : ->
+    Math.round(@pos.valueOf().x)
+
+  y : ->
+    Math.round(@pos.valueOf().y)
+
+  size : ->
+    Math.round(@bsize.value.val)
 
 # ImageSource abstracts a set of images, accesible by index
 # width and height of ImageSource correspond to 
@@ -47,14 +58,6 @@ class Painter extends Base
   # the Painter interface
   defaults:
     imgSrc: null
-#    minBrushSize: 1
-#    maxBrushSize: 15
-#    brushSize: 3
-#    brushDx: 1
-#    brushDy: 1
-#    chanceDirection: 20
-#    chanceSize: 20
-#    chanceRespawn: 20
 
   init: ->
   paint: (renderer, destination) ->
@@ -79,14 +82,8 @@ class MovingBrushPainter extends Painter
     @brushes = []
     i = 0
     while i <= @state.brushCount
-      @brushes[i] = new Brush(0,0,
-        @state.imgSrc.state.width,@state.imgSrc.state.height,'circle')
-        # dx: @state.brushDx
-        # dy: @state.brushDy
-        # x: getRandom 0, @state.imgSrc.state.width - 1
-        # y: getRandom 0, @state.imgSrc.state.height - 1
-        # size: @state.brushSize
-        # type: @state.brushType
+      @brushes[i] = new Brush(0,@state.imgSrc.state.width,
+        0,@state.imgSrc.state.height,'circle')
       ++i
   @
 
@@ -104,37 +101,8 @@ class MovingBrushPainter extends Painter
       ++i
 
   update: ->
-
-    # clamp = (val, delta, min, max) ->
-    #    v = val + delta
-    #    v = min if v < min
-    #    v = max if v > max
-    #    v
-
     for br in @brushes
       br.update()
-      # brush = br.state
-      # imgState = @state.imgSrc.state
-
-      # # move brush within image area limits
-      # brush.x = clamp(brush.x,brush.dx,0,imgState.width)
-      # brush.y = clamp(brush.y,brush.dy,0,imgState.height)
-      
-      # brush.type = @state.brushType
-      
-      # # Reset brushsize every now and then
-      # if percentTrue @state.chanceSize
-      #   brush.size = getRandomInt(@state.minBrushSize, @state.maxBrushSize) 
-
-      # # Respawn every now and then
-      # if percentTrue @state.chanceRespawn
-      #   brush.x = getRandom 1, imgState.width
-      #   brush.y = getRandom 1, imgState.height
-
-      # # Change direction every now and then
-      # if percentTrue @state.chanceDirection
-      #   brush.dx = getRandom(-1, 1) * (brush.size / 2)
-      #   brush.dy = getRandom(-1, 1) * (brush.size / 2)
     @
 
 

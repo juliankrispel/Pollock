@@ -71,8 +71,8 @@ class RandomPosition
 
   #interpolate between two positions
   interpolate : (from, to, t) ->
-    @x.interpolate(from.x.val, to.x.val, t)
-    @y.interpolate(from.y.val, to.y.val, t)
+    @x.interpolate(from.x, to.x, t)
+    @y.interpolate(from.y, to.y, t)
     @valueOf()
 
   valueOf : ->
@@ -125,7 +125,6 @@ class Mutable
     switch @cymode
       when 'irregular'
         @cycle.newValue()
-
     @ctr = @cycle.intValue()
 
   valueOf : ->
