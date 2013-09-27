@@ -22,6 +22,8 @@ class RandomIntervalNumber
   constructor : () ->
     @myClass = RandomIntervalNumber
     @val = 0
+    @min = 0
+    @max = 1
 
   assign : (from) ->
     @setRange(from.min,from.max)
@@ -53,6 +55,8 @@ class RandomPosition
 
   constructor : () ->
     @myClass = RandomPosition
+    @x = new RandomIntervalNumber()
+    @y = new RandomIntervalNumber()
 
   setRange : (l,r,t,b) ->
     @x = new RandomIntervalNumber().setRange(l,r)

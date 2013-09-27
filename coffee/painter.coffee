@@ -1,20 +1,17 @@
-
-# Brush Class
-#class Brush extends Base
-#  defaults: 
-#    x: 0
-#    y: 0
-#    size: 0
-#    type: 0
-
+# -----------------------------------------------------------------------------
+# Brush Interface:
+# .x() | .y() -> get position
+# .size()     -> get brush size
+# .type       -> get brush type
 class Brush 
-  constructor : (l,r,t,b,typ) ->
-    @pos = new Mutable().setType(new RandomPosition().setRange(l,r,t,b))
-    @pos.setIrregular(20,100,'linp')
-    @bsize = new Mutable().setType(new RandomIntervalNumber().setRange(10,20))
-    @bsize.value.setValue(1)
-    @bsize.setIrregular(20,100,'linp')
-    @type = typ
+  # members:
+  # pos  [RandomPosition]
+  # size [RandomIntervalNumber]
+
+  constructor : () ->
+    @pos   = new Mutable().setType(new RandomPosition())
+    @bsize = new Mutable().setType(new RandomIntervalNumber())
+    type   = 'rectangle'
 
   update : ->
     @pos.update()
@@ -30,6 +27,7 @@ class Brush
   size : ->
     Math.round(@bsize.value.val)
 
+# -----------------------------------------------------------------------------
 # ImageSource abstracts a set of images, accesible by index
 # width and height of ImageSource correspond to 
 # the maximal width and height of images it contains
@@ -52,8 +50,10 @@ class ImageSource extends Base
   addImage: (img) ->
     @state.images.push img
 
-# a Painter is responsible for what is going to get drawn where
-# this object just defines the interface
+# -----------------------------------------------------------------------------
+# The painter is responsible for what is going to get drawn where
+
+# This object just defines the interface
 class Painter extends Base
   # the Painter interface
   defaults:
@@ -65,7 +65,7 @@ class Painter extends Base
   setImageSource: (image) ->
     @state.imgSrc = image
 
-# the MovingBrushPainter is a simple painter that just copies
+# The MovingBrushPainter is a simple painter that just copies
 # brushes from multiple input images to a destination image
 class MovingBrushPainter extends Painter
   defaults:
@@ -82,8 +82,16 @@ class MovingBrushPainter extends Painter
     @brushes = []
     i = 0
     while i <= @state.brushCount
-      @brushes[i] = new Brush(0,@state.imgSrc.state.width,
-        0,@state.imgSrc.state.height,'circle')
+      B = new Brush()
+      B.pos.value.setRange(0,@state.imgSrc.state.width,0,@state.imgSrc.state.height)
+      B.pos.setIrregular(20,100,'linp')
+      B.pos.update()
+      B.bsize.value.setRange(10,20)
+      B.bsize.setIrregular(20,100,'linp')
+      B.bsize.update()
+      B.type = 'circle'
+      @brushes[i] = B
+
       ++i
   @
 
