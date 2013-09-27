@@ -2,7 +2,10 @@
 class SimpleRenderer extends Base
   
   getBrushData: (brush, context) ->
-    context.getImageData(brush.x(),brush.y(),brush.size(),brush.size())
+    x = brush.x()
+    y = brush.y()
+    s = brush.size()
+    context.getImageData(x,y,s,s)
 
   alphablend: (src, dst, alpha) ->
     Math.round( alpha * src + (1 - alpha) * dst )

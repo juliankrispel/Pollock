@@ -32,13 +32,16 @@ class RandomIntervalNumber
   setRange : (min, max) ->
     @min = min
     @max = max
+    @newValue()
     @
 
   newValue : ->
     @val = getRandom(@min, @max)
+    @
 
   setValue : (v) ->
-    @val = v
+    @val = if v<@min then @min else if v>@max then @max else v
+    @
 
   # t=1..0, from..to
   interpolate : (from, to, t) ->

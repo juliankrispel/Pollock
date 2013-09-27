@@ -3,15 +3,14 @@
 # .x() | .y() -> get position
 # .size()     -> get brush size
 # .type       -> get brush type
-class Brush 
-  # members:
-  # pos  [RandomPosition]
-  # size [RandomIntervalNumber]
 
-  constructor : () ->
-    @pos   = new Mutable().setType(new RandomPosition())
-    @bsize = new Mutable().setType(new RandomIntervalNumber())
-    type   = 'rectangle'
+class Brush 
+  constructor : (w,h) ->
+    @pos   = new Mutable().setType(new RandomPosition().setRange(0,w,0,h))
+    @pos.setIrregular(20,100,'linp')
+    @bsize = new Mutable().setType(new RandomIntervalNumber().setRange(10,20))
+    @bsize.setIrregular(20,100,'linp')
+    @type = 'circle'
 
   update : ->
     @pos.update()
@@ -26,6 +25,36 @@ class Brush
 
   size : ->
     Math.round(@bsize.value.val)
+
+class Brush2
+  constructor : (w,h) ->
+    @pos = new Mutable().setType(new RandomPosition().setRange(0,w,0,h))
+    @pos.setIrregular(100,200,'discrete')
+    @delta = new  Mutable().setType(new RandomPosition().setRange(-10,10,-10,10))
+    @delta.setIrregular(1,10,'linp')
+    #@bsize = new Mutable().setType(new RandomIntervalNumber().setRange(10,20))
+    #@bsize.setIrregular(20,100,'linp')
+    @type = 'circle'
+    @update()
+    
+  update : ->
+    @pos.update()
+    @delta.update()
+    #@bsize.update()
+    @pos.value.x.setValue(@pos.value.x + @delta.value.x)
+    @pos.value.y.setValue(@pos.value.y + @delta.value.y)
+    d=@delta.valueOf()
+    @bsize = (Math.round(Math.sqrt(d.x*d.x+d.y*d.y))*2)+1
+
+  x : ->
+    Math.round(@pos.valueOf().x)
+
+  y : ->
+    Math.round(@pos.valueOf().y)
+
+  size : ->
+    @bsize
+
 
 # -----------------------------------------------------------------------------
 # ImageSource abstracts a set of images, accesible by index
@@ -82,20 +111,11 @@ class MovingBrushPainter extends Painter
     @brushes = []
     i = 0
     while i <= @state.brushCount
-      B = new Brush()
-      B.pos.value.setRange(0,@state.imgSrc.state.width,0,@state.imgSrc.state.height)
-      B.pos.setIrregular(20,100,'linp')
-      B.pos.update()
-      B.bsize.value.setRange(10,20)
-      B.bsize.setIrregular(20,100,'linp')
-      B.bsize.update()
-      B.type = 'circle'
-      @brushes[i] = B
-
+      @brushes[i] = new Brush2(@state.imgSrc.state.width,@state.imgSrc.state.height)
       ++i
   @
 
-  paint: (renderer, dest) =>
+  paint: (renderer, dest) ->
     imgIndex = 0
     imgCount = @state.imgSrc.getImageCount()
 
