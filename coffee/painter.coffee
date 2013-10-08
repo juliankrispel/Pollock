@@ -32,15 +32,12 @@ class Brush2
     @pos.setIrregular(100,200,'discrete')
     @delta = new  Mutable().setType(new RandomPosition().setRange(-10,10,-10,10))
     @delta.setIrregular(1,10,'linp')
-    #@bsize = new Mutable().setType(new RandomIntervalNumber().setRange(10,20))
-    #@bsize.setIrregular(20,100,'linp')
     @type = 'circle'
     @update()
     
   update : ->
     @pos.update()
     @delta.update()
-    #@bsize.update()
     @pos.value.x.setValue(@pos.value.x + @delta.value.x)
     @pos.value.y.setValue(@pos.value.y + @delta.value.y)
     d=@delta.valueOf()
