@@ -32,7 +32,7 @@ class PublishSubscriber
 
         # subscribe
         @channels[channel].subscribers[subscriber] = callback;
-        @subscribers[subscriber].channels[channel] = channels[channel];
+        @subscribers[subscriber].channels[channel] = @channels[channel];
     @
 
     unsubscribe: (channel, subscriber) ->
@@ -55,5 +55,33 @@ class PublishSubscriber
         @channels[channel].value = value
         # notify
         for listener, callback of @channels[channel].subscribers
-            callback() if listener == subscriber 
+            callback() if listener != subscriber 
     @ 
+
+
+class PublishSubscriberTest
+
+    constructor: () ->
+        @PS = new PublishSubscriber()
+    @
+
+    printValue: (name, sub) ->
+        console.log(name + " value: " + @PS.getValue(name,sub))
+    @
+
+    runTest: () ->
+        @PS.registerChannel("FOO", { value: "bar"})
+        @printValue("FOO","")
+
+        @PS.subscribe("FOO", "A", () -> console.log("notify A") )
+        @PS.subscribe("FOO", "B", () -> console.log("notify B") )
+
+        console.log("A changes value")
+        @PS.setValue("FOO", "A", 42)
+        @printValue("FOO","")
+        console.log("B changes value")
+        @PS.setValue("FOO", "B", "BAZ")
+        @printValue("FOO","")
+    @
+
+window.PublishSubscriberTest = new PublishSubscriberTest()
