@@ -160,35 +160,3 @@ class MutableController
    log : ->
       for m in @mutables
         console.log(m.constructor.name + ":" + m.valueOf())
-
-# --------------------------------------------------------
-# simple test case
-class MutableTest
-  constructor: ->
-
-  runTest: ->
-    @mc = new MutableController()
-    @A = new Mutable().setType(new RandomIntervalNumber().setRange(0,1))
-    @A.cycle.setValue(3)
-    @mc.registerMutable(@A)
-    @B = new Mutable().setType(new RandomIntervalNumber().setRange(0,10))
-    @B.cycle.setValue(2)
-    @mc.registerMutable(@B)
-    @C = new Mutable().setType(new RandomPosition().setRange(0,20,10,30))
-    @C.cycle.setRange(1,4)
-    @C.cymode = 'irregular'
-    @mc.registerMutable(@C)
-    @D = new Mutable().setType(new RandomIntervalNumber().setRange(0,1))
-    @D.cycle.setValue(3)
-    @D.upmode = 'linp'
-    @mc.registerMutable(@D)
-
-    console.log('A: regular cycle [3], B: regular cycle[2], C: irregular cycle[1-4], D interpolating regular cycle[3]')
-
-    for i in [1..10]
-      @mc.update()
-      console.log("A:" + @A.valueOf() + " B:" + @B.valueOf() + 
-                " C:" + @C.value.x.valueOf() + "," + @C.value.y.valueOf() +
-                " D:" + @D.valueOf() )
-
-window.MutableTest = new MutableTest()

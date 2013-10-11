@@ -22,7 +22,6 @@ class window.PublishSubscriber
 
 
     subscribe: (channel, subscriber, callback) ->
-        console.log 'dwq', typeof callback
         if !@channels.hasOwnProperty(channel)
             console.error("[PublishSubscriber ERR]: " + subscriber + " tried to subscribe to channel " + channel + ", which doesn't exist.")
             return @

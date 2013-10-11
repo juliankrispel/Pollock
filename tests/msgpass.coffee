@@ -8,14 +8,14 @@ describe 'test publish/subscribe mechanism', ->
     afterEach ->
         ps = {}
 
-    it 'PublishSubscriber correctly instantiates', ->
+    it 'instantiates PublishSubscriber', ->
         expect(typeof ps).toBe 'object'
 
-    it 'register channel', ->
+    it 'registers channel', ->
         ps.registerChannel 'FOO', value: 'bar'
         expect(ps.getValue 'FOO', '').toBe 'bar'
 
-    it 'subscribe to channel change on channel', ->
+    it 'subscribes to change event on channel', ->
         isNotified = false
 
         ps.registerChannel 'FOO', value: 'bar'
@@ -23,7 +23,7 @@ describe 'test publish/subscribe mechanism', ->
             isNotified = true
 
         ps.setValue('FOO', 'A', 'BAZ')
-        console.log ps.getValue 'FOO', ''
+
         waits 200
 
         runs ->
