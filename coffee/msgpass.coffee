@@ -5,7 +5,7 @@
 # - each subscriber can subscribe only  once to a channel. 
 # - each subscriber can set a callback function per channel
 
-class PublishSubscriber 
+class window.PublishSubscriber 
 
     constructor: () ->
         @channels = {};
@@ -14,7 +14,7 @@ class PublishSubscriber
 
     registerChannel: (name, metadata) ->
         if @channels.hasOwnProperty(name)
-            console.log("[PublishSubscriber ERR]: channel " + name + " already exists.")
+            console.error("[PublishSubscriber ERR]: channel " + name + " already exists.")
             return @
         @channels[name] = metadata;
         @channels[name].subscribers = {};
@@ -22,8 +22,9 @@ class PublishSubscriber
 
 
     subscribe: (channel, subscriber, callback) ->
+        console.log 'dwq', typeof callback
         if !@channels.hasOwnProperty(channel)
-            console.log("[PublishSubscriber ERR]: " + subscriber + " tried to subscribe to channel " + channel + ", which doesn't exist.")
+            console.error("[PublishSubscriber ERR]: " + subscriber + " tried to subscribe to channel " + channel + ", which doesn't exist.")
             return @
 
         # initialize subscriber if not existent
@@ -37,11 +38,11 @@ class PublishSubscriber
 
     unsubscribe: (channel, subscriber) ->
        if not subscriber.hasOwnProperty(subscriber)
-           console.log("[PublishSubscriber ERR]: " + subscriber + " tried to unsubscribe from " + channel + ", but i don't know him.")
+           console.error("[PublishSubscriber ERR]: " + subscriber + " tried to unsubscribe from " + channel + ", but i don't know him.")
            return @
 
        if not channels.hasOwnProperty(channel)
-           console.log("[PublishSubscriber ERR]: " + subscriber + " tried to unsubscribe from " + channel + ", which doesn't exist.")
+           console.error("[PublishSubscriber ERR]: " + subscriber + " tried to unsubscribe from " + channel + ", which doesn't exist.")
            return @
 
         @subscribers[subscriber].channels[channel] = null;
@@ -51,37 +52,11 @@ class PublishSubscriber
     getValue: (channel, subscriber) ->
        @channels[channel].value
 
-    setValue: (channel, subscriber, value) ->
+    setValue: (channel, subscriber, value) =>
         @channels[channel].value = value
+
         # notify
+        #@subscribers['A'].channels['FOO'].
         for listener, callback of @channels[channel].subscribers
-            callback() if listener != subscriber 
-    @ 
-
-
-class PublishSubscriberTest
-
-    constructor: () ->
-        @PS = new PublishSubscriber()
+            callback() if listener == subscriber 
     @
-
-    printValue: (name, sub) ->
-        console.log(name + " value: " + @PS.getValue(name,sub))
-    @
-
-    runTest: () ->
-        @PS.registerChannel("FOO", { value: "bar"})
-        @printValue("FOO","")
-
-        @PS.subscribe("FOO", "A", () -> console.log("notify A") )
-        @PS.subscribe("FOO", "B", () -> console.log("notify B") )
-
-        console.log("A changes value")
-        @PS.setValue("FOO", "A", 42)
-        @printValue("FOO","")
-        console.log("B changes value")
-        @PS.setValue("FOO", "B", "BAZ")
-        @printValue("FOO","")
-    @
-
-window.PublishSubscriberTest = new PublishSubscriberTest()

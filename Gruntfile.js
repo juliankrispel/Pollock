@@ -1,7 +1,16 @@
 module.exports = function(grunt){
     grunt.loadNpmTasks('grunt-contrib-coffee');
     grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-contrib-testem');
     grunt.initConfig({
+        testem: {
+            options : {
+                launch_in_dev : ['Chrome']
+            },
+            main : {
+                src: [ 'tests/*.coffee' ]
+            }
+        },
         coffee:{
             compileJoined: {
                 options: {
@@ -18,7 +27,8 @@ module.exports = function(grunt){
                     'js/ui.js': [
                         'coffee/ui.coffee'
                     ],
-                    'js/mtest.js': [
+                    'js/test.js': [
+                        'tests/*.coffee',
                         'coffee/util.coffee',
                         'coffee/mutable.coffee',
                     ],
