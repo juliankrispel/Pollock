@@ -16,15 +16,19 @@ describe 'test publish/subscribe mechanism', ->
         expect(ps.getValue 'FOO', '').toBe 'bar'
 
     it 'subscribes to change event on channel', ->
-        isNotified = false
+        channelBIsNotified = false
+        channelAIsNotified = false
 
         ps.registerChannel 'FOO', value: 'bar'
-        ps.subscribe 'FOO', 'A', ->
-            isNotified = true
+
+        ps.subscribe 'FOO', 'A', -> channelAIsNotified = true
+        ps.subscribe 'FOO', 'B', -> channelBIsNotified = true
 
         ps.setValue('FOO', 'A', 'BAZ')
+        ps.setValue('FOO', 'B', 'FAZ')
 
         waits 200
 
         runs ->
-            expect(isNotified).toBe true
+            expect(channelAIsNotified).toBe true
+            expect(channelBIsNotified).toBe true

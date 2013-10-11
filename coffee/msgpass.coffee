@@ -57,5 +57,5 @@ class window.PublishSubscriber
         # notify
         #@subscribers['A'].channels['FOO'].
         for listener, callback of @channels[channel].subscribers
-            callback() if listener == subscriber 
+            callback() if listener != subscriber 
     @
