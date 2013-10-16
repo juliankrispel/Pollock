@@ -22,7 +22,7 @@ class window.PublishSubscriber
 
     unregisterChannel: (name) ->
         if @channels.hasOwnProperty(name)
-            @channels[name] = null;
+            delete @channels[name];
         else
             console.error("[PublishSubscriber ERR]: tried to unregister channel " + name + ", which is unknown to me.")
     @
@@ -64,9 +64,7 @@ class window.PublishSubscriber
 
     setValue: (channel, subscriber, value) =>
         @channels[channel].value = value
-
-        # notify
-        #@subscribers['A'].channels['FOO'].
+        # notify all subscribers of a channel but the callee
         for listener, callback of @channels[channel].subscribers
             callback() if listener != subscriber 
     @

@@ -17,9 +17,9 @@ describe 'test publish/subscribe mechanism', ->
 
     it 'unregisters channel', ->
         ps.registerChannel 'FOO', value: 'bar'
-        expect(ps.getChannel('FOO')).toNotBe null
+        expect(ps.getChannel('FOO')).toNotBe undefined
         ps.unregisterChannel 'FOO'
-        expect(ps.getChannel('FOO')).toBe null
+        expect(ps.getChannel('FOO')).toBe undefined
 
     it 'changes channel value', ->
         ps.registerChannel 'FOO', value: 'BAR'
