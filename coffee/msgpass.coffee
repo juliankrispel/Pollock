@@ -20,6 +20,17 @@ class window.PublishSubscriber
         @channels[name].subscribers = {};
     @
 
+    unregisterChannel: (name) ->
+        if @channels.hasOwnProperty(name)
+            @channels[name] = null;
+        else
+            console.error("[PublishSubscriber ERR]: tried to unregister channel " + name + ", which is unknown to me.")
+    @
+
+    getChannel: (name) ->
+        if @channels.hasOwnProperty(name)
+            return @channels[name]
+    null
 
     subscribe: (channel, subscriber, callback) ->
         if !@channels.hasOwnProperty(channel)
@@ -36,16 +47,16 @@ class window.PublishSubscriber
     @
 
     unsubscribe: (channel, subscriber) ->
-       if not subscriber.hasOwnProperty(subscriber)
+       if not @subscribers.hasOwnProperty(subscriber)
            console.error("[PublishSubscriber ERR]: " + subscriber + " tried to unsubscribe from " + channel + ", but i don't know him.")
            return @
 
-       if not channels.hasOwnProperty(channel)
+       if not @channels.hasOwnProperty(channel)
            console.error("[PublishSubscriber ERR]: " + subscriber + " tried to unsubscribe from " + channel + ", which doesn't exist.")
            return @
 
-        @subscribers[subscriber].channels[channel] = null;
-        @channels[channel].subscribers[subscriber] = null;
+        delete @subscribers[subscriber].channels[channel];
+        delete @channels[channel].subscribers[subscriber];
     @
 
     getValue: (channel, subscriber) ->
