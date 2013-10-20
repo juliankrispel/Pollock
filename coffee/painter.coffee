@@ -1,12 +1,59 @@
+# -----------------------------------------------------------------------------
+# Brush Interface:
+# .x() | .y() -> get position
+# .size()     -> get brush size
+# .type       -> get brush type
 
-# Brush Class
-class Brush extends Base
-  defaults: 
-    x: 0
-    y: 0
-    size: 0
-    type: 0
+class Brush 
+  constructor : (w,h) ->
+    @pos   = new Mutable().setType(new RandomPosition().setRange(0,w,0,h))
+    @pos.setIrregular(20,100,'linp')
+    @bsize = new Mutable().setType(new RandomIntervalNumber().setRange(10,20))
+    @bsize.setIrregular(20,100,'linp')
+    @type = 'circle'
 
+  update : ->
+    @pos.update()
+    @bsize.update()
+    @
+
+  x : ->
+    Math.round(@pos.valueOf().x)
+
+  y : ->
+    Math.round(@pos.valueOf().y)
+
+  size : ->
+    Math.round(@bsize.value.val)
+
+class Brush2
+  constructor : (w,h) ->
+    @pos = new Mutable().setType(new RandomPosition().setRange(0,w,0,h))
+    @pos.setIrregular(100,200,'discrete')
+    @delta = new  Mutable().setType(new RandomPosition().setRange(-10,10,-10,10))
+    @delta.setIrregular(1,10,'linp')
+    @type = 'circle'
+    @update()
+    
+  update : ->
+    @pos.update()
+    @delta.update()
+    @pos.value.x.setValue(@pos.value.x + @delta.value.x)
+    @pos.value.y.setValue(@pos.value.y + @delta.value.y)
+    d=@delta.valueOf()
+    @bsize = (Math.round(Math.sqrt(d.x*d.x+d.y*d.y))*2)+1
+
+  x : ->
+    Math.round(@pos.valueOf().x)
+
+  y : ->
+    Math.round(@pos.valueOf().y)
+
+  size : ->
+    @bsize
+
+
+# -----------------------------------------------------------------------------
 # ImageSource abstracts a set of images, accesible by index
 # width and height of ImageSource correspond to 
 # the maximal width and height of images it contains
@@ -29,13 +76,16 @@ class ImageSource extends Base
   addImage: (img) ->
     @state.images.push img
 
-# a Painter is responsible for what is going to get drawn where
-# this object just defines the interface
+# -----------------------------------------------------------------------------
+# The painter is responsible for what is going to get drawn where
+
+# This object just defines the interface
 class Painter extends Base
   # the Painter interface
   defaults:
     #Defaults
     imgSrc: null
+<<<<<<< HEAD
     brushes: null
     brushCount: 10
     brushType: 'circle'
@@ -48,6 +98,8 @@ class Painter extends Base
     chanceDirection: 20
     chanceSize: 20
     chanceRespawn: 20
+=======
+>>>>>>> mutable
 
   init: ->
   paint: (renderer, destination) ->
@@ -55,7 +107,7 @@ class Painter extends Base
   setImageSource: (image) ->
     @state.imgSrc = image
 
-# the MovingBrushPainter is a simple painter that just copies
+# The MovingBrushPainter is a simple painter that just copies
 # brushes from multiple input images to a destination image
 class MovingBrushPainter extends Painter
   setBrushes: (num) ->
@@ -67,6 +119,7 @@ class MovingBrushPainter extends Painter
     @brushes = []
     i = 0
     while i <= @state.brushCount
+<<<<<<< HEAD
       @brushes[i] = new Brush
         dx: @state.brushDx
         dy: @state.brushDy
@@ -74,10 +127,13 @@ class MovingBrushPainter extends Painter
         y: getRandom 0, @state.imgSrc.state.height - 1
         size: @state.brushSize
         type: @state.brushType
+=======
+      @brushes[i] = new Brush2(@state.imgSrc.state.width,@state.imgSrc.state.height)
+>>>>>>> mutable
       ++i
   @
 
-  paint: (renderer, dest) =>
+  paint: (renderer, dest) ->
     imgIndex = 0
     imgCount = @state.imgSrc.getImageCount()
 
@@ -91,6 +147,7 @@ class MovingBrushPainter extends Painter
       ++i
 
   update: ->
+<<<<<<< HEAD
 
     clamp = (val, delta, min, max) ->
        v = val + delta
@@ -121,6 +178,10 @@ class MovingBrushPainter extends Painter
       if percentTrue @state.chanceDirection
         brush.dx = getRandom(-1, 1) * (brush.size / 2)
         brush.dy = getRandom(-1, 1) * (brush.size / 2)
+=======
+    for br in @brushes
+      br.update()
+>>>>>>> mutable
     @
 
 

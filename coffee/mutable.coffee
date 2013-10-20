@@ -22,6 +22,8 @@ class RandomIntervalNumber
   constructor : () ->
     @myClass = RandomIntervalNumber
     @val = 0
+    @min = 0
+    @max = 1
 
   assign : (from) ->
     @setRange(from.min,from.max)
@@ -30,13 +32,16 @@ class RandomIntervalNumber
   setRange : (min, max) ->
     @min = min
     @max = max
+    @newValue()
     @
 
   newValue : ->
     @val = getRandom(@min, @max)
+    @
 
   setValue : (v) ->
-    @val = v
+    @val = if v<@min then @min else if v>@max then @max else v
+    @
 
   # t=1..0, from..to
   interpolate : (from, to, t) ->
@@ -53,6 +58,8 @@ class RandomPosition
 
   constructor : () ->
     @myClass = RandomPosition
+    @x = new RandomIntervalNumber()
+    @y = new RandomIntervalNumber()
 
   setRange : (l,r,t,b) ->
     @x = new RandomIntervalNumber().setRange(l,r)
@@ -71,8 +78,8 @@ class RandomPosition
 
   #interpolate between two positions
   interpolate : (from, to, t) ->
-    @x.interpolate(from.x.val, to.x.val, t)
-    @y.interpolate(from.y.val, to.y.val, t)
+    @x.interpolate(from.x, to.x, t)
+    @y.interpolate(from.y, to.y, t)
     @valueOf()
 
   valueOf : ->
@@ -116,7 +123,6 @@ class Mutable
     switch @cymode
       when 'irregular'
         @cycle.newValue()
-
     @ctr = @cycle.intValue()
 
   valueOf : ->
@@ -145,35 +151,3 @@ class MutableController
    log : ->
       for m in @mutables
         console.log(m.constructor.name + ":" + m.valueOf())
-
-# --------------------------------------------------------
-# simple test case
-class MutableTest
-  constructor: ->
-
-  runTest: ->
-    @mc = new MutableController()
-    @A = new Mutable().setType(new RandomIntervalNumber().setRange(0,1))
-    @A.cycle.setValue(3)
-    @mc.registerMutable(@A)
-    @B = new Mutable().setType(new RandomIntervalNumber().setRange(0,10))
-    @B.cycle.setValue(2)
-    @mc.registerMutable(@B)
-    @C = new Mutable().setType(new RandomPosition().setRange(0,20,10,30))
-    @C.cycle.setRange(1,4)
-    @C.cymode = 'irregular'
-    @mc.registerMutable(@C)
-    @D = new Mutable().setType(new RandomIntervalNumber().setRange(0,1))
-    @D.cycle.setValue(3)
-    @D.upmode = 'linp'
-    @mc.registerMutable(@D)
-
-    console.log('A: regular cycle [3], B: regular cycle[2], C: irregular cycle[1-4], D interpolating regular cycle[3]')
-
-    for i in [1..10]
-      @mc.update()
-      console.log("A:" + @A.valueOf() + " B:" + @B.valueOf() + 
-                " C:" + @C.value.x.valueOf() + "," + @C.value.y.valueOf() +
-                " D:" + @D.valueOf() )
-
-window.MutableTest = new MutableTest()

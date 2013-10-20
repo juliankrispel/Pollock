@@ -2,10 +2,10 @@
 class SimpleRenderer extends Base
   
   getBrushData: (brush, context) ->
-    context.getImageData Math.round(brush.x), 
-      Math.round(brush.y), 
-      Math.round(brush.size), 
-      Math.round(brush.size)
+    x = brush.x()
+    y = brush.y()
+    s = brush.size()
+    context.getImageData(x,y,s,s)
 
   alphablend: (src, dst, alpha) ->
     Math.round( alpha * src + (1 - alpha) * dst )
@@ -16,13 +16,11 @@ class SimpleRenderer extends Base
   scrblend: (src, dst) ->
     Math.round(255.0*(1-(1-src/255.0)*(1-dst/255.0)))
 
-
   compositeBlock: (src, dst, bmode) ->
     for i in [0..src.length] by 4
       dst[i] = bmode(src[i],dst[i])
       dst[i+1] = bmode(src[i+1],dst[i+1])
       dst[i+2] = bmode(src[i+2],dst[i+2])
-
 
   renderBrush: (brush, source, destination) ->
     srcContext = source.imca.getContext("2d")
@@ -36,14 +34,14 @@ class SimpleRenderer extends Base
     if brush.type is "circle"
       x = 0
       y = 0
-      cnt = brush.size / 2
+      cnt = brush.size() / 2
       i = 0
       y = 0
 
-      while y < brush.size
+      while y < brush.size()
         x = 0
 
-        while x < brush.size
+        while x < brush.size()
           dx = x - cnt
           dy = y - cnt
           d = Math.sqrt(dx * dx + dy * dy)
@@ -55,5 +53,5 @@ class SimpleRenderer extends Base
           i += 4
           ++x
         ++y
-    destination.putImageData dstData, brush.x, brush.y
+    destination.putImageData dstData, brush.x(), brush.y()
     @

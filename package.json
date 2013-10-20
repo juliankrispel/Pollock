@@ -1,11 +1,13 @@
 {
-    "dependencies": {
+    "devDependencies": {
         "coffee-script": "*",
         "bower": "*",
         "grunt": "*",
         "grunt-cli": "*",
         "grunt-contrib-coffee": "*",
-        "grunt-contrib-watch": "*"
+        "grunt-contrib-watch": "*",
+        "grunt-contrib-testem": "*",
+        "testem": "*"
     },
     "scripts": {
         "build": "npm install && bower install && grunt"
