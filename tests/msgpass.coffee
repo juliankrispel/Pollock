@@ -3,7 +3,7 @@ describe 'test publish/subscribe mechanism', ->
 
     #Setup and teardown Object
     beforeEach ->
-        ps = new PublishSubscriber
+        ps = new PublishSubscriber()
 
     afterEach ->
         ps = {}
@@ -17,9 +17,9 @@ describe 'test publish/subscribe mechanism', ->
 
     it 'unregisters channel', ->
         ps.registerChannel 'FOO', value: 'bar'
-        expect(ps.getChannel('FOO')).toNotBe undefined
+        expect(ps.getChannel('FOO')).toNotBe(null)
         ps.unregisterChannel 'FOO'
-        expect(ps.getChannel('FOO')).toBe undefined
+        expect(ps.getChannel('FOO')).toBe(null)
 
     it 'changes channel value', ->
         ps.registerChannel 'FOO', value: 'BAR'
@@ -62,7 +62,6 @@ describe 'test publish/subscribe mechanism', ->
         expect(channelBIsNotified).toBe true
 
     it 'unregister channel', ->
-
         notifyCount = 0    
         ps.registerChannel 'FOO', value: 'bar'
         ps.subscribe 'FOO', 'ITSME', -> notifyCount++
@@ -75,3 +74,20 @@ describe 'test publish/subscribe mechanism', ->
         ps.unsubscribe 'FOO', 'ITSME'
         ps.setValue('FOO', '', 'bla')
         expect(notifyCount).toBe 2
+
+    it 'read from non-existant channel', ->
+        expect(ps.getChannel("foo")).toBe null
+        expect(ps.getValue("foo", "A")).toBe null      
+
+    it 'create channel upon subscription', ->
+        expect(ps.getChannel("FOO")).toBe null
+        ps.subscribe 'FOO', 'A', -> {}
+        expect(ps.getChannel("FOO")).toNotBe null
+        expect(ps.getValue('FOO', 'A')).toBe("")
+
+
+    it 'create channel upon write', ->
+        expect(ps.getChannel("FOO")).toBe null
+        ps.setValue('FOO',"A", 42)
+        expect(ps.getChannel("FOO")).toNotBe null
+        expect(ps.getValue("FOO","A")).toBe 42

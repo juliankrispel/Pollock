@@ -10,7 +10,6 @@ class window.PublishSubscriber
     constructor: () ->
         @channels = {};
         @subscribers = {};
-    @
 
     registerChannel: (name, metadata) ->
         if @channels.hasOwnProperty(name)
@@ -18,33 +17,34 @@ class window.PublishSubscriber
             return @
         @channels[name] = metadata;
         @channels[name].subscribers = {};
-    @
+        @
 
     unregisterChannel: (name) ->
         if @channels.hasOwnProperty(name)
             delete @channels[name];
         else
             console.error("[PublishSubscriber ERR]: tried to unregister channel " + name + ", which is unknown to me.")
-    @
+        @
 
     getChannel: (name) ->
         if @channels.hasOwnProperty(name)
             return @channels[name]
-    null
+        null
 
     subscribe: (channel, subscriber, callback) ->
-        if !@channels.hasOwnProperty(channel)
-            console.error("[PublishSubscriber ERR]: " + subscriber + " tried to subscribe to channel " + channel + ", which doesn't exist.")
+        if not @channels.hasOwnProperty(channel)
+            #console.error("[PublishSubscriber ERR]: " + subscriber + " tried to subscribe to channel " + channel + ", which doesn't exist.")
+            @registerChannel(channel, { value: "" })
             return @
 
         # initialize subscriber if not existent
-        if !@subscribers.hasOwnProperty(subscriber)
+        if not @subscribers.hasOwnProperty(subscriber)
             @subscribers[subscriber] = { channels : {} }
 
         # subscribe
         @channels[channel].subscribers[subscriber] = callback;
         @subscribers[subscriber].channels[channel] = @channels[channel];
-    @
+        @
 
     unsubscribe: (channel, subscriber) ->
        if not @subscribers.hasOwnProperty(subscriber)
@@ -57,14 +57,21 @@ class window.PublishSubscriber
 
         delete @subscribers[subscriber].channels[channel];
         delete @channels[channel].subscribers[subscriber];
-    @
+        @
 
     getValue: (channel, subscriber) ->
-       @channels[channel].value
+        if @channels.hasOwnProperty(channel)
+            return @channels[channel].value
+        console.error("[PublishSubscriber ERR]: " + subscriber + " tried to read from non-existant channel " + channel)
+        null
 
     setValue: (channel, subscriber, value) =>
-        @channels[channel].value = value
-        # notify all subscribers of a channel but the callee
-        for listener, callback of @channels[channel].subscribers
-            callback() if listener != subscriber 
-    @
+        if not @channels.hasOwnProperty(channel)
+            @registerChannel(channel, { value: value })      
+        # notify only if value actually changes
+        if  @channels[channel].value != value       
+            @channels[channel].value = value
+            # notify all subscribers of a channel but the callee
+            for listener, callback of @channels[channel].subscribers
+                callback() if listener != subscriber 
+        @
