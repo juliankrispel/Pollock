@@ -75,3 +75,12 @@ class window.PublishSubscriber
             for listener, callback of @channels[channel].subscribers
                 callback() if listener != subscriber 
         @
+
+    makePublic: (obj, property, channel) ->
+        PS = this
+        Object.defineProperty(obj, property, {
+            get: () -> PS.getValue(channel,obj.constructor.name)
+            set: (val) -> PS.setValue(channel,obj.constructor.name,val)          
+        })
+        @subscribe(channel, obj.constructor.name, {})
+        @        
