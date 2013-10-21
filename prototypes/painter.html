@@ -1,0 +1,53 @@
+<!DOCTYPE HTML>
+<html lang="en" ng-app="PainterApp">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        body{
+            background: #eee;
+        }
+
+        canvas{
+            background: #fff;
+            -webkit-box-shadow: 2px 2px 5px #ccc;
+        }
+    </style>
+</head>
+<body ng-controller="PainterCtrl">
+    <form>
+        <small>Images</small><br />
+        <ul>
+            <li ng-repeat="img in painter.images">
+            <input ng-model="img.url" type="text"/><img height="50" src="{{img.url}}"/><button ng-click="removeImage($index)">x</button>
+            </li>
+            <li><button ng-click="addImage()">add_image</button></li>
+        </ul>
+        <button ng-click="start()">Start</button>
+        <button ng-click="stop()">Stop</button><br />
+        <label for="size">Brush Size</label>
+        <input type="number" id="size" ng-model="painter.size" type="text"/><br />
+        <label for="type">Brush Shape</label>
+        <select id="type" ng-model="painter.brushType">
+            <option value="circle">Circle</option>
+            <option value="square">Square</option>
+            <option value="weird">Weird</option>
+        </select><br />
+        <label for="minBrushSize">Minimum Brush Size</label>
+        <input id="minBrushSize" type="number" ng-model="painter.minBrushSize"/><br />
+        <label for="maxBrushSize">Max Brush Size</label>
+        <input id="maxBrushSize" type="number" ng-model="painter.maxBrushSize"/><br />
+        <label for="directionchange">Chance for a change of direction</label>
+        <input type="number" id="directionchange" ng-model="painter.chanceDirection"/><br />
+        <label for="chanceRespawn">Chance for a respawn</label>
+        <input type="number" id="chanceRespawn" ng-model="painter.chanceRespawn"/><br />
+        <label for="chanceChangeSize">Chance for changing brushsize</label>
+        <input type="number" id="chanceChangeSize" ng-model="painter.chanceSize"/>
+    </form>
+    <canvas canvas-painter id="canvas" width="770" height="1024">
+</body>
+<script src="../bower_components/underscore/underscore-min.js"></script>
+<script src="../js/painter.js"></script>
+<script src="../bower_components/angular/angular.min.js"></script>
+<script src="../js/ui.js"></script>
+</html>
