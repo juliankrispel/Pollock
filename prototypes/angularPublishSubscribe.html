@@ -42,13 +42,21 @@
 
         cycleMut();
 
-
+        /* 
+        * This would be in the painter
+        * Painter Start
+        */
         function updateRange(){
           mut.value.setRange($scope.brush.min, $scope.brush.max);
         }
 
         ps.subscribe('minSize', 'app', updateRange);
         ps.subscribe('maxSize', 'app', updateRange);
+
+        /*
+        * Painter End
+        * Pretty much everything else in the GUI
+        */
 
         $scope.$watch('brush', function(changed, b){
           ps.setValue('minSize', 'gui', $scope.brush.min);
