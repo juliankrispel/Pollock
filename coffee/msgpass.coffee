@@ -35,7 +35,6 @@ class window.PublishSubscriber
         if not @channels.hasOwnProperty(channel)
             #console.error("[PublishSubscriber ERR]: " + subscriber + " tried to subscribe to channel " + channel + ", which doesn't exist.")
             @registerChannel(channel, { value: "" })
-            return @
 
         # initialize subscriber if not existent
         if not @subscribers.hasOwnProperty(subscriber)

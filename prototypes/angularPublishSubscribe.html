@@ -12,13 +12,12 @@
 
       angular.module('app').controller('test', function($scope){
 
-
         ps.subscribe('TEST', 'A', function(a){
           console.log('sideA changed', a);  
         });
 
         // When setValue is called the above callback should be fired
-        ps.setValue('TEST', 'A', 'HELLO');
+        ps.setValue('TEST', 'nobody', 'HELLO');
 
         $scope.sideA = ps.getValue('TEST');
         $scope.sideB = ps.getValue('TEST');
