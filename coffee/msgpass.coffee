@@ -66,7 +66,8 @@ class window.PublishSubscriber
 
     setValue: (channel, subscriber, value) =>
         if not @channels.hasOwnProperty(channel)
-            @registerChannel(channel, { value: value })      
+            @registerChannel(channel, { value: value })
+    
         # notify only if value actually changes
         if  @channels[channel].value != value       
             @channels[channel].value = value

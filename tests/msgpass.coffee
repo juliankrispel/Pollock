@@ -80,11 +80,14 @@ describe 'test publish/subscribe mechanism', ->
         expect(ps.getValue("foo", "A")).toBe null      
 
     it 'create channel upon subscription', ->
+        isNotified = false
         expect(ps.getChannel("FOO")).toBe null
-        ps.subscribe 'FOO', 'A', -> {}
+        ps.subscribe 'FOO', 'A', -> isNotified=true
         expect(ps.getChannel("FOO")).toNotBe null
         expect(ps.getValue('FOO', 'A')).toBe("")
-
+        ps.setValue 'FOO', '', 42
+        expect(ps.getValue('FOO', 'A')).toBe(42)
+        expect(isNotified).toBe true
 
     it 'create channel upon write', ->
         expect(ps.getChannel("FOO")).toBe null
