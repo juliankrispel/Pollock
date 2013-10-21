@@ -1,0 +1,38 @@
+<html ng-app="app">
+  <body ng-controller="test">
+    <input type="text" ng-model="sideA"/>
+    <input type="text" ng-model="sideB"/>
+    <script src="../bower_components/underscore/underscore-min.js"></script>
+    <script src="../bower_components/angular/angular.min.js"></script>
+    <script src="../js/msgpass.js"></script>
+    <script>
+      ps = new PublishSubscriber;
+
+      angular.module('app', []);
+
+      angular.module('app').controller('test', function($scope){
+
+
+        ps.subscribe('TEST', 'A', function(a){
+          console.log('sideA changed', a);  
+        });
+
+        ps.setValue('TEST', 'A', 'E213213');
+        ps.getValue('TEST', 'A')
+        setTimeout(function(){
+          ps.setValue('TEST', 'A', 'E213213');
+
+        }, 100);
+
+        $scope.sideA = ps.getValue('TEST');
+        $scope.sideB = ps.getValue('TEST');
+
+        $scope.$watch('sideA', function(a,b){
+          console.log(a, b);
+          ps.getValue('TEST');
+        });
+
+      });
+    </script>
+  </body>
+</html>
