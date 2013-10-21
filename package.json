@@ -7,6 +7,7 @@
         "grunt-contrib-coffee": "*",
         "grunt-contrib-watch": "*",
         "grunt-contrib-testem": "*",
+        "grunt-contrib-connect": "*",
         "testem": "*"
     },
     "scripts": {

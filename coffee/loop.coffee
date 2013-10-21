@@ -22,6 +22,7 @@ mainLoop = (images) ->
   imgSource.setSize images[0].width, images[0].height
   i = 0
 
+
   while i < images.length
     images[i].imca = document.createElement("canvas")
     images[i].imca.width = images[i].width

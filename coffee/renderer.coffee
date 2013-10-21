@@ -1,6 +1,6 @@
 # the renderer is actually responsible for copying pixels
 class SimpleRenderer extends Base
-  
+
   getBrushData: (brush, context) ->
     x = brush.x()
     y = brush.y()

@@ -55,7 +55,6 @@ class RandomIntervalNumber
     @val
 
 class RandomPosition
-
   constructor : () ->
     @myClass = RandomPosition
     @x = new RandomIntervalNumber()

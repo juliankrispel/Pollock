@@ -13,7 +13,6 @@ angular.module('PainterApp').controller 'PainterCtrl', ($scope) ->
     }
     $scope.removeImage = (index) ->
         $scope.painter.images.splice(index, 1)
-
     $scope.addImage = ->
         $scope.painter.images.push { url: '' }
 
@@ -22,7 +21,4 @@ angular.module('PainterApp').directive 'canvasPainter', ->
         scope.start = ->
             startPainter element[0], scope.painter.images, (myPainter) ->
                 scope.painter = {}
-                scope.painter = myPainter.state
                 scope.$apply()
-                scope.$watch (changes)-> 
-                    _(myPainter.state).extend changes.painter

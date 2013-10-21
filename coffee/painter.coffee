@@ -6,10 +6,10 @@
 
 class Brush 
   constructor : (w,h) ->
-    @pos   = new Mutable().setType(new RandomPosition().setRange(0,w,0,h))
-    @pos.setIrregular(20,100,'linp')
+    @pos = new Mutable().setType(new RandomPosition().setRange(0,w,0,h))
+    @pos.cycle.setRange(20,100)
     @bsize = new Mutable().setType(new RandomIntervalNumber().setRange(10,20))
-    @bsize.setIrregular(20,100,'linp')
+    @bsize.cycle.setRange(20,100)
     @type = 'circle'
 
   update : ->
@@ -29,12 +29,12 @@ class Brush
 class Brush2
   constructor : (w,h) ->
     @pos = new Mutable().setType(new RandomPosition().setRange(0,w,0,h))
-    @pos.setIrregular(100,200,'discrete')
+    @pos.cycle.setRange(100,200)
     @delta = new  Mutable().setType(new RandomPosition().setRange(-10,10,-10,10))
-    @delta.setIrregular(1,10,'linp')
+    @delta.cycle.setRange(1,10)
     @type = 'circle'
     @update()
-    
+
   update : ->
     @pos.update()
     @delta.update()
@@ -85,6 +85,7 @@ class Painter extends Base
   defaults:
     #Defaults
     imgSrc: null
+    brushCount: 6
 
   init: ->
   paint: (renderer, destination) ->
@@ -99,12 +100,14 @@ class MovingBrushPainter extends Painter
     @state.brushCount = num
     @init
 
-  init: ->
+  init: =>
     # initialize brushes
     @brushes = []
     i = 0
     while i <= @state.brushCount
-      @brushes[i] = new Brush2(@state.imgSrc.state.width,@state.imgSrc.state.height)
+      @brushes[i] = new Brush2(
+          @state.imgSrc.state.width, 
+          @state.imgSrc.state.height)
       ++i
   @
 
@@ -116,7 +119,7 @@ class MovingBrushPainter extends Painter
     i = 0
     while i < @state.brushCount
       src = @state.imgSrc.getImage imgIndex
-      renderer.renderBrush @brushes[i].state, src, dest
+      renderer.renderBrush @brushes[i], src, dest
       imgIndex++
       imgIndex = 0 if imgIndex is imgCount
       ++i
@@ -125,5 +128,3 @@ class MovingBrushPainter extends Painter
     for br in @brushes
       br.update()
     @
-
-
