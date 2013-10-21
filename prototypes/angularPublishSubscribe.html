@@ -17,18 +17,15 @@
           console.log('sideA changed', a);  
         });
 
-        ps.setValue('TEST', 'A', 'E213213');
-        ps.getValue('TEST', 'A')
-        setTimeout(function(){
-          ps.setValue('TEST', 'A', 'E213213');
-        }, 100);
+        // When setValue is called the above callback should be fired
+        ps.setValue('TEST', 'A', 'HELLO');
 
         $scope.sideA = ps.getValue('TEST');
         $scope.sideB = ps.getValue('TEST');
 
         $scope.$watch('sideA', function(a,b){
           console.log(a, b);
-          ps.getValue('TEST');
+          ps.setValue('TEST', '', 'HELLO');
         });
 
       });
