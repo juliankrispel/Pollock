@@ -1,31 +1,59 @@
 <html ng-app="app">
   <body ng-controller="test">
-    <input type="text" ng-model="sideA"/>
-    <input type="text" ng-model="sideB"/>
+    <h3>Current Mutable Value: {{brush.mut}}</h3>
+    <label>Min Size</label>
+    <input type="text" ng-model="brush.min"/>
+    <input type="text" ng-model="brush.max"/>
     <script src="../bower_components/underscore/underscore-min.js"></script>
     <script src="../bower_components/angular/angular.min.js"></script>
+    <script src="../js/painter.js"></script>
     <script src="../js/msgpass.js"></script>
     <script>
-      ps = new PublishSubscriber;
+      var ps = new PublishSubscriber;
+
+      var mut = new Mutable().setType(
+        new RandomIntervalNumber().setRange(1,10)
+      );
+
+      window.m = mut;
+
+      mut.cycle.setRange(0, 1);
 
       angular.module('app', []);
 
       angular.module('app').controller('test', function($scope){
+        $scope.brush = {
+          max: 10,
+          min: 2,
+          mut: +mut
+        }
 
-        ps.subscribe('TEST', 'A', function(a){
-          console.log('sideA changed', a);  
-        });
+        function cycleMut(){
+          mut.update();
+          $scope.brush.mut = +mut;
+          $scope.$apply();
 
-        // When setValue is called the above callback should be fired
-        ps.setValue('TEST', 'nobody', 'HELLO');
+          setTimeout(function(){
+            cycleMut();
+          }, 500);
+        }
 
-        $scope.sideA = ps.getValue('TEST');
-        $scope.sideB = ps.getValue('TEST');
+        $scope.mutValue = +mut
 
-        $scope.$watch('sideA', function(a,b){
-          console.log(a, b);
-          ps.setValue('TEST', '', 'HELLO');
-        });
+        cycleMut();
+
+
+        function updateRange(){
+          mut.value.setRange($scope.brush.min, $scope.brush.max);
+        }
+
+        ps.subscribe('minSize', 'app', updateRange);
+        ps.subscribe('maxSize', 'app', updateRange);
+
+        $scope.$watch('brush', function(changed, b){
+          ps.setValue('minSize', 'gui', $scope.brush.min);
+          ps.setValue('maxSize', 'gui', $scope.brush.max);
+        }, true);
 
       });
     </script>
