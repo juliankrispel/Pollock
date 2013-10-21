@@ -91,3 +91,14 @@ describe 'test publish/subscribe mechanism', ->
         ps.setValue('FOO',"A", 42)
         expect(ps.getChannel("FOO")).toNotBe null
         expect(ps.getValue("FOO","A")).toBe 42
+
+    it 'create channels from variables', ->
+        FOO = { BAR: 5 }
+        notified = false
+
+        ps.makePublic(FOO, 'BAR', 'PublicBAR')
+        ps.subscribe 'PublicBAR', 'Notifier', -> notified = true
+        FOO.BAR = 42
+        expect(notified).toBe true
+
+
