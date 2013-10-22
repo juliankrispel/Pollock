@@ -29,10 +29,14 @@ class RandomIntervalNumber
     @setRange(from.min,from.max)
     @val = from.val
 
+  clamp : () ->
+    @val = @min if @val < @min
+    @val = @max if @val > @max
+
   setRange : (min, max) ->
     @min = min
     @max = max
-    @newValue()
+    @clamp()
     @
 
   newValue : ->
@@ -61,8 +65,10 @@ class RandomPosition
     @y = new RandomIntervalNumber()
 
   setRange : (l,r,t,b) ->
-    @x = new RandomIntervalNumber().setRange(l,r)
-    @y = new RandomIntervalNumber().setRange(t,b)
+    #@x = new RandomIntervalNumber().setRange(l,r)
+    #@y = new RandomIntervalNumber().setRange(t,b)
+    @x.setRange(l,r)
+    @y.setRange(t,b)
     @
 
   assign : (from) ->

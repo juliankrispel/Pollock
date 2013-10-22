@@ -35,8 +35,8 @@ class Brush2
     @delta = new Mutable().setType(new RandomPosition().setRange(-10,10,-10,10))
     @delta.cymode = 'irregular'
     @delta.upmode = 'linp'
-    @delta.cycle.setRange(10,50)
-    @sizem = new Mutable().setType(new RandomIntervalNumber().setRange(2,30))
+    @delta.cycle.setRange(30,100)
+    @sizem = new Mutable().setType(new RandomIntervalNumber().setRange(2,15))
     @sizem.upmode = 'linp'
     @sizem.cymode = 'irregular'
     @sizem.cycle.setRange(20,100)
@@ -45,8 +45,10 @@ class Brush2
 
   update : ->
     @pos.update()                 # randomly spawn a new position
-    @delta.update()               # interpolate moving direction
     @sizem.update()               # randomly set a new brush size now and then
+    S = +@sizem.value
+    @delta.value.setRange(-S/2,S/2,-S/2,S/2)
+    @delta.update()               # interpolate moving direction
     D = @delta.valueOf()
     @pos.value.x.setValue(@pos.value.x + D.x)
     @pos.value.y.setValue(@pos.value.y + D.y)
