@@ -23,12 +23,13 @@ angular.module('PainterApp').directive 'canvasPainter', ->
                 scope.painter = {}
                 scope.painter.minSize = myPainter.PS.getValue('Brush.minSize')
                 scope.painter.maxSize = myPainter.PS.getValue('Brush.maxSize')
+                console.log()
                 scope.$watch('painter.maxSize', ()->
-                    myPainter.PS.channels['Brush.maxSize'].value = scope.painter.minSize
+                    myPainter.PS.setValue('Brush.maxSize', '', scope.painter.maxSize)
                 )
 
                 scope.$watch('painter.minSize', ()->
-                    myPainter.PS.channels['Brush.minSize'].value = scope.painter.maxSize
+                    myPainter.PS.setValue('Brush.minSize', '', scope.painter.minSize)
                 )
 
                 scope.$apply()
