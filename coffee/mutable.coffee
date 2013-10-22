@@ -53,7 +53,7 @@ class RandomIntervalNumber
     @val
 
   intValue : ->
-    Math.round(@val)
+    @val | 0
 
   valueOf : ->
     @val

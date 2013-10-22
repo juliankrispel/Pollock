@@ -18,13 +18,13 @@ class Brush
     @
 
   x : ->
-    Math.round(@pos.valueOf().x)
+    @pos.valueOf().x | 0
 
   y : ->
-    Math.round(@pos.valueOf().y)
+    @pos.valueOf().y | 0
 
   size : ->
-    Math.round(@bsize.value.val)
+    @bsize.value.val | 0
 
 class Brush2
   constructor : (w,h) ->
@@ -32,14 +32,16 @@ class Brush2
     @pos.cymode = 'irregular'
     @pos.upmode = 'discrete'
     @pos.cycle.setRange(100,200)
+
     @delta = new Mutable().setType(new RandomPosition().setRange(-10,10,-10,10))
     @delta.cymode = 'irregular'
     @delta.upmode = 'linp'
-    @delta.cycle.setRange(30,100)
-    @sizem = new Mutable().setType(new RandomIntervalNumber().setRange(2,15))
+    @delta.cycle.setRange(10,50)
+    @sizem = new Mutable().setType(new RandomIntervalNumber().setRange(2,30))
     @sizem.upmode = 'linp'
     @sizem.cymode = 'irregular'
     @sizem.cycle.setRange(20,100)
+
     @type = 'circle'
     @update()
 
@@ -52,15 +54,15 @@ class Brush2
     D = @delta.valueOf()
     @pos.value.x.setValue(@pos.value.x + D.x)
     @pos.value.y.setValue(@pos.value.y + D.y)
-    @bsize = Math.round(+@sizem.value)
+    @bsize = +@sizem.value | 0
     #d=@delta.valueOf()
     #@bsize = (Math.round(Math.sqrt(d.x*d.x+d.y*d.y))*2)+1
 
   x : ->
-    Math.round(@pos.valueOf().x)
+    @pos.valueOf().x | 0
 
   y : ->
-    Math.round(@pos.valueOf().y)
+    @pos.valueOf().y | 0
 
   size : ->
     @bsize
