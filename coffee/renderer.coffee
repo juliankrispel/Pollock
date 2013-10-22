@@ -31,12 +31,19 @@ class SimpleRenderer extends Base
 
     @compositeBlock srcData.data, dstData.data, @scrblend  if brush.type is "weird"
 
-    if brush.type is "circle"
+    if brush.type is "circle" or "scircle"
       x = 0
       y = 0
       cnt = brush.size() / 2
       i = 0
       y = 0
+
+      # take color of center pixel
+      if brush.type is "scircle"
+        midoff = (cnt+cnt*brush.size())*4
+        R = srcData.data[midoff+0]
+        G = srcData.data[midoff+1]
+        B = srcData.data[midoff+2]
 
       while y < brush.size()
         x = 0
@@ -47,9 +54,13 @@ class SimpleRenderer extends Base
           d = Math.sqrt(dx * dx + dy * dy)
           alpha = (cnt - d) / cnt
           alpha = 0  if alpha < 0
-          dstData.data[i]     = @alphablend(srcData.data[i], dstData.data[i], alpha)
-          dstData.data[i + 1] = @alphablend(srcData.data[i + 1], dstData.data[i + 1], alpha)
-          dstData.data[i + 2] = @alphablend(srcData.data[i + 2], dstData.data[i + 2], alpha)
+          if brush.type is "circle"
+            R = srcData.data[i+0]
+            G = srcData.data[i+1]
+            B = srcData.data[i+2]
+          dstData.data[i]     = @alphablend(R, dstData.data[i], alpha)   # srcData.data[i+..]
+          dstData.data[i + 1] = @alphablend(G, dstData.data[i + 1], alpha)
+          dstData.data[i + 2] = @alphablend(B, dstData.data[i + 2], alpha)
           i += 4
           ++x
         ++y
