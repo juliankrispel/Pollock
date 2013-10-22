@@ -8,13 +8,13 @@ class SimpleRenderer extends Base
     context.getImageData(x,y,s,s)
 
   alphablend: (src, dst, alpha) ->
-    Math.round( alpha * src + (1 - alpha) * dst )
+    alpha * src + (1 - alpha) * dst | 0
 
   avgblend: (src, dst) ->
-    Math.round((src+dst)/2.0)
+    (src+dst)/2.0 | 0
 
   scrblend: (src, dst) ->
-    Math.round(255.0*(1-(1-src/255.0)*(1-dst/255.0)))
+    255.0*(1-(1-src/255.0)*(1-dst/255.0)) | 0
 
   compositeBlock: (src, dst, bmode) ->
     for i in [0..src.length] by 4
