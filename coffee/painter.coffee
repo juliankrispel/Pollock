@@ -28,20 +28,27 @@ class Brush
 
 class Brush2
   constructor : (w,h) ->
-    @pos = new Mutable().setType(new RandomPosition().setRange(0,w,0,h))
+    @pos = new Mutable().setType(new RandomPosition().setRange(0,w-50,0,h-50))
     @pos.cycle.setRange(100,200)
-    @delta = new  Mutable().setType(new RandomPosition().setRange(-10,10,-10,10))
-    @delta.cycle.setRange(1,10)
+    @delta = new Mutable().setType(new RandomPosition().setRange(-10,10,-10,10))
+    @delta.cycle.setRange(1,20)
+    @sizem = new Mutable().setType(new RandomIntervalNumber().setRange(5,30))
+    @delta.cycle.setRange(1,20)
     @type = 'circle'
     @update()
 
   update : ->
     @pos.update()
     @delta.update()
+    @sizem.update()
     @pos.value.x.setValue(@pos.value.x + @delta.value.x)
     @pos.value.y.setValue(@pos.value.y + @delta.value.y)
     d=@delta.valueOf()
-    @bsize = (Math.round(Math.sqrt(d.x*d.x+d.y*d.y))*2)+1
+    @bsize = Math.round(+@sizem.value)
+    if @bsize == 0
+      console.log 'min:'+@sizem.value.min+' max:'+@sizem.value.max+' val:'+ (0+@sizem.value)
+      console.log 'brak'
+    #@bsize = (Math.round(Math.sqrt(d.x*d.x+d.y*d.y))*2)+1
 
   x : ->
     Math.round(@pos.valueOf().x)
@@ -81,6 +88,9 @@ class ImageSource extends Base
 
 # This object just defines the interface
 class Painter extends Base
+  #constructor: () ->
+  #  @PS = new PublishSubscriber();
+
   # the Painter interface
   defaults:
     #Defaults
@@ -96,11 +106,13 @@ class Painter extends Base
 # The MovingBrushPainter is a simple painter that just copies
 # brushes from multiple input images to a destination image
 class MovingBrushPainter extends Painter
+
   setBrushes: (num) ->
     @state.brushCount = num
     @init
 
   init: =>
+    @PS = new PublishSubscriber();
     # initialize brushes
     @brushes = []
     i = 0
@@ -108,6 +120,9 @@ class MovingBrushPainter extends Painter
       @brushes[i] = new Brush2(
           @state.imgSrc.state.width, 
           @state.imgSrc.state.height)
+      # make brush state public
+      @PS.makePublic(@brushes[i].sizem.value,'min','Brush.minSize')
+      @PS.makePublic(@brushes[i].sizem.value,'max','Brush.maxSize')
       ++i
   @
 

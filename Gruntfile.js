@@ -28,7 +28,8 @@ module.exports = function(grunt){
                 },
                 files: {
                     'js/painter.js': [
-                        'coffee/util.coffee', 
+                        'coffee/util.coffee',
+                        'coffee/msgpass.coffee',                         
                         'coffee/mutable.coffee',
                         'coffee/painter.coffee',
                         'coffee/renderer.coffee',
