@@ -37,7 +37,7 @@ class Brush2
     @delta.cymode = 'irregular'
     @delta.upmode = 'linp'
     @delta.cycle.setRange(10,50)
-    @sizem = new Mutable().setType(new RandomIntervalNumber().setRange(2,30))
+    @sizem = new Mutable().setType(new RandomIntervalNumber().setRange(2,15))
     @sizem.upmode = 'linp'
     @sizem.cymode = 'irregular'
     @sizem.cycle.setRange(20,100)
@@ -54,7 +54,7 @@ class Brush2
     D = @delta.valueOf()
     @pos.value.x.setValue(@pos.value.x + D.x)
     @pos.value.y.setValue(@pos.value.y + D.y)
-    @bsize = +@sizem.value | 0
+    @bsize = S | 0
     #d=@delta.valueOf()
     #@bsize = (Math.round(Math.sqrt(d.x*d.x+d.y*d.y))*2)+1
 
