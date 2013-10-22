@@ -26,6 +26,7 @@ angular.module('PainterApp').directive 'canvasPainter', ->
 
         for name in list
           scope.painter[name] = myPainter.PS.getValue(name)
+
           myPainter.PS.subscribe(name, 'gui', () -> 
             scope.painter[name] = myPainter.PS.getValue(name))
 

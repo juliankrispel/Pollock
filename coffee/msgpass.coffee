@@ -16,7 +16,7 @@ class window.PublishSubscriber
             console.error("[PublishSubscriber ERR]: channel " + name + " already exists.")
             return @
         @_channels[name] = metadata;
-        @_channels[name]._subscribers = {};
+        @_channels[name]._subscribers = () ->;
         @
 
     unregisterChannel: (name) ->
