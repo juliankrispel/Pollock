@@ -111,7 +111,7 @@ class Painter extends Base
   defaults:
     #Defaults
     imgSrc: null
-    brushCount: 1
+    brushCount: 6
 
   init: ->
   paint: (renderer, destination) ->
