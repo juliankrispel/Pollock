@@ -102,7 +102,5 @@ describe 'test publish/subscribe mechanism', ->
         ps.makePublic(FOO, 'BAR', 'PublicBAR')
         ps.subscribe 'PublicBAR', 'Notifier', -> notified = true
         expect(notified).toBe false
-        FOO.BAR = 42
+        FOO.BAR = 2
         expect(notified).toBe true
-
-

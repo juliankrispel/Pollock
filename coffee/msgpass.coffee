@@ -67,9 +67,9 @@ class window.PublishSubscriber
     setValue: (channel, subscriber, value) =>
         if not @channels.hasOwnProperty(channel)
             @registerChannel(channel, { value: value })
-    
+
         # notify only if value actually changes
-        if  @channels[channel].value != value       
+        if  @channels[channel].value != value
             @channels[channel].value = value
             # notify all subscribers of a channel but the callee
             for listener, callback of @channels[channel].subscribers
@@ -77,10 +77,10 @@ class window.PublishSubscriber
         @
 
     makePublic: (obj, property, channel) ->
-        PS = this
+        PS = @
         Object.defineProperty(obj, property, {
             get: () -> PS.getValue(channel,obj.constructor.name)
-            set: (val) -> PS.setValue(channel,obj.constructor.name,val)          
+            set: (val) -> PS.setValue(channel,obj.constructor.name,val)
         })
         @subscribe(channel, obj.constructor.name, {})
-        @        
+        @
