@@ -125,8 +125,8 @@ class MovingBrushPainter extends Painter
           @state.imgSrc.state.width, 
           @state.imgSrc.state.height)
       # make brush state public
-      @PS.makePublic(@brushes[i].sizem.value,'min','Brush.minSize')
-      @PS.makePublic(@brushes[i].sizem.value,'max','Brush.maxSize')
+      @PS.makePublic(@brushes[i].sizem.value,'min','brushMinSize')
+      @PS.makePublic(@brushes[i].sizem.value,'max','brushMaxSize')
       ++i
   @
 

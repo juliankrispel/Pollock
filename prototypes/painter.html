@@ -19,9 +19,9 @@
         <button ng-click="start()">Start</button>
         <button ng-click="stop()">Stop</button><br />
         <label for="minBrushSize">Minimum Brush Size</label>
-        <input id="minBrushSize" type="number" ng-model="painter.minSize"/><br />
+        <input id="minBrushSize" type="number" ng-model="painter.brushMinSize"/><br />
         <label for="maxBrushSize">Max Brush Size</label>
-        <input id="maxBrushSize" type="number" ng-model="painter.maxSize"/>
+        <input id="maxBrushSize" type="number" ng-model="painter.brushMaxSize"/>
 
     </form>
     <canvas canvas-painter id="canvas" width="770" height="1024">
