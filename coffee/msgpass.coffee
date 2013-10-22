@@ -16,7 +16,7 @@ class window.PublishSubscriber
             console.error("[PublishSubscriber ERR]: channel " + name + " already exists.")
             return @
         @_channels[name] = metadata;
-        @_channels[name]._subscribers = () ->;
+        @_channels[name]._subscribers = {};
         @
 
     unregisterChannel: (name) ->
@@ -89,7 +89,7 @@ class window.PublishSubscriber
             get: () -> PS.getValue(channel,obj.constructor.name)
             set: (val) -> PS.setValue(channel,obj.constructor.name,val)
         })
-        @subscribe(channel, obj.constructor.name, ->)
+        @subscribe(channel, obj.constructor.name,()->)
         if defaultvalue != undefined
            @setValue(channel, obj.constructor.name, defaultvalue)
         @
