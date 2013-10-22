@@ -28,14 +28,17 @@ class Brush
 
 class Brush2
   constructor : (w,h) ->
-    @pos = new Mutable().setType(new RandomPosition().setRange(0,w,0,h))
-    @pos.cymode = 'irregular'
-    @pos.upmode = 'discrete'
-    @pos.cycle.setValue = (v) ->
+    setValue = (v) -> 
       @val = if v<@min then @max else if v>@max then @min else v
       @
 
+    @pos = new Mutable().setType(new RandomPosition().setRange(0,w,0,h))
+    @pos.cymode = 'irregular'
+    @pos.upmode = 'discrete'
     @pos.cycle.setRange(900,2000)
+
+    @pos.value.x.setValue = setValue;
+    @pos.value.y.setValue = setValue;
 
     @delta = new Mutable().setType(new RandomPosition().setRange(-10,10,-10,10))
     @delta.cymode = 'irregular'
@@ -108,7 +111,7 @@ class Painter extends Base
   defaults:
     #Defaults
     imgSrc: null
-    brushCount: 6
+    brushCount: 1
 
   init: ->
   paint: (renderer, destination) ->
