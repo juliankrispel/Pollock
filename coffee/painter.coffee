@@ -28,26 +28,30 @@ class Brush
 
 class Brush2
   constructor : (w,h) ->
-    @pos = new Mutable().setType(new RandomPosition().setRange(0,w-50,0,h-50))
+    @pos = new Mutable().setType(new RandomPosition().setRange(0,w,0,h))
+    @pos.cymode = 'irregular'
+    @pos.upmode = 'discrete'
     @pos.cycle.setRange(100,200)
     @delta = new Mutable().setType(new RandomPosition().setRange(-10,10,-10,10))
-    @delta.cycle.setRange(1,20)
-    @sizem = new Mutable().setType(new RandomIntervalNumber().setRange(5,30))
-    @delta.cycle.setRange(1,20)
+    @delta.cymode = 'irregular'
+    @delta.upmode = 'linp'
+    @delta.cycle.setRange(10,50)
+    @sizem = new Mutable().setType(new RandomIntervalNumber().setRange(2,30))
+    @sizem.upmode = 'linp'
+    @sizem.cymode = 'irregular'
+    @sizem.cycle.setRange(20,100)
     @type = 'circle'
     @update()
 
   update : ->
-    @pos.update()
-    @delta.update()
-    @sizem.update()
-    @pos.value.x.setValue(@pos.value.x + @delta.value.x)
-    @pos.value.y.setValue(@pos.value.y + @delta.value.y)
-    d=@delta.valueOf()
+    @pos.update()                 # randomly spawn a new position
+    @delta.update()               # interpolate moving direction
+    @sizem.update()               # randomly set a new brush size now and then
+    D = @delta.valueOf()
+    @pos.value.x.setValue(@pos.value.x + D.x)
+    @pos.value.y.setValue(@pos.value.y + D.y)
     @bsize = Math.round(+@sizem.value)
-    if @bsize == 0
-      console.log 'min:'+@sizem.value.min+' max:'+@sizem.value.max+' val:'+ (0+@sizem.value)
-      console.log 'brak'
+    #d=@delta.valueOf()
     #@bsize = (Math.round(Math.sqrt(d.x*d.x+d.y*d.y))*2)+1
 
   x : ->
