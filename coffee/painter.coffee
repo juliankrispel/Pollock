@@ -31,6 +31,10 @@ class Brush2
     @pos = new Mutable().setType(new RandomPosition().setRange(0,w,0,h))
     @pos.cymode = 'irregular'
     @pos.upmode = 'discrete'
+    @pos.cycle.setValue = (v) ->
+      @val = if v<@min then @max else if v>@max then @min else v
+      @
+
     @pos.cycle.setRange(900,2000)
 
     @delta = new Mutable().setType(new RandomPosition().setRange(-10,10,-10,10))
