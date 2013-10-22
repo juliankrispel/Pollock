@@ -31,12 +31,13 @@ class Brush2
     @pos = new Mutable().setType(new RandomPosition().setRange(0,w,0,h))
     @pos.cymode = 'irregular'
     @pos.upmode = 'discrete'
-    @pos.cycle.setRange(100,200)
+    @pos.cycle.setRange(900,2000)
 
     @delta = new Mutable().setType(new RandomPosition().setRange(-10,10,-10,10))
     @delta.cymode = 'irregular'
     @delta.upmode = 'linp'
     @delta.cycle.setRange(10,50)
+
     @sizem = new Mutable().setType(new RandomIntervalNumber().setRange(2,15))
     @sizem.upmode = 'linp'
     @sizem.cymode = 'irregular'
