@@ -44,7 +44,8 @@ class RandomIntervalNumber
     @
 
   setValue : (v) ->
-    @val = if v<@min then @min else if v>@max then @max else v
+    @val = v 
+    @clamp()
     @
 
   # t=1..0, from..to

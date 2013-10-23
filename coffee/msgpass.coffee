@@ -83,13 +83,17 @@ class window.PublishSubscriber
 
     makePublic: (obj, property, channel) ->
         PS = @
+
         if obj.hasOwnProperty(property)
             defaultvalue = obj[property]
         Object.defineProperty(obj, property, {
             get: () -> PS.getValue(channel,obj.constructor.name)
             set: (val) -> PS.setValue(channel,obj.constructor.name,val)
         })
+        
+        newChannel = not @_channels.hasOwnProperty(channel)
+
         @subscribe(channel, obj.constructor.name,()->)
-        if defaultvalue != undefined
+        if defaultvalue != undefined and newChannel
            @setValue(channel, obj.constructor.name, defaultvalue)
         @

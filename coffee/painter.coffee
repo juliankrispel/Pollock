@@ -36,7 +36,7 @@ class Brush2
     @pos.cymode = 'irregular'
     @pos.upmode = 'discrete'
     @pos.cycle.setRange(900,2000)
-
+    # locally change update behavior of position randomintervalnumber
     @pos.value.x.setValue = setValue;
     @pos.value.y.setValue = setValue;
 
@@ -51,6 +51,7 @@ class Brush2
     @sizem.cycle.setRange(20,100)
 
     @type = 'circle'
+
     @update()
 
   update : ->
@@ -65,6 +66,8 @@ class Brush2
     @bsize = S | 0
     #d=@delta.valueOf()
     #@bsize = (Math.round(Math.sqrt(d.x*d.x+d.y*d.y))*2)+1
+
+
 
   x : ->
     @pos.valueOf().x | 0
@@ -128,10 +131,14 @@ class MovingBrushPainter extends Painter
     @init
 
   createBrush: (type) ->
-    new type(
+    brush = new type(
       @state.imgSrc.state.width, 
       @state.imgSrc.state.height)
-
+    # public brush state (can be manipulated by GUI)
+    @PS.makePublic(brush.sizem.value,'min','brushMinSize')
+    @PS.makePublic(brush.sizem.value,'max','brushMaxSize')
+    @PS.makePublic(brush,'type','brushType')
+    brush
 
   init: =>
     @PS = new PublishSubscriber();
@@ -140,10 +147,6 @@ class MovingBrushPainter extends Painter
     i = 0
     while i <= @state.brushCount
       @brushes[i] =  @createBrush(Brush2)
-      # make brush state public
-      @PS.makePublic(@brushes[i].sizem.value,'min','brushMinSize')
-      @PS.makePublic(@brushes[i].sizem.value,'max','brushMaxSize')
-      @PS.makePublic(@brushes[i],'type','brushType')
       ++i
 
     @PS.makePublic(@state, 'brushCount', 'brushCount')
