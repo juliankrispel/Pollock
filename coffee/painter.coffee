@@ -127,19 +127,25 @@ class MovingBrushPainter extends Painter
     @state.brushCount = num
     @init
 
+  createBrush: (type) ->
+    new type(
+      @state.imgSrc.state.width, 
+      @state.imgSrc.state.height)
+
+
   init: =>
     @PS = new PublishSubscriber();
     # initialize brushes
     @brushes = []
     i = 0
     while i <= @state.brushCount
-      @brushes[i] = new Brush2(
-          @state.imgSrc.state.width, 
-          @state.imgSrc.state.height)
+      @brushes[i] =  @createBrush(Brush2)
       # make brush state public
       @PS.makePublic(@brushes[i].sizem.value,'min','brushMinSize')
       @PS.makePublic(@brushes[i].sizem.value,'max','brushMaxSize')
       ++i
+
+    @PS.makePublic(@state, 'brushCount', 'brushCount')
   @
 
   paint: (renderer, dest) ->
@@ -150,6 +156,8 @@ class MovingBrushPainter extends Painter
     i = 0
     while i < @state.brushCount
       src = @state.imgSrc.getImage imgIndex
+      if(!@brushes[i])
+        @brushes[i] = @createBrush(Brush2)
       renderer.renderBrush @brushes[i], src, dest
       imgIndex++
       imgIndex = 0 if imgIndex is imgCount
