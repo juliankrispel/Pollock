@@ -52,7 +52,6 @@ class Brush2
 
     @type = 'circle'
 
-    @update()
 
   update : ->
     @pos.update()                 # randomly spawn a new position
@@ -66,8 +65,6 @@ class Brush2
     @bsize = S | 0
     #d=@delta.valueOf()
     #@bsize = (Math.round(Math.sqrt(d.x*d.x+d.y*d.y))*2)+1
-
-
 
   x : ->
     @pos.valueOf().x | 0
@@ -138,6 +135,7 @@ class MovingBrushPainter extends Painter
     @PS.makePublic(brush.sizem.value,'min','brushMinSize')
     @PS.makePublic(brush.sizem.value,'max','brushMaxSize')
     @PS.makePublic(brush,'type','brushType')
+    brush.update() # initialize state (and use bound values)
     brush
 
   init: =>
