@@ -24,9 +24,10 @@
         <input id="maxBrushSize" type="number" ng-model="painter.brushMaxSize"/><br />
         <label for="brushCount">Brush Count</label>
         <input ng-model="painter.brushCount" type="text"/><br />
-
-
-
+        <label for="brushType">Brush Type</label>
+        <select id="brushType" ng-model="painter.brushType">
+        <option ng-repeat="brush in brushTypes">{{brush}}</option>
+        </select>
     </form>
     <canvas canvas-painter id="canvas" width="770" height="1024">
 </body>
