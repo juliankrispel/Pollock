@@ -21,7 +21,9 @@ angular.module('PainterApp').directive 'canvasPainter', ->
   (scope, element, attrs) ->
     scope.start = ->
       startPainter element[0], scope.painter.images, (myPainter) ->
-        scope.painter = {}
+        scope.painter = {
+          hasLoaded: true
+        }
 
         list = [ 'brushMinSize', 'brushMaxSize', 'brushCount', 'brushType' ]
 

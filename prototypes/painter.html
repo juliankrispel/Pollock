@@ -16,7 +16,8 @@
 </head>
 <body ng-controller="PainterCtrl">
     <form>
-        <button ng-click="start()">Start</button>
+      <button ng-click="start()">Start</button>
+      <div ng-show="painter.hasLoaded">
         <button ng-click="stop()">Stop</button><br />
         <label for="minBrushSize">Minimum Brush Size</label>
         <input id="minBrushSize" type="number" ng-model="painter.brushMinSize"/><br />
@@ -26,8 +27,9 @@
         <input ng-model="painter.brushCount" type="text"/><br />
         <label for="brushType">Brush Type</label>
         <select id="brushType" ng-model="painter.brushType">
-        <option ng-repeat="brush in brushTypes">{{brush}}</option>
+          <option ng-repeat="brush in brushTypes">{{brush}}</option>
         </select>
+      </div>
     </form>
     <canvas canvas-painter id="canvas" width="770" height="1024">
 </body>
