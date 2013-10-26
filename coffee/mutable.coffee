@@ -18,7 +18,6 @@
 #     given t=0..1
 
 class RandomIntervalNumber
-
   constructor : () ->
     @myClass = RandomIntervalNumber
     @val = 0

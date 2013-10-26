@@ -87,17 +87,17 @@ class ImageSource extends Base
     images: []
 
   setSize: (width, height) =>
-    @state.width = width
-    @state.height = height
+    @width = width
+    @height = height
 
   getImageCount: =>
-    @state.images.length
+    @images.length
 
   getImage: (index) ->
-    @state.images[index]
+    @images[index]
 
   addImage: (img) ->
-    @state.images.push img
+    @images.push img
 
 # -----------------------------------------------------------------------------
 # The painter is responsible for what is going to get drawn where
@@ -117,20 +117,20 @@ class Painter extends Base
   paint: (renderer, destination) ->
   update: ->
   setImageSource: (image) ->
-    @state.imgSrc = image
+    @imgSrc = image
 
 # The MovingBrushPainter is a simple painter that just copies
 # brushes from multiple input images to a destination image
 class MovingBrushPainter extends Painter
 
   setBrushes: (num) ->
-    @state.brushCount = num
+    @brushCount = num
     @init
 
   createBrush: (type) ->
     brush = new type(
-      @state.imgSrc.state.width, 
-      @state.imgSrc.state.height)
+      @imgSrc.width, 
+      @imgSrc.height)
     # public brush state (can be manipulated by GUI)
     @PS.makePublic(brush.sizem.value,'min','brushMinSize')
     @PS.makePublic(brush.sizem.value,'max','brushMaxSize')
@@ -143,21 +143,21 @@ class MovingBrushPainter extends Painter
     # initialize brushes
     @brushes = []
     i = 0
-    while i <= @state.brushCount
+    while i <= @brushCount
       @brushes[i] =  @createBrush(Brush2)
       ++i
 
-    @PS.makePublic(@state, 'brushCount', 'brushCount')
+    @PS.makePublic(@, 'brushCount', 'brushCount')
   @
 
   paint: (renderer, dest) ->
     imgIndex = 0
-    imgCount = @state.imgSrc.getImageCount()
+    imgCount = @imgSrc.getImageCount()
 
     # render each brush, cycling through input images
     i = 0
-    while i < @state.brushCount
-      src = @state.imgSrc.getImage imgIndex
+    while i < @brushCount
+      src = @imgSrc.getImage imgIndex
       if(!@brushes[i])
         @brushes[i] = @createBrush(Brush2)
       renderer.renderBrush @brushes[i], src, dest
