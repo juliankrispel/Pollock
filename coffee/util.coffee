@@ -47,3 +47,4 @@ extend = (obj) ->
 class Base
   constructor: (mixin) ->
     _(@).extend _(@defaults).clone(), mixin
+    @init() if @['init']

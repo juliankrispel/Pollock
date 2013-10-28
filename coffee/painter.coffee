@@ -6,8 +6,18 @@
 
 class Brush 
   constructor : (w,h) ->
-    @pos = new Mutable().setType(new RandomPosition().setRange(0,w,0,h))
+    @pos = new Mutable(
+      type: new RandomPosition(0, w, 0, h)
+      upmode: 'discrete'
+      cycle: {
+        mode: 'regular'
+        min: 20
+        max: 100
+      }
+    )
+
     @pos.cycle.setRange(20,100)
+
     @bsize = new Mutable().setType(new RandomIntervalNumber().setRange(10,20))
     @bsize.cycle.setRange(20,100)
     @type = 'circle'
@@ -28,27 +38,38 @@ class Brush
 
 class Brush2
   constructor : (w,h) ->
+    @pos = new Mutable
+      value: new RandomPosition(0, w, 0, h)
+      upmode: 'discrete'
+      cycle: {
+        mode: 'irregular'
+        min: 900
+        max: 2000
+      }
+
+    # locally change update behavior of position randomintervalnumber
     setValue = (v) -> 
       @val = if v<@min then @max else if v>@max then @min else v
       @
 
-    @pos = new Mutable().setType(new RandomPosition().setRange(0,w,0,h))
-    @pos.cymode = 'irregular'
-    @pos.upmode = 'discrete'
-    @pos.cycle.setRange(900,2000)
-    # locally change update behavior of position randomintervalnumber
     @pos.value.x.setValue = setValue;
     @pos.value.y.setValue = setValue;
 
-    @delta = new Mutable().setType(new RandomPosition().setRange(-10,10,-10,10))
-    @delta.cymode = 'irregular'
-    @delta.upmode = 'linp'
-    @delta.cycle.setRange(10,50)
+    @delta = new Mutable
+      value: new RandomPosition -10, 10, -10, 10
+      upmode: 'linp'
+      cycle: 
+        mode: 'irregular'
+        min: 10
+        max: 50
 
-    @sizem = new Mutable().setType(new RandomIntervalNumber().setRange(2,15))
-    @sizem.upmode = 'linp'
-    @sizem.cymode = 'irregular'
-    @sizem.cycle.setRange(20,100)
+    @sizem = new Mutable
+      value: new RandomIntervalNumber 2, 15
+      upmode: 'linp'
+      cycle: 
+        mode: 'irregular'
+        min: 20
+        max: 100
 
     @type = 'circle'
 
@@ -74,7 +95,6 @@ class Brush2
 
   size : ->
     @bsize
-
 
 # -----------------------------------------------------------------------------
 # ImageSource abstracts a set of images, accesible by index
@@ -113,7 +133,7 @@ class Painter extends Base
     imgSrc: null
     brushCount: 6
 
-  init: ->
+  start: ->
   paint: (renderer, destination) ->
   update: ->
   setImageSource: (image) ->
@@ -122,7 +142,6 @@ class Painter extends Base
 # The MovingBrushPainter is a simple painter that just copies
 # brushes from multiple input images to a destination image
 class MovingBrushPainter extends Painter
-
   setBrushes: (num) ->
     @brushCount = num
     @init
@@ -131,14 +150,15 @@ class MovingBrushPainter extends Painter
     brush = new type(
       @imgSrc.width, 
       @imgSrc.height)
+
     # public brush state (can be manipulated by GUI)
-    @PS.makePublic(brush.sizem.value,'min','brushMinSize')
-    @PS.makePublic(brush.sizem.value,'max','brushMaxSize')
-    @PS.makePublic(brush,'type','brushType')
+    @PS.makePublic(brush.sizem.value, 'min', 'brushMinSize')
+    @PS.makePublic(brush.sizem.value, 'max', 'brushMaxSize')
+    @PS.makePublic(brush, 'type', 'brushType')
     brush.update() # initialize state (and use bound values)
     brush
 
-  init: =>
+  start: =>
     @PS = new PublishSubscriber();
     # initialize brushes
     @brushes = []
