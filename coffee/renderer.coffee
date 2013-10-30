@@ -93,6 +93,7 @@ class SimpleRenderer extends Base
             dstData.data[i]     = @alphablend(R, dstData.data[i], alpha)   # srcData.data[i+..]
             dstData.data[i + 1] = @alphablend(G, dstData.data[i + 1], alpha)
             dstData.data[i + 2] = @alphablend(B, dstData.data[i + 2], alpha)
+            dstData.data[i + 3] = 255
             i += 4
             ++x
           ++y
