@@ -11,7 +11,9 @@ describe 'test Mutables', ->
         expect(typeof mc).toBe 'object'
 
     it 'registers a Mutable with a RandomIntervalNumber and update Mutable via MutableController', ->
-        m = new Mutable().setType new RandomIntervalNumber().setRange(0,1)
+        m = new Mutable
+          value: new RandomIntervalNumber 0, 1
+
         m.cycle.setValue(3)
         mc.registerMutable(m)
 
@@ -24,8 +26,11 @@ describe 'test Mutables', ->
         expect(m.valueOf()).not.toEqual value
 
     it 'registers a Mutable with a RandomPosition and update Mutable via MutableController', ->
-        m = new Mutable().setType new RandomPosition().setRange(1,20,10,30)
-        m.cycle.setRange(1,4)
+        m = new Mutable
+            value: new RandomPosition 1, 20, 10, 30
+            cycle: 
+                min: 1
+                max: 4
         mc.registerMutable(m)
 
         value = m.valueOf()
