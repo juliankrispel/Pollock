@@ -23,6 +23,34 @@ class SimpleRenderer extends Base
       dst[i+2] = bmode(src[i+2],dst[i+2])
     @
 
+  rgb2luminance : (RGB, i) ->
+    0.299 * RGB[i] + 0.587 * RGB[i+1] + 0.114 * RGB[i+2]
+
+  quickSortStep: (array, offset, length) ->
+    pindex = getRandomInt(0,length-1)
+    pivot = @rgb2luminance(array, offset+pindex*4)
+    left  = new Uint8ClampedArray(length*4)
+    right = new Uint8ClampedArray(length*4)
+    li = 0
+    ri = 0
+    for i in [0..(length*4)] by 4
+      if @rgb2luminance(array, offset+i) < pivot
+        left[li+0] = array[offset+i+0]
+        left[li+1] = array[offset+i+1]
+        left[li+2] = array[offset+i+2]
+        left[li+3] = array[offset+i+3]
+        li += 4
+      else
+        right[ri+0] = array[offset+i+0]
+        right[ri+1] = array[offset+i+1]
+        right[ri+2] = array[offset+i+2]
+        right[ri+3] = array[offset+i+3]
+        ri += 4
+    if li > 0
+      array.set( left.subarray(0,li-1), offset+0)
+    if ri > 0
+      array.set( right.subarray(0,ri-4), offset+li)
+
   renderBrush: (brush, source, destination) ->
 
     # get brush image data and background image data
@@ -67,6 +95,18 @@ class SimpleRenderer extends Base
             i += 4
             ++x
           ++y
+
+      when 'sort'
+        y = 0
+        offset = 0
+        while y < brush.size()
+          @quickSortStep(dstData.data, offset, brush.size())
+          offset += brush.size()*4
+          ++y
+    #/switch brush.type
+
     # write brush back to image
     destination.putImageData dstData, brush.x(), brush.y()
     @
+
+   

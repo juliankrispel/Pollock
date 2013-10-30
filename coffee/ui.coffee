@@ -11,7 +11,7 @@ angular.module('PainterApp').controller 'PainterCtrl', ($scope) ->
       {url: "img/08.jpg"}
     ]
   }
-  $scope.brushTypes = ['circle', 'scircle', 'square', 'weird']
+  $scope.brushTypes = ['circle', 'scircle', 'square', 'weird', 'sort']
   $scope.removeImage = (index) ->
     $scope.painter.images.splice(index, 1)
   $scope.addImage = ->

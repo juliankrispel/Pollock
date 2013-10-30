@@ -4,29 +4,7 @@
 # .size()     -> get brush size
 # .type       -> get brush type
 
-class Brush 
-  constructor : (w,h) ->
-    @pos = new Mutable().setType(new RandomPosition().setRange(0,w,0,h))
-    @pos.cycle.setRange(20,100)
-    @bsize = new Mutable().setType(new RandomIntervalNumber().setRange(10,20))
-    @bsize.cycle.setRange(20,100)
-    @type = 'circle'
-
-  update : ->
-    @pos.update()
-    @bsize.update()
-    @
-
-  x : ->
-    @pos.valueOf().x | 0
-
-  y : ->
-    @pos.valueOf().y | 0
-
-  size : ->
-    @bsize.value.val | 0
-
-class Brush2
+class Brush
   constructor : (w,h) ->
     setValue = (v) -> 
       @val = if v<@min then @max else if v>@max then @min else v
@@ -144,7 +122,7 @@ class MovingBrushPainter extends Painter
     @brushes = []
     i = 0
     while i <= @state.brushCount
-      @brushes[i] =  @createBrush(Brush2)
+      @brushes[i] =  @createBrush(Brush)
       ++i
 
     @PS.makePublic(@state, 'brushCount', 'brushCount')
@@ -158,8 +136,9 @@ class MovingBrushPainter extends Painter
     i = 0
     while i < @state.brushCount
       src = @state.imgSrc.getImage imgIndex
+      # create new brush if brushCount exceeds current size
       if(!@brushes[i])
-        @brushes[i] = @createBrush(Brush2)
+        @brushes[i] = @createBrush(Brush)
       renderer.renderBrush @brushes[i], src, dest
       imgIndex++
       imgIndex = 0 if imgIndex is imgCount
