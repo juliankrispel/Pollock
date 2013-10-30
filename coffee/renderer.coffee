@@ -21,6 +21,7 @@ class SimpleRenderer extends Base
       dst[i] = bmode(src[i],dst[i])
       dst[i+1] = bmode(src[i+1],dst[i+1])
       dst[i+2] = bmode(src[i+2],dst[i+2])
+      dst[i+3] = 255
     @
 
   rgb2luminance : (RGB, i) ->
@@ -33,7 +34,7 @@ class SimpleRenderer extends Base
     right = new Uint8ClampedArray(length*4)
     li = 0
     ri = 0
-    for i in [0..(length*4)] by 4
+    for i in [0..((length-1)*4)] by 4
       if @rgb2luminance(array, offset+i) < pivot
         left[li+0] = array[offset+i+0]
         left[li+1] = array[offset+i+1]
