@@ -1,0 +1,95 @@
+#
+# Brush Movement Behavior Interface
+#
+# .x() | .y() -> getPosition
+# .update()   -> update internal state
+#
+# internal state parameters: Name / Type / Defaults / Channel
+# 'test1' / 'integer'  / [ <min>, <default>, <max>] / 'testNumberChannel'
+# 'test2' / 'real'     / [ <min>, <default>, <max>] / 'testRealChannel'
+# 'test3' / 'string'   / [ <default> ] / 'testStringChannel'
+# 'test4' / 'choose'   / [ 'opt1', 'opt2', 'opt3' ] / 'testOptChannel'
+# 'test5' / 'interval' / [ <min>, <defmin>, <defmax>, <max>] / 'testIntervalChan'
+
+class MovementBehavior
+
+    constructor : () ->
+        @type = 'none'
+
+    x : () ->
+        0
+
+    y : () ->
+        0
+
+    update : () ->
+        @
+    
+
+class RandomMovementBehavior extends MovementBehavior
+    
+    Defaults:
+        StateParameters: [
+            [ 'brushSize', 'interval', [1.0, 5.0, 10.0, 200.0], 'brushSize' ]
+        ]
+
+    constructor : () ->
+
+
+
+
+# -----------------------------------------------------------------------------
+# Brush Interface:
+# .x() | .y() -> get position
+# .size()     -> get brush size
+# .type       -> get brush type
+
+
+class Brush
+  constructor : (w,h) ->
+    setValue = (v) -> 
+      @val = if v<@min then @max else if v>@max then @min else v
+      @
+
+    @pos = new Mutable().setType(new RandomPosition().setRange(0,w,0,h))
+    @pos.cymode = 'irregular'
+    @pos.upmode = 'discrete'
+    @pos.cycle.setRange(900,2000)
+    # locally change update behavior of position randomintervalnumber
+    @pos.value.x.setValue = setValue;
+    @pos.value.y.setValue = setValue;
+
+    @delta = new Mutable().setType(new RandomPosition().setRange(-10,10,-10,10))
+    @delta.cymode = 'irregular'
+    @delta.upmode = 'linp'
+    @delta.cycle.setRange(10,50)
+
+    @sizem = new Mutable().setType(new RandomIntervalNumber().setRange(2,15))
+    @sizem.upmode = 'linp'
+    @sizem.cymode = 'irregular'
+    @sizem.cycle.setRange(20,100)
+
+    @type = 'circle'
+
+
+  update : ->
+    @pos.update()                 # randomly spawn a new position
+    @sizem.update()               # randomly set a new brush size now and then
+    S = +@sizem.value
+    @delta.value.setRange(-S/2,S/2,-S/2,S/2)
+    @delta.update()               # interpolate moving direction
+    D = @delta.valueOf()
+    @pos.value.x.setValue(@pos.value.x + D.x)
+    @pos.value.y.setValue(@pos.value.y + D.y)
+    @bsize = S | 0
+    #d=@delta.valueOf()
+    #@bsize = (Math.round(Math.sqrt(d.x*d.x+d.y*d.y))*2)+1
+
+  x : ->
+    @pos.valueOf().x | 0
+
+  y : ->
+    @pos.valueOf().y | 0
+
+  size : ->
+    @bsize
