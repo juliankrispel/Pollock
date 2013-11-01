@@ -4,12 +4,7 @@
 # .x() | .y() -> getPosition
 # .update()   -> update internal state
 #
-# internal state parameters: Name / Type / Defaults / Channel
-# 'test1' / 'integer'  / [ <min>, <default>, <max>] / 'testNumberChannel'
-# 'test2' / 'real'     / [ <min>, <default>, <max>] / 'testRealChannel'
-# 'test3' / 'string'   / [ <default> ] / 'testStringChannel'
-# 'test4' / 'choose'   / [ 'opt1', 'opt2', 'opt3' ] / 'testOptChannel'
-# 'test5' / 'interval' / [ <min>, <defmin>, <defmax>, <max>] / 'testIntervalChan'
+# internal state parameters: Name / Type / [Defaults] / [Member Vars] ] / Channel
 
 class MovementBehavior
 
@@ -28,12 +23,16 @@ class MovementBehavior
 
 class RandomMovementBehavior extends MovementBehavior
     
-    Defaults:
-        StateParameters: [
-            [ 'brushSize', 'interval', [1.0, 5.0, 10.0, 200.0], 'brushSize' ]
-        ]
+    PublicStateParameters: [
+        [ 'Brush Size', 'interval', [1.0, 5.0, 10.0, 200.0], ['bsize.value.min','bsize.value.max'] ,'brushSize' ]
+    ]
 
     constructor : () ->
+        @bsize = new Mutable().setType(new RandomIntervalNumber().setRange(2,15))
+        @bsize.upmode = 'linp'
+        @bsize.cymode = 'irregular'
+        @bsize.cycle.setRange(20,100)
+
 
 
 
