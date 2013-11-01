@@ -25,17 +25,26 @@ class RandomMovementBehavior extends MovementBehavior
     
     PublicStateParameters: [
         [ 'Brush Size', 'interval', [1.0, 5.0, 10.0, 200.0], ['bsize.value.min','bsize.value.max'] ,'brushSize' ]
+        [ 'Brush Speed', 'interval', [1, 20, 100, 300], ['bsize.cycle.min','bsize.cycle.max'] ,'brushSpeed' ]
     ]
 
     constructor : () ->
+        setValue = (v) -> 
+          @val = if v<@min then @max else if v>@max then @min else v
+          @
+
+        @pos = new Mutable().setType(new RandomPosition().setRange(0,w,0,h))
+        @pos.cymode = 'irregular'
+        @pos.upmode = 'discrete'
+        @pos.cycle.setRange(900,2000)
+        # locally change update behavior of position randomintervalnumber
+        @pos.value.x.setValue = setValue;
+        @pos.value.y.setValue = setValue;
+
         @bsize = new Mutable().setType(new RandomIntervalNumber().setRange(2,15))
         @bsize.upmode = 'linp'
         @bsize.cymode = 'irregular'
         @bsize.cycle.setRange(20,100)
-
-
-
-
 
 # -----------------------------------------------------------------------------
 # Brush Interface:
@@ -44,7 +53,7 @@ class RandomMovementBehavior extends MovementBehavior
 # .type       -> get brush type
 
 
-class Brush
+class OldBrush
   constructor : (w,h) ->
     setValue = (v) -> 
       @val = if v<@min then @max else if v>@max then @min else v
