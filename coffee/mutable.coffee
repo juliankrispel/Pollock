@@ -18,12 +18,16 @@
 #     given t=0..1
 
 class RandomIntervalNumber
-
-  constructor : () ->
+  constructor: (min, max)->
     @myClass = RandomIntervalNumber
     @val = 0
-    @min = 0
-    @max = 1
+    @min = min
+    @max = max
+
+  clone : () ->
+    cloned = new RandomIntervalNumber(@val.min, @val.max)
+    cloned.val = @val
+    cloned
 
   assign : (from) ->
     @setRange(from.min,from.max)
@@ -60,10 +64,13 @@ class RandomIntervalNumber
     @val
 
 class RandomPosition
-  constructor : () ->
+  constructor : (l, r, t, b) ->
+    unless l or r or t or b
+      throw(new Error('l,r,t,b all must be defined'))
+
     @myClass = RandomPosition
-    @x = new RandomIntervalNumber()
-    @y = new RandomIntervalNumber()
+    @x = new RandomIntervalNumber(l, r)
+    @y = new RandomIntervalNumber(t, b)
 
   setRange : (l,r,t,b) ->
     #@x = new RandomIntervalNumber().setRange(l,r)
@@ -71,6 +78,12 @@ class RandomPosition
     @x.setRange(l,r)
     @y.setRange(t,b)
     @
+
+  clone : () ->
+    cloned = new RandomPosition(@x.min, @x.max, @y.min, @y.max)
+    cloned.x.val = @x.val
+    cloned.y.val = @y.val
+    cloned
 
   assign : (from) ->
     @setRange(from.x.min,from.x.max,from.y.min,from.y.max)
@@ -98,24 +111,29 @@ class RandomPosition
 # and the following repetition behavior:
 #   'regular', 'irregular'
 
-class Mutable
+class Mutable extends Base
   # members:
-  constructor: () ->
-    @ctr = 1       # will trigger evaluation on first update
-    @cycle = new RandomIntervalNumber().setRange(5,20)
-    @cycle.setValue(10)         # default
-    @upmode = 'discrete'        # default update mode
-    @cymode = 'regular'         # default cycle mode
-    @value = NaN
-    @lastValue = NaN
+  defaults:
+    ctr: 1       # will trigger evaluation on first update
+    upmode: 'discrete'        # default update mode
+    value: NaN
+    lastValue: NaN
+    cycle:
+      mode: 'regular'
+      min: 20
+      max: 100
+      interval: 5
+
+  init: () ->
+    @_cycle = new RandomIntervalNumber(@cycle.min, @cycle.max)
+    @_cycle.setValue(10)
+    @setType(@value)
 
   # setType has to be called until mutable is valid!
   setType: ( val ) ->
     @value = val
-    @lastValue = new @value.myClass()
-    @lastValue.assign(@value)
-    @currentValue = new @value.myClass()
-    @currentValue.assign(@value)
+    @lastValue = @value.clone()
+    @currentValue = @value.clone()
     @
 
   update : ->
@@ -128,15 +146,18 @@ class Mutable
   newCycle : ->
     switch @cymode
       when 'irregular'
-        @cycle.newValue()
-    @ctr = @cycle.intValue()
+        @_cycle.newValue()
+
+      when 'regular'
+        @ctr = @cycle.interval
+    @ctr = @_cycle.intValue()
 
   valueOf : ->
     switch @upmode
       when 'discrete'
         v = @value.valueOf()
       when 'linp'
-        v = @currentValue.interpolate(@lastValue, @value, @ctr/@cycle.val)
+        v = @currentValue.interpolate(@lastValue, @value, @ctr/@_cycle.val)
     v
 
 # --------------------------------------------------------

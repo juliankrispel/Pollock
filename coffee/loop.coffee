@@ -33,7 +33,7 @@ mainLoop = (images) ->
     ++i
 
   myPainter.setImageSource imgSource
-  myPainter.init()
+  myPainter.start()
 
   myRenderer = new SimpleRenderer
   dstContext = dstCanvas.getContext("2d")
