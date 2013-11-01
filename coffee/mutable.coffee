@@ -24,6 +24,11 @@ class RandomIntervalNumber
     @min = min
     @max = max
 
+  clone : () ->
+    cloned = new RandomIntervalNumber(@val.min, @val.max)
+    cloned.val = @val
+    cloned
+
   assign : (from) ->
     @setRange(from.min,from.max)
     @val = from.val
@@ -74,6 +79,12 @@ class RandomPosition
     @y.setRange(t,b)
     @
 
+  clone : () ->
+    cloned = new RandomPosition(@x.min, @x.max, @y.min, @y.max)
+    cloned.x.val = @x.val
+    cloned.y.val = @y.val
+    cloned
+
   assign : (from) ->
     @setRange(from.x.min,from.x.max,from.y.min,from.y.max)
     @x.val = from.x.val
@@ -121,8 +132,8 @@ class Mutable extends Base
   # setType has to be called until mutable is valid!
   setType: ( val ) ->
     @value = val
-    @lastValue = new @value.myClass(val)
-    @currentValue = new @value.myClass(val)
+    @lastValue = @value.clone()
+    @currentValue = @value.clone()
     @
 
   update : ->
