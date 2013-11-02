@@ -56,4 +56,4 @@ window.startPainter = (renderTarget, images, callback) ->
     (images) ->
         mainLoop images
         # Pass the reference to myPainter back to UI
-        callback myPainter if callback
+        callback(myPainter) if callback

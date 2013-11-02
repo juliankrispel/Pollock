@@ -3,8 +3,13 @@
 # .x() | .y() -> get position
 # .size()     -> get brush size
 # .type       -> get brush type
-class Brush
-  constructor : (w,h) ->
+class Brush extends Base
+  public: 
+    'sizem.value.min': 'brushMinSize',
+    'sizem.value.max': 'brushMaxSize',
+    'type': 'brushType'
+
+  init: (w, h) ->
     @pos = new Mutable
       value: new RandomPosition(0, w, 0, h)
       upmode: 'discrete'
@@ -40,6 +45,8 @@ class Brush
 
     @type = 'circle'
 
+    # initialize state (and use bound values)
+    @.update() 
 
   update : ->
     @pos.update()                 # randomly spawn a new position
@@ -113,8 +120,11 @@ class MovingBrushPainter extends Painter
     @brushCount = num
     @init
 
-  createBrush: (type) ->
-    brush = new type(
+  public: 
+    'brushCount': 'brushCount'
+
+  createBrush: () ->
+    brush = new Brush(
       @imgSrc.width, 
       @imgSrc.height)
 
@@ -126,15 +136,15 @@ class MovingBrushPainter extends Painter
     brush
 
   start: =>
-    @PS = new PublishSubscriber();
     # initialize brushes
     @brushes = []
     i = 0
     while i <= @brushCount
-      @brushes[i] =  @createBrush(Brush)
+      console.log 'brushes are initializing, so public variables should be declared'
+      @brushes[i] =  new Brush(@imgSrc.width, @imgSrc.height)
       ++i
 
-    @PS.makePublic(@, 'brushCount', 'brushCount')
+#    @PS.makePublic(@, 'brushCount', 'brushCount')
   @
 
   paint: (renderer, dest) ->

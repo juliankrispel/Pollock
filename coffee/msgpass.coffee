@@ -81,19 +81,46 @@ class window.PublishSubscriber
                 callback() if listener != subscriber
         @
 
+    publishSubscribe: (obj)->
+        # Cancel operation if object doesn't have a 
+        # public declaration
+        if obj['public']
+            # To register everything in public, loop
+            # through the declaration
+            for param, value of obj['public']
+                # Because it can be declared as a string
+                # 'brush.size.value': 'brushMinSize' we have
+                # to split up the path and loop over it 
+                # to find the variable.
+                publicMember = obj
+                paths = param.split('.')
+                lastPath = paths.pop()
+                # Don't loop over an array smaller than 1
+                if paths.length > 1
+                    # don't loop over last item in array which needs
+                    # to be passed on to makePublic
+                    for path in paths 
+                        # Catch invalid variable names
+                        if(!publicMember[path])
+                            throw new Error('object ' + publicMember + ' has no member called ' + path)
+                        publicMember = publicMember[path]
+
+                # bind object member to PublishSubscriber with makePublic
+                @makePublic(publicMember, lastPath, value)
+
     makePublic: (obj, property, channel) ->
         PS = @
 
         if obj.hasOwnProperty(property)
-            defaultvalue = obj[property]
+            defaultValue = obj[property]
         Object.defineProperty(obj, property, {
             get: () -> PS.getValue(channel,obj.constructor.name)
             set: (val) -> PS.setValue(channel,obj.constructor.name,val)
         })
-        
-        newChannel = not @_channels.hasOwnProperty(channel)
+
+        isNewChannel = not @_channels.hasOwnProperty(channel)
 
         @subscribe(channel, obj.constructor.name,()->)
-        if defaultvalue != undefined and newChannel
-           @setValue(channel, obj.constructor.name, defaultvalue)
+        if defaultValue != undefined and isNewChannel
+           @setValue(channel, obj.constructor.name, defaultValue)
         @
