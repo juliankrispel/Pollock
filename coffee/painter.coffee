@@ -123,18 +123,6 @@ class MovingBrushPainter extends Painter
   public: 
     'brushCount': 'brushCount'
 
-  createBrush: () ->
-    brush = new Brush(
-      @imgSrc.width, 
-      @imgSrc.height)
-
-    # public brush state (can be manipulated by GUI)
-    @PS.makePublic(brush.sizem.value, 'min', 'brushMinSize')
-    @PS.makePublic(brush.sizem.value, 'max', 'brushMaxSize')
-    @PS.makePublic(brush, 'type', 'brushType')
-    brush.update() # initialize state (and use bound values)
-    brush
-
   start: =>
     # initialize brushes
     @brushes = []
@@ -143,8 +131,6 @@ class MovingBrushPainter extends Painter
       console.log 'brushes are initializing, so public variables should be declared'
       @brushes[i] =  new Brush(@imgSrc.width, @imgSrc.height)
       ++i
-
-#    @PS.makePublic(@, 'brushCount', 'brushCount')
   @
 
   paint: (renderer, dest) ->
