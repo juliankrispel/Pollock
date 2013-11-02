@@ -3,33 +3,50 @@
 # .x() | .y() -> get position
 # .size()     -> get brush size
 # .type       -> get brush type
+class Brush extends Base
+  public: 
+    'sizem.value.min': 'brushMinSize',
+    'sizem.value.max': 'brushMaxSize',
+    'type': 'brushType'
 
-class Brush
-  constructor : (w,h) ->
+  init: (w, h) ->
+    @pos = new Mutable
+      value: new RandomPosition(0, w, 0, h)
+      upmode: 'discrete'
+      cycle: {
+        mode: 'irregular'
+        min: 900
+        max: 2000
+      }
+
+    # locally change update behavior of position randomintervalnumber
     setValue = (v) -> 
       @val = if v<@min then @max else if v>@max then @min else v
       @
 
-    @pos = new Mutable().setType(new RandomPosition().setRange(0,w,0,h))
-    @pos.cymode = 'irregular'
-    @pos.upmode = 'discrete'
-    @pos.cycle.setRange(900,2000)
-    # locally change update behavior of position randomintervalnumber
     @pos.value.x.setValue = setValue;
     @pos.value.y.setValue = setValue;
 
-    @delta = new Mutable().setType(new RandomPosition().setRange(-10,10,-10,10))
-    @delta.cymode = 'irregular'
-    @delta.upmode = 'linp'
-    @delta.cycle.setRange(10,50)
+    @delta = new Mutable
+      value: new RandomPosition -10, 10, -10, 10
+      upmode: 'linp'
+      cycle: 
+        mode: 'irregular'
+        min: 10
+        max: 50
 
-    @sizem = new Mutable().setType(new RandomIntervalNumber().setRange(2,15))
-    @sizem.upmode = 'linp'
-    @sizem.cymode = 'irregular'
-    @sizem.cycle.setRange(20,100)
+    @sizem = new Mutable
+      value: new RandomIntervalNumber 2, 15
+      upmode: 'linp'
+      cycle: 
+        mode: 'irregular'
+        min: 20
+        max: 100
 
     @type = 'circle'
 
+    # initialize state (and use bound values)
+    @.update() 
 
   update : ->
     @pos.update()                 # randomly spawn a new position
@@ -53,7 +70,6 @@ class Brush
   size : ->
     @bsize
 
-
 # -----------------------------------------------------------------------------
 # ImageSource abstracts a set of images, accesible by index
 # width and height of ImageSource correspond to 
@@ -65,17 +81,17 @@ class ImageSource extends Base
     images: []
 
   setSize: (width, height) =>
-    @state.width = width
-    @state.height = height
+    @width = width
+    @height = height
 
   getImageCount: =>
-    @state.images.length
+    @images.length
 
   getImage: (index) ->
-    @state.images[index]
+    @images[index]
 
   addImage: (img) ->
-    @state.images.push img
+    @images.push img
 
 # -----------------------------------------------------------------------------
 # The painter is responsible for what is going to get drawn where
@@ -91,52 +107,40 @@ class Painter extends Base
     imgSrc: null
     brushCount: 6
 
-  init: ->
+  start: ->
   paint: (renderer, destination) ->
   update: ->
   setImageSource: (image) ->
-    @state.imgSrc = image
+    @imgSrc = image
 
 # The MovingBrushPainter is a simple painter that just copies
 # brushes from multiple input images to a destination image
 class MovingBrushPainter extends Painter
-
   setBrushes: (num) ->
-    @state.brushCount = num
+    @brushCount = num
     @init
 
-  createBrush: (type) ->
-    brush = new type(
-      @state.imgSrc.state.width, 
-      @state.imgSrc.state.height)
-    # public brush state (can be manipulated by GUI)
-    @PS.makePublic(brush.sizem.value,'min','brushMinSize')
-    @PS.makePublic(brush.sizem.value,'max','brushMaxSize')
-    @PS.makePublic(brush,'type','brushType')
-    brush.update() # initialize state (and use bound values)
-    brush
+  public: 
+    'brushCount': 'brushCount'
 
-  init: =>
-    @PS = new PublishSubscriber();
+  start: =>
     # initialize brushes
     @brushes = []
     i = 0
-    while i <= @state.brushCount
-      @brushes[i] =  @createBrush(Brush)
+    while i <= @brushCount
+      console.log 'brushes are initializing, so public variables should be declared'
+      @brushes[i] =  new Brush(@imgSrc.width, @imgSrc.height)
       ++i
-
-    @PS.makePublic(@state, 'brushCount', 'brushCount')
   @
 
   paint: (renderer, dest) ->
     imgIndex = 0
-    imgCount = @state.imgSrc.getImageCount()
+    imgCount = @imgSrc.getImageCount()
 
     # render each brush, cycling through input images
     i = 0
-    while i < @state.brushCount
-      src = @state.imgSrc.getImage imgIndex
-      # create new brush if brushCount exceeds current size
+    while i < @brushCount
+      src = @imgSrc.getImage imgIndex
       if(!@brushes[i])
         @brushes[i] = @createBrush(Brush)
       renderer.renderBrush @brushes[i], src, dest

@@ -43,7 +43,4 @@ extend = (obj) ->
         obj[prop] = source[prop]
   obj
 
-# Base Class
-class Base
-  constructor: (options) ->
-    @state = extend _(@defaults).clone(), options
+

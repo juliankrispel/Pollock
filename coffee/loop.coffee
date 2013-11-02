@@ -33,7 +33,7 @@ mainLoop = (images) ->
     ++i
 
   myPainter.setImageSource imgSource
-  myPainter.init()
+  myPainter.start()
 
   myRenderer = new SimpleRenderer
   dstContext = dstCanvas.getContext("2d")
@@ -56,4 +56,4 @@ window.startPainter = (renderTarget, images, callback) ->
     (images) ->
         mainLoop images
         # Pass the reference to myPainter back to UI
-        callback myPainter if callback
+        callback(myPainter) if callback
