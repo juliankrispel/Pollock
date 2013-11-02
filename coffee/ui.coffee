@@ -12,6 +12,7 @@ angular.module('PainterApp').controller 'PainterCtrl', ($scope) ->
     ]
   }
   $scope.brushTypes = ['circle', 'scircle', 'square', 'weird', 'sort']
+  $scope.brushMovements = ['Movement 1', 'Movement 2', 'Movement 3']
   $scope.removeImage = (index) ->
     $scope.painter.images.splice(index, 1)
   $scope.addImage = ->
@@ -25,7 +26,7 @@ angular.module('PainterApp').directive 'canvasPainter', ->
           hasLoaded: true
         }
 
-        list = [ 'brushMinSize', 'brushMaxSize', 'brushCount', 'brushType' ]
+        list = [ 'brushMinSize', 'brushMaxSize', 'brushCount', 'brushType', 'brushMovement' ]
 
         for name in list
           do(name) ->

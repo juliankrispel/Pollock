@@ -1,13 +1,49 @@
+class Movement extends Base
+
+class MovementOne extends Movement
+  init: ()->
+    console.log 'hello I\'m Movement 1'
+
+class MovementTwo extends Movement
+  init: ()->
+    console.log 'hello I\'m Movement 2'
+
+class MovementThree extends Movement
+  init: ()->
+    console.log 'hello I\'m Movement 3'
+
 # -----------------------------------------------------------------------------
 # Brush Interface:
 # .x() | .y() -> get position
 # .size()     -> get brush size
 # .type       -> get brush type
 class Brush extends Base
+  defaults:
+    type: 'circle'
+    movement: {}
+    movementType: 'Movement 1'
+
+  subscribe:
+    'brushMovement': 'switchMovement'
+
   public: 
-    'sizem.value.min': 'brushMinSize',
-    'sizem.value.max': 'brushMaxSize',
-    'type': 'brushType'
+    'brushMinSize': 'sizem.value.min',
+    'brushMaxSize': 'sizem.value.max',
+    'brushMovement': 'movementType',
+    'brushType': 'type'
+
+  startMovement: (movementClass) ->
+    return false
+    movementClass = movementClass or MovementOne
+    @movement = new movementClass
+
+  switchMovement: () =>
+    console.log 'switch movement', @movementType
+    switch @movementType
+      when 'Movement 1' then @startMovement(MovementOne)
+      when 'Movement 2' then @startMovement(MovementTwo)
+      when 'Movement 3' then @startMovement(MovementThree)
+      else @startMovement()
 
   init: (w, h) ->
     @pos = new Mutable
@@ -43,10 +79,12 @@ class Brush extends Base
         min: 20
         max: 100
 
-    @type = 'circle'
 
     # initialize state (and use bound values)
     @.update() 
+    @.startMovement()
+
+  changeMovement: (movement)->
 
   update : ->
     @pos.update()                 # randomly spawn a new position
@@ -128,7 +166,8 @@ class MovingBrushPainter extends Painter
     @brushes = []
     i = 0
     while i <= @brushCount
-      console.log 'brushes are initializing, so public variables should be declared'
+      console.log('New Brush')
+      console.log('##')
       @brushes[i] =  new Brush(@imgSrc.width, @imgSrc.height)
       ++i
   @
@@ -142,7 +181,7 @@ class MovingBrushPainter extends Painter
     while i < @brushCount
       src = @imgSrc.getImage imgIndex
       if(!@brushes[i])
-        @brushes[i] = @createBrush(Brush)
+        @brushes[i] = new Brush(@imgSrc.width, @imgSrc.height)
       renderer.renderBrush @brushes[i], src, dest
       imgIndex++
       imgIndex = 0 if imgIndex is imgCount

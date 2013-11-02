@@ -6,7 +6,6 @@
 # - each subscriber can set a callback function per channel
 
 class window.PublishSubscriber 
-
     constructor: () ->
         @_channels = {};
         @_subscribers = {};
@@ -41,11 +40,9 @@ class window.PublishSubscriber
             @_subscribers[subscriber] = { _channels : {} }
 
         # subscribe
-        try 
-            callback()
-        catch error
-            console.log('[PublishSubscriber ERR]: ' + subscriber + " tried to register an invalid callback.")
-            callback = ->
+
+        if(typeof callback not 'function')
+            console.log('[PublishSubscriber ERR]: `typeof` callback != function')
         @_channels[channel]._subscribers[subscriber] = callback;
         @_subscribers[subscriber]._channels[channel] = @_channels[channel];
         @
@@ -70,45 +67,40 @@ class window.PublishSubscriber
         null
 
     setValue: (channel, subscriber, value) =>
-        if not @_channels.hasOwnProperty(channel)
-            @registerChannel(channel, { value: value })
+      # Create a channel if it doesn't exist
+      # for future subscribers
+      if not @_channels.hasOwnProperty(channel)
+        @registerChannel(channel, { value: value })
 
-        # notify only if value actually changes
-        if  @_channels[channel].value != value
-            @_channels[channel].value = value
-            # notify all _subscribers of a channel but the callee
-            for listener, callback of @_channels[channel]._subscribers
-                callback() if listener != subscriber
-        @
+      # notify only if value actually changes
+      if @_channels[channel].value != value
+        @_channels[channel].value = value
+        # notify all _subscribers of a channel but the callee
+        for listener, callback of @_channels[channel]._subscribers
+            callback() if listener != subscriber
+      @
 
-    publishSubscribe: (obj)->
-        # Cancel operation if object doesn't have a 
-        # public declaration
-        if obj['public']
-            # To register everything in public, loop
-            # through the declaration
-            for param, value of obj['public']
-                # Because it can be declared as a string
-                # 'brush.size.value': 'brushMinSize' we have
-                # to split up the path and loop over it 
-                # to find the variable.
-                publicMember = obj
-                paths = param.split('.')
-                lastPath = paths.pop()
-                # Don't loop over an array smaller than 1
-                if paths.length > 1
-                    # don't loop over last item in array which needs
-                    # to be passed on to makePublic
-                    for path in paths 
-                        # Catch invalid variable names
-                        if(!publicMember[path])
-                            throw new Error('object ' + publicMember + ' has no member called ' + path)
-                        publicMember = publicMember[path]
+    subscribeAll: (obj)->
+      if obj['subscribe']
+        for subscribeTo, callbackName of obj['subscribe']
+          @subscribe(subscribeTo, 'painter', obj[callbackName])
 
-                # bind object member to PublishSubscriber with makePublic
-                @makePublic(publicMember, lastPath, value)
 
-    makePublic: (obj, property, channel) ->
+    publishAll: (obj)->
+      # Cancel operation if object doesn't have a 
+      # public declaration
+      if obj['public']
+        # To register everything in public, loop
+        # through the declaration
+        for publicVar, memberVar of obj['public']
+          paths = memberVar.split('.')
+          lastPath = paths.pop()
+
+          memberVar = useArrayAsDirectory(obj, paths)
+
+          @publish(memberVar, lastPath, publicVar)
+
+    publish: (obj, property, channel) ->
         PS = @
 
         if obj.hasOwnProperty(property)

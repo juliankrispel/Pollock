@@ -5,24 +5,24 @@
 # .update()   -> update internal state
 #
 # internal state parameters: Name / Type / [Defaults] / [Member Vars] ] / Channel
+class Movement
+  public: 
+    ''
+  constructor : () ->
+    @type = 'none'
+  x : () ->
+    0
+  y : () ->
+    0
+  update : () ->
+    @
 
-class MovementBehavior
+class FirstMovement
+  description: 'Brush Size'
 
-    constructor : () ->
-        @type = 'none'
 
-    x : () ->
-        0
+class RandomMovementBehavior extends Movement
 
-    y : () ->
-        0
-
-    update : () ->
-        @
-    
-
-class RandomMovementBehavior extends MovementBehavior
-    
     PublicStateParameters: [
         [ 'Brush Size', 'interval', [1.0, 5.0, 10.0, 200.0], ['bsize.value.min','bsize.value.max'] ,'brushSize' ]
         [ 'Brush Speed', 'interval', [1, 20, 100, 300], ['bsize.cycle.min','bsize.cycle.max'] ,'brushSpeed' ]

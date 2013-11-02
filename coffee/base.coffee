@@ -26,7 +26,7 @@ class Base
     if(@['init'])
         @init.apply(@, initArgs)
 
-    # publishSubscribe all variables defined in
+    # publishAll all variables defined in
     # class member 'public'. Public class variables 
     # are declared like this
     #
@@ -34,6 +34,7 @@ class Base
     #   name: 'I\'m an Example Class'
     #   public: 
     #     'name': 'exampleClassName'
-    @PS.publishSubscribe(@)
+    @PS.publishAll(@)
+    @PS.subscribeAll(@)
 
 window.PS = PS
