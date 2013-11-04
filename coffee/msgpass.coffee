@@ -82,7 +82,7 @@ class window.PublishSubscriber
     publishAll: (obj)->
       # Cancel operation if object doesn't have a 
       # public declaration
-      if obj['public']
+      if obj['public'] and typeof obj['public'] == 'object'
         # To register everything in public, loop
         # through the declaration
         for publicVar, memberVar of obj['public']

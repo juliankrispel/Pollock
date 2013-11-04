@@ -1,25 +1,37 @@
 class Movement extends Base
+  public:
+    'movementDescription': 'description'
+    'movementMinSize': 'minSize'
 
 class MovementOne extends Movement
+  public:
+    'movementDescription': 'description'
+    'movementMinSize': 'minSize'
+    'movementOneAttribute': 'maxSize'
   defaults:
-    name: 'Movement 1'
+    descripton: 'Movement 1'
+    maxSize: 50
     minSize: 3
   init: ()->
     console.log 'hello I\'m Movement 1'
 
 class MovementTwo extends Movement
+  public:
+    'movementTwoAttribute': 'maxSize'
   defaults:
-    name: 'Movement 1'
-    maxSize: 20
-    minSize: 3
+    descripton: 'Movement 2'
+    maxSize: 40
+    minSize: 1
   init: ()->
     console.log 'hello I\'m Movement 2'
 
 class MovementThree extends Movement
+  public:
+    'movementThreeAttribute': 'maxSize'
   defaults:
-    name: 'Movement 1'
+    descripton: 'Movement 1'
     maxSize: 20
-    minSize: 3
+    minSize: 6
   init: ()->
     console.log 'hello I\'m Movement 3'
 
@@ -47,7 +59,7 @@ class Brush extends Base
     @movement = new movementClass
 
   switchMovement: () =>
-    switch @movement
+    switch @movementType
       when 'Movement 1' then @startMovement(MovementOne)
       when 'Movement 2' then @startMovement(MovementTwo)
       when 'Movement 3' then @startMovement(MovementThree)
@@ -106,9 +118,9 @@ class Brush extends Base
     @bsize = S | 0
     #d=@delta.valueOf()
     #@bsize = (Math.round(Math.sqrt(d.x*d.x+d.y*d.y))*2)+1
-    if(@_oldMovement isnt @movement)
+    if(@_oldMovement isnt @movementType)
       @switchMovement()
-      @_oldMovement = @movement
+      @_oldMovement = @movementType
 
   x : ->
     @pos.valueOf().x | 0
