@@ -26,7 +26,7 @@ angular.module('PainterApp').directive 'canvasPainter', ->
           hasLoaded: true
         }
 
-        list = [ 'brushMinSize', 'brushMaxSize', 'brushCount', 'brushType', 'brushMovement' ]
+        list = [ 'brushMinSize', 'brushMaxSize', 'brushCount', 'brushType', 'brushMovement', 'brushMovementType' ]
 
         for name in list
           do(name) ->

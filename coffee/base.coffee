@@ -35,6 +35,5 @@ class Base
     #   public: 
     #     'name': 'exampleClassName'
     @PS.publishAll(@)
-    @PS.subscribeAll(@)
 
 window.PS = PS

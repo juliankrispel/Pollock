@@ -1,14 +1,25 @@
 class Movement extends Base
 
 class MovementOne extends Movement
+  defaults:
+    name: 'Movement 1'
+    minSize: 3
   init: ()->
     console.log 'hello I\'m Movement 1'
 
 class MovementTwo extends Movement
+  defaults:
+    name: 'Movement 1'
+    maxSize: 20
+    minSize: 3
   init: ()->
     console.log 'hello I\'m Movement 2'
 
 class MovementThree extends Movement
+  defaults:
+    name: 'Movement 1'
+    maxSize: 20
+    minSize: 3
   init: ()->
     console.log 'hello I\'m Movement 3'
 
@@ -20,26 +31,23 @@ class MovementThree extends Movement
 class Brush extends Base
   defaults:
     type: 'circle'
-    movement: {}
     movementType: 'Movement 1'
-
-  subscribe:
-    'brushMovement': 'switchMovement'
+    _oldMovement: 'Movement 1'
+    movement: {}
 
   public: 
     'brushMinSize': 'sizem.value.min',
     'brushMaxSize': 'sizem.value.max',
-    'brushMovement': 'movementType',
+    'brushMovementType': 'movementType',
+    'brushMovement': 'movement',
     'brushType': 'type'
 
   startMovement: (movementClass) ->
-    return false
     movementClass = movementClass or MovementOne
     @movement = new movementClass
 
   switchMovement: () =>
-    console.log 'switch movement', @movementType
-    switch @movementType
+    switch @movement
       when 'Movement 1' then @startMovement(MovementOne)
       when 'Movement 2' then @startMovement(MovementTwo)
       when 'Movement 3' then @startMovement(MovementThree)
@@ -98,6 +106,9 @@ class Brush extends Base
     @bsize = S | 0
     #d=@delta.valueOf()
     #@bsize = (Math.round(Math.sqrt(d.x*d.x+d.y*d.y))*2)+1
+    if(@_oldMovement isnt @movement)
+      @switchMovement()
+      @_oldMovement = @movement
 
   x : ->
     @pos.valueOf().x | 0
@@ -166,8 +177,6 @@ class MovingBrushPainter extends Painter
     @brushes = []
     i = 0
     while i <= @brushCount
-      console.log('New Brush')
-      console.log('##')
       @brushes[i] =  new Brush(@imgSrc.width, @imgSrc.height)
       ++i
   @

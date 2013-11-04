@@ -40,8 +40,7 @@ class window.PublishSubscriber
             @_subscribers[subscriber] = { _channels : {} }
 
         # subscribe
-
-        if(typeof callback not 'function')
+        if(typeof callback != 'function')
             console.log('[PublishSubscriber ERR]: `typeof` callback != function')
         @_channels[channel]._subscribers[subscriber] = callback;
         @_subscribers[subscriber]._channels[channel] = @_channels[channel];
@@ -80,12 +79,6 @@ class window.PublishSubscriber
             callback() if listener != subscriber
       @
 
-    subscribeAll: (obj)->
-      if obj['subscribe']
-        for subscribeTo, callbackName of obj['subscribe']
-          @subscribe(subscribeTo, 'painter', obj[callbackName])
-
-
     publishAll: (obj)->
       # Cancel operation if object doesn't have a 
       # public declaration
@@ -113,6 +106,6 @@ class window.PublishSubscriber
         isNewChannel = not @_channels.hasOwnProperty(channel)
 
         @subscribe(channel, obj.constructor.name,()->)
-        if defaultValue != undefined and isNewChannel
+        if defaultValue isnt undefined and isNewChannel
            @setValue(channel, obj.constructor.name, defaultValue)
         @
