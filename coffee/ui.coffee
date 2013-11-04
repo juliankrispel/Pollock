@@ -32,7 +32,7 @@ angular.module('PainterApp').directive 'canvasPainter', ->
           'brushCount', 
           'brushType', 
           'brushMovementType',
-          'movementDescripton',
+          'movementDescription',
           'movementMinSize',
           'movementOneAttribute',
           'movementTwoAttribute',
@@ -41,10 +41,13 @@ angular.module('PainterApp').directive 'canvasPainter', ->
 
         for name in list
           do(name) ->
-            scope.painter[name] = myPainter.PS.getValue(name)
-
             myPainter.PS.subscribe(name, 'gui', () -> 
-              scope.painter[name] = myPainter.PS.getValue(name))
+              console.log(name, myPainter.PS.getValue(name))
+              scope.painter[name] = myPainter.PS.getValue(name)
+              scope.$apply()
+            )
+
+            scope.painter[name] = myPainter.PS.getValue(name)
 
             scope.$watch('painter.' + name, ()->
               myPainter.PS.setValue(name, 'gui', scope.painter[name])

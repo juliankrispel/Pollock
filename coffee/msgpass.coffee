@@ -106,6 +106,6 @@ class window.PublishSubscriber
         isNewChannel = not @_channels.hasOwnProperty(channel)
 
         @subscribe(channel, obj.constructor.name,()->)
-        if defaultValue isnt undefined and isNewChannel
-           @setValue(channel, obj.constructor.name, defaultValue)
+        if defaultValue isnt undefined #and isNewChannel
+          @setValue(channel, obj.constructor.name, defaultValue)
         @

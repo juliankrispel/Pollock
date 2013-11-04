@@ -33,11 +33,11 @@
           <option ng-repeat="movement in brushMovements">{{movement}}</option>
         </select>
         <div>
-          <input ng-model="movementDescription" type="text"/>
-          <input ng-model="movementMinSize" type="text"/>
-          <input ng-show="brushMovementType == 'Movement 1'" ng-model="movementOneAttribute" type="text"/>
-          <input ng-show="brushMovementType == 'Movement 2'" ng-model="movementTwoAttribute" type="text"/>
-          <input ng-show="brushMovementType == 'Movement 3'" ng-model="movementThreeAttribute" type="text"/>
+          <h2>{{painter.movementDescription}}</h2>
+          <input ng-model="painter.movementMinSize" type="text"/>
+          <input ng-show="painter.brushMovementType == 'Movement 1'" ng-model="painter.movementOneAttribute" type="text"/>
+          <input ng-show="painter.brushMovementType == 'Movement 2'" ng-model="painter.movementTwoAttribute" type="text"/>
+          <input ng-show="painter.brushMovementType == 'Movement 3'" ng-model="painter.movementThreeAttribute" type="text"/>
         </div>
 
       </div>

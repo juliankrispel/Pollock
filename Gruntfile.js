@@ -32,6 +32,7 @@ module.exports = function(grunt){
                         'coffee/msgpass.coffee',
                         'coffee/base.coffee',
                         'coffee/mutable.coffee',
+                        'coffee/brush.coffee',
                         'coffee/painter.coffee',
                         'coffee/renderer.coffee',
                         'coffee/loop.coffee',
