@@ -34,10 +34,10 @@
         </select>
         <div>
           <h2>{{painter.movementDescription}}</h2>
-          <input ng-model="painter.movementMinSize" type="text"/>
-          <input ng-show="painter.brushMovementType == 'Movement 1'" ng-model="painter.movementOneAttribute" type="text"/>
-          <input ng-show="painter.brushMovementType == 'Movement 2'" ng-model="painter.movementTwoAttribute" type="text"/>
-          <input ng-show="painter.brushMovementType == 'Movement 3'" ng-model="painter.movementThreeAttribute" type="text"/>
+          <label>Minimum Movement Change</label>
+          <input ng-model="painter.movementChangeDirectionMin" type="number"/>
+          <label>Maximum Movement Change</label>
+          <input ng-model="painter.movementChangeDirectionMax" type="number"/>
         </div>
 
       </div>

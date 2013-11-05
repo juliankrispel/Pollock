@@ -34,9 +34,8 @@ angular.module('PainterApp').directive 'canvasPainter', ->
           'brushMovementType',
           'movementDescription',
           'movementMinSize',
-          'movementOneAttribute',
-          'movementTwoAttribute',
-          'movementThreeAttribute'
+          'movementChangeDirectionMin',
+          'movementChangeDirectionMax'
         ]
 
         for name in list

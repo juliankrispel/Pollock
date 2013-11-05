@@ -3,15 +3,10 @@ class Movement extends Base
 
 class MovementOne extends Movement
   public:
-    'movementDescription': 'description'
-    'movementMinSize': 'minSize'
-    'movementOneAttribute': 'maxSize'
-    'brushMinSize': 'sizem.value.min',
-    'brushMaxSize': 'sizem.value.max',  
-  defaults:
-    description: 'Random Movement'
-    maxSize: 50
-    minSize: 3
+    'brushMinSize': 'sizem.value.min'
+    'brushMaxSize': 'sizem.value.max'
+    'movementChangeDirectionMin': 'delta.cycle.min'
+    'movementChangeDirectionMax': 'delta.cycle.max'
 
   init: (w, h) ->
     console.log 'Random Movement initialized, parameters: w:' + w + " h:" + h;
@@ -23,12 +18,15 @@ class MovementOne extends Movement
         min: 900
         max: 2000
       }
+
     # locally change update behavior of position randomintervalnumber
     setValue = (v) -> 
       @val = if v<@min then @max else if v>@max then @min else v
       @
+
     @pos.value.x.setValue = setValue;
     @pos.value.y.setValue = setValue;
+
     @delta = new Mutable
       value: new RandomPosition -10, 10, -10, 10
       upmode: 'linp'
@@ -36,6 +34,7 @@ class MovementOne extends Movement
         mode: 'irregular'
         min: 10
         max: 50
+
     @sizem = new Mutable
       value: new RandomIntervalNumber 2, 15
       upmode: 'linp'
