@@ -143,8 +143,11 @@ class Mutable extends Base
       @value.newValue()
       @newCycle()
 
+  setCycle : ( value ) ->
+
+
   newCycle : ->
-    switch @cymode
+    switch @cycle.mode
       when 'irregular'
         @_cycle.newValue()
 

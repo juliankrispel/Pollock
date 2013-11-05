@@ -55,7 +55,7 @@ useArrayAsDirectory = (obj, paths) ->
   for path in paths 
     # Catch invalid variable names
     if(!publicMember[path])
-        throw new Error('object ' + publicMember + ' has no member called ' + path)
+        throw new Error('object ' + publicMember.constructor.name + ' has no member called ' + path)
     publicMember = publicMember[path]
   publicMember
 

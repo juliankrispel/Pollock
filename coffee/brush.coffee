@@ -5,8 +5,8 @@ class MovementOne extends Movement
   public:
     'brushMinSize': 'sizem.value.min'
     'brushMaxSize': 'sizem.value.max'
-    'movementChangeDirectionMin': 'delta.cycle.min'
-    'movementChangeDirectionMax': 'delta.cycle.max'
+    'movementChangeDirectionMin': 'delta._cycle.min'
+    'movementChangeDirectionMax': 'delta._cycle.max'
 
   init: (w, h) ->
     console.log 'Random Movement initialized, parameters: w:' + w + " h:" + h;
