@@ -1,17 +1,73 @@
 class Movement extends Base
 
+
 class MovementOne extends Movement
   public:
     'movementDescription': 'description'
     'movementMinSize': 'minSize'
     'movementOneAttribute': 'maxSize'
+    'brushMinSize': 'sizem.value.min',
+    'brushMaxSize': 'sizem.value.max',  
   defaults:
-    description: 'Movement 1'
+    description: 'Random Movement'
     maxSize: 50
     minSize: 3
-  init: ()->
-    console.log 'hello I\'m Movement 1'
 
+  init: (w, h) ->
+    console.log 'Random Movement initialized, parameters: w:' + w + " h:" + h;
+    @pos = new Mutable
+      value: new RandomPosition(0, w, 0, h)
+      upmode: 'discrete'
+      cycle: {
+        mode: 'irregular'
+        min: 900
+        max: 2000
+      }
+    # locally change update behavior of position randomintervalnumber
+    setValue = (v) -> 
+      @val = if v<@min then @max else if v>@max then @min else v
+      @
+    @pos.value.x.setValue = setValue;
+    @pos.value.y.setValue = setValue;
+    @delta = new Mutable
+      value: new RandomPosition -10, 10, -10, 10
+      upmode: 'linp'
+      cycle: 
+        mode: 'irregular'
+        min: 10
+        max: 50
+    @sizem = new Mutable
+      value: new RandomIntervalNumber 2, 15
+      upmode: 'linp'
+      cycle: 
+        mode: 'irregular'
+        min: 20
+        max: 100
+    # initialize state (and use bound values)
+    @.update() 
+
+  update: () ->
+    @pos.update()                 # randomly spawn a new position
+    @sizem.update()               # randomly set a new brush size now and then
+    S = +@sizem.value
+    @delta.value.setRange(-S/2,S/2,-S/2,S/2)
+    @delta.update()               # interpolate moving direction
+    D = @delta.valueOf()
+    @pos.value.x.setValue(@pos.value.x + D.x)
+    @pos.value.y.setValue(@pos.value.y + D.y)
+    @bsize = S | 0
+
+  x: () ->
+     @pos.valueOf().x | 0   
+
+  y: () ->
+    @pos.valueOf().y | 0
+
+  size: () ->
+    @bsize.valueOf()
+
+
+# fixed position, or "no" movement
 class MovementTwo extends Movement
   public:
     'movementDescription': 'description'
@@ -23,6 +79,14 @@ class MovementTwo extends Movement
     minSize: 1
   init: ()->
     console.log 'hello I\'m Movement 2'
+  x: () ->
+    0
+
+  y: () ->
+    0
+
+  size: () ->
+    { }
 
 class MovementThree extends Movement
   public:
@@ -30,7 +94,7 @@ class MovementThree extends Movement
     'movementMinSize': 'minSize'
     'movementThreeAttribute': 'maxSize'
   defaults:
-    description: 'Movement 1'
+    description: 'Movement 3'
     maxSize: 20
     minSize: 6
   init: ()->
@@ -44,91 +108,45 @@ class MovementThree extends Movement
 class Brush extends Base
   defaults:
     type: 'circle'
-    movementType: 'Movement 1'
-    _oldMovement: 'Movement 1'
+    movementType: 'Random Movement'
+    _oldMovement: 'Random Movement'
     movement: {}
 
   public: 
-    'brushMinSize': 'sizem.value.min',
-    'brushMaxSize': 'sizem.value.max',
     'brushMovementType': 'movementType',
     'brushType': 'type'
 
   startMovement: (movementClass) ->
     movementClass = movementClass or MovementOne
-    @movement = new movementClass
+    @movement = new movementClass(@width, @height)
 
   switchMovement: () =>
     switch @movementType
-      when 'Movement 1' then @startMovement(MovementOne)
+      when 'Random Movement' then @startMovement(MovementOne)
       when 'Movement 2' then @startMovement(MovementTwo)
       when 'Movement 3' then @startMovement(MovementThree)
       else @startMovement()
 
   init: (w, h) ->
-    @pos = new Mutable
-      value: new RandomPosition(0, w, 0, h)
-      upmode: 'discrete'
-      cycle: {
-        mode: 'irregular'
-        min: 900
-        max: 2000
-      }
-
-    # locally change update behavior of position randomintervalnumber
-    setValue = (v) -> 
-      @val = if v<@min then @max else if v>@max then @min else v
-      @
-
-    @pos.value.x.setValue = setValue;
-    @pos.value.y.setValue = setValue;
-
-    @delta = new Mutable
-      value: new RandomPosition -10, 10, -10, 10
-      upmode: 'linp'
-      cycle: 
-        mode: 'irregular'
-        min: 10
-        max: 50
-
-    @sizem = new Mutable
-      value: new RandomIntervalNumber 2, 15
-      upmode: 'linp'
-      cycle: 
-        mode: 'irregular'
-        min: 20
-        max: 100
-
-
-    # initialize state (and use bound values)
-    @.update() 
+    @width=w
+    @height=h
     @.startMovement()
 
-  changeMovement: (movement)->
+  #changeMovement: (movement)->
 
   update : ->
-    @pos.update()                 # randomly spawn a new position
-    @sizem.update()               # randomly set a new brush size now and then
-    S = +@sizem.value
-    @delta.value.setRange(-S/2,S/2,-S/2,S/2)
-    @delta.update()               # interpolate moving direction
-    D = @delta.valueOf()
-    @pos.value.x.setValue(@pos.value.x + D.x)
-    @pos.value.y.setValue(@pos.value.y + D.y)
-    @bsize = S | 0
-    #d=@delta.valueOf()
-    #@bsize = (Math.round(Math.sqrt(d.x*d.x+d.y*d.y))*2)+1
     if(@_oldMovement isnt @movementType)
       @switchMovement()
       @_oldMovement = @movementType
-
+    @movement.update()
+  
   x : ->
-    @pos.valueOf().x | 0
+    @movement.x()
 
   y : ->
-    @pos.valueOf().y | 0
+    @movement.y()
 
   size : ->
-    @bsize
+    @movement.size()
 
 
