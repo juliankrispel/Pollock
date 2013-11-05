@@ -20,9 +20,9 @@
 class RandomIntervalNumber
   constructor: (min, max)->
     @myClass = RandomIntervalNumber
-    @val = 0
     @min = min
     @max = max
+    @val = @min
 
   clone : () ->
     cloned = new RandomIntervalNumber(@val.min, @val.max)
