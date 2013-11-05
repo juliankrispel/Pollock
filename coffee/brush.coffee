@@ -69,6 +69,7 @@ class MovementOne extends Movement
 
 # fixed position, or "no" movement
 class MovementTwo extends Movement
+  
   public:
     'movementDescription': 'description'
     'movementMinSize': 'minSize'
@@ -77,16 +78,22 @@ class MovementTwo extends Movement
     description: 'Movement 2'
     maxSize: 90
     minSize: 1
-  init: ()->
+  init: (w,h)->
+    @width=w
+    @height=h
     console.log 'hello I\'m Movement 2'
+
+  update: () ->
+    @
+
   x: () ->
-    0
+    @width/2
 
   y: () ->
-    0
+    @height/2
 
   size: () ->
-    { }
+    10
 
 class MovementThree extends Movement
   public:
