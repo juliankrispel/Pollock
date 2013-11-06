@@ -26,17 +26,7 @@ angular.module('PainterApp').directive 'canvasPainter', ->
           hasLoaded: true
         }
 
-        list = [ 
-          'brushMinSize', 
-          'brushMaxSize', 
-          'brushCount', 
-          'brushType', 
-          'brushMovementType',
-          'movementDescription',
-          'movementMinSize',
-          'movementChangeDirectionMin',
-          'movementChangeDirectionMax'
-        ]
+        list = myPainter.PS.getPublishedChannels()
 
         for name in list
           do(name) ->
