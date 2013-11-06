@@ -3,21 +3,16 @@ class Movement extends Base
 
 class MovementOne extends Movement
   public:
-    'brushMinSize': 'sizem.value.min'
-    'brushMaxSize': 'sizem.value.max'
-    'movementChangeDirectionMin': 'delta._cycle.min'
-    'movementChangeDirectionMax': 'delta._cycle.max'
+    'brushMinSize': 'sizem.value.range.min'
+    'brushMaxSize': 'sizem.value.range.max'
+    'movementChangeDirectionMin': 'delta.cycle.range.min'
+    'movementChangeDirectionMax': 'delta.cycle.range.max'
 
   init: (w, h) ->
-    console.log 'Random Movement initialized, parameters: w:' + w + " h:" + h;
     @pos = new Mutable
-      value: new RandomPosition(0, w, 0, h)
+      value: new RandomPosition(new Range(0, w), new Range(0, h))
       upmode: 'discrete'
-      cycle: {
-        mode: 'irregular'
-        min: 900
-        max: 2000
-      }
+      cycle: new RandomIntervalNumber(new Range(50,1000))
 
     # locally change update behavior of position randomintervalnumber
     setValue = (v) -> 
@@ -28,20 +23,15 @@ class MovementOne extends Movement
     @pos.value.y.setValue = setValue;
 
     @delta = new Mutable
-      value: new RandomPosition -10, 10, -10, 10
+      value: new RandomPosition new Range(-10, 10), new Range(-10, 10)
       upmode: 'linp'
-      cycle: 
-        mode: 'irregular'
-        min: 10
-        max: 50
+      cycle: new RandomIntervalNumber(new Range(10,50))
 
     @sizem = new Mutable
-      value: new RandomIntervalNumber 2, 15
+      value: new RandomIntervalNumber new Range(2, 15)
       upmode: 'linp'
-      cycle: 
-        mode: 'irregular'
-        min: 20
-        max: 100
+      cycle: new RandomIntervalNumber new Range(20, 100)
+
     # initialize state (and use bound values)
     @.update() 
 
@@ -49,7 +39,7 @@ class MovementOne extends Movement
     @pos.update()                 # randomly spawn a new position
     @sizem.update()               # randomly set a new brush size now and then
     S = +@sizem.value
-    @delta.value.setRange(-S/2,S/2,-S/2,S/2)
+    @delta.value.setRange(new Range(-S/2,S/2),new Range(-S/2,S/2))
     @delta.update()               # interpolate moving direction
     D = @delta.valueOf()
     @pos.value.x.setValue(@pos.value.x + D.x)

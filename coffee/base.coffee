@@ -19,7 +19,12 @@ class Base
             initArgs.push arg
         isFirst = false
 
-    _(@).extend _(@defaults).clone(), mixin
+    # evaluate any functions inside defaults
+    defaults = {}
+    for key, val of @defaults      
+      defaults[key] = _(@defaults).result(key)
+
+    _(@).extend _(defaults).clone(), mixin
 
     # If this class has an init method it will
     # it will be called with initArgs
