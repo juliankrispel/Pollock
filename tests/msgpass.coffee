@@ -99,8 +99,22 @@ describe 'test publish/subscribe mechanism', ->
         FOO = { BAR: 5 }
         notified = false
 
-        ps.makePublic(FOO, 'BAR', 'PublicBAR')
+        ps.publish(FOO, 'BAR', 'PublicBAR')
         ps.subscribe 'PublicBAR', 'Notifier', -> notified = true
         expect(notified).toBe false
         FOO.BAR = 2
         expect(notified).toBe true
+    
+    it 'get public channel list', ->
+
+        FOO = { BAR: 5 }
+        FOZ = { BAZ: 3 }
+
+        ps.subscribe 'TestChannel', 'WAT', ->
+        ps.publish(FOO, 'BAR', 'PublicBAR')
+        ps.publish(FOZ, 'BAZ', 'PublicBAZ')
+
+        chanlist = ps.getPublishedChannels()
+        expect(chanlist).toContain('PublicBAR')
+        expect(chanlist).toContain('PublicBAZ')
+        expect(chanlist).toNotContain('TestChannel')

@@ -93,6 +93,12 @@ class window.PublishSubscriber
 
           @publish(memberVar, lastPath, publicVar)
 
+    getPublishedChannels: () ->
+      chanlist = []
+      for name, channel of @_channels
+        chanlist.push(name) if channel.hasOwnProperty('published')
+      chanlist
+
     publish: (obj, property, channel) ->
         PS = @
 
@@ -105,7 +111,9 @@ class window.PublishSubscriber
 
         isNewChannel = not @_channels.hasOwnProperty(channel)
 
-        @subscribe(channel, obj.constructor.name,()->)
-        if defaultValue isnt undefined #and isNewChannel
-          @setValue(channel, obj.constructor.name, defaultValue)
-        @
+        subName = obj.constructor.name+"_"+property
+        @subscribe(channel, subName,()->)
+        @_channels[channel].published = true
+        if defaultValue isnt undefined 
+          @setValue(channel, subName, defaultValue)
+        subName
