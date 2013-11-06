@@ -16,7 +16,7 @@ class MovementOne extends Movement
 
     # locally change update behavior of position randomintervalnumber
     setValue = (v) -> 
-      @val = if v<@min then @max else if v>@max then @min else v
+      @val = if v<@range.min then @range.max else if v>@range.max then @range.min else v
       @
 
     @pos.value.x.setValue = setValue;
