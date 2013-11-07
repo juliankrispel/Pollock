@@ -20,6 +20,7 @@ angular.module('PainterApp').controller 'PainterCtrl', ($scope) ->
 
 angular.module('PainterApp').directive 'canvasPainter', ->
   (scope, element, attrs) ->
+    window.$s = scope
     scope.start = ->
       startPainter element[0], scope.painter.images, (myPainter) ->
         scope.painter = {
@@ -38,7 +39,10 @@ angular.module('PainterApp').directive 'canvasPainter', ->
             scope.painter[name] = myPainter.PS.getValue(name)
 
             scope.$watch('painter.' + name, ()->
-              myPainter.PS.setValue(name, 'gui', scope.painter[name])
+              val = scope.painter[name]
+              if(name is 'brushMinSize' or name is'brushMaxSize')
+                val = +val
+              myPainter.PS.setValue(name, 'gui', val)
             )
 
         scope.$apply()
