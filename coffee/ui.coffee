@@ -12,7 +12,7 @@ angular.module('PainterApp').controller 'PainterCtrl', ($scope) ->
     ]
   }
   $scope.brushTypes = ['circle', 'scircle', 'square', 'weird', 'sort']
-  $scope.brushMovements = ['Random Movement', 'Movement 2', 'Movement 3']
+  $scope.brushMovements = ['Random', 'Static']
   $scope.removeImage = (index) ->
     $scope.painter.images.splice(index, 1)
   $scope.addImage = ->
@@ -26,13 +26,13 @@ angular.module('PainterApp').directive 'canvasPainter', ->
           hasLoaded: true
         }
 
-        list = myPainter.PS.getPublishedChannels()
+        list = myPainter.PS.getAllChannels()
 
         for name in list
           do(name) ->
-            myPainter.PS.subscribe(name, 'gui', () -> 
-              console.log(name, myPainter.PS.getValue(name))
-              scope.painter[name] = myPainter.PS.getValue(name)
+            myPainter.PS.subscribe(name, 'gui', (value) -> 
+              console.log(name, value)
+              scope.painter[name] = value
               scope.$apply()
             )
 

@@ -1,16 +1,20 @@
-class Movement extends Base
+# movements need to reside in global namespace to be available
+# to the class switcher
+window.Movement = class Movement extends Base
 
-
-class MovementOne extends Movement
+window.MovementOne = class MovementOne extends Movement
+  defaults:
+    width: 10
+    height: 10
   public:
     'brushMinSize': 'sizem.value.range.min'
     'brushMaxSize': 'sizem.value.range.max'
     'movementChangeDirectionMin': 'delta.cycle.range.min'
     'movementChangeDirectionMax': 'delta.cycle.range.max'
 
-  init: (w, h) ->
+  init: () ->
     @pos = new Mutable
-      value: new RandomPosition(new Range(0, w), new Range(0, h))
+      value: new RandomPosition(new Range(0, @width), new Range(0, @height))
       upmode: 'discrete'
       cycle: new RandomIntervalNumber(new Range(50,1000))
 
@@ -57,7 +61,7 @@ class MovementOne extends Movement
 
 
 # fixed position, or "no" movement
-class MovementTwo extends Movement
+window.MovementTwo = class MovementTwo extends Movement
   
   public:
     'movementDescription': 'description'
@@ -67,9 +71,7 @@ class MovementTwo extends Movement
     description: 'Movement 2'
     maxSize: 90
     minSize: 1
-  init: (w,h)->
-    @width=w
-    @height=h
+  init: ()->
     console.log 'hello I\'m Movement 2'
 
   update: () ->
@@ -84,65 +86,63 @@ class MovementTwo extends Movement
   size: () ->
     10
 
-class MovementThree extends Movement
-  public:
-    'movementDescription': 'description'
-    'movementMinSize': 'minSize'
-    'movementThreeAttribute': 'maxSize'
+# --------------------------------------------------------------------
+# ClassSwitcher using the PublishSubscriber mechanism
+# Note: Classed have reside in global Namespace (window) to be switchable
+
+class ClassSwitcher extends Base
   defaults:
-    description: 'Movement 3'
-    maxSize: 20
-    minSize: 6
-  init: ()->
-    console.log 'hello I\'m Movement 3'
+    channel: 'ClassSwitcherChannel'
+    default: 'name1'
+    params: {}
+    classes:
+      'name1' : 'Class1'
+      'name2' : 'Class2'
+
+  init : () ->
+    @_class = @default
+    @update()
+    PS.publish(this, '_class' , @channel)
+    
+  update : () ->
+    if @_class != @_oldClass
+      if @classes.hasOwnProperty(@_class)
+        @_oldClass = @_class
+        @_value = new window[@classes[@_class]]( @params )
+
+  val : () ->
+    @_value
 
 # -----------------------------------------------------------------------------
-# Brush Interface:
-# .x() | .y() -> get position
-# .size()     -> get brush size
-# .type       -> get brush type
+# The Brush contains a (switchable) Movement and the Brush type (circle, sort, ..)
+#
 class Brush extends Base
   defaults:
     type: 'circle'
-    movementType: 'Random Movement'
-    _oldMovement: 'Random Movement'
-    movement: {}
 
   public: 
-    'brushMovementType': 'movementType',
     'brushType': 'type'
 
-  startMovement: (movementClass) ->
-    movementClass = movementClass or MovementOne
-    @movement = new movementClass(@width, @height)
-
-  switchMovement: () =>
-    switch @movementType
-      when 'Random Movement' then @startMovement(MovementOne)
-      when 'Movement 2' then @startMovement(MovementTwo)
-      when 'Movement 3' then @startMovement(MovementThree)
-      else @startMovement()
-
   init: (w, h) ->
-    @width=w
-    @height=h
-    @.startMovement()
-
-  #changeMovement: (movement)->
+    @movement = new ClassSwitcher
+      channel: 'brushMovementType'
+      default: 'Random'
+      params:
+        width: w
+        height: h
+      classes: 
+        'Random' : 'MovementOne'
+        'Static' : 'MovementTwo'
 
   update : ->
-    if(@_oldMovement isnt @movementType)
-      @switchMovement()
-      @_oldMovement = @movementType
-    @movement.update()
+    @movement.update()         # switches class
+    @movement.val().update()   # update movement
   
   x : ->
-    @movement.x()
+    @movement.val().x()
 
   y : ->
-    @movement.y()
+    @movement.val().y()
 
   size : ->
-    @movement.size()
-
-
+    @movement.val().size()

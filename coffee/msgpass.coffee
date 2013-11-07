@@ -76,7 +76,7 @@ class window.PublishSubscriber
         @_channels[channel].value = value
         # notify all _subscribers of a channel but the callee
         for listener, callback of @_channels[channel]._subscribers
-            callback() if listener != subscriber
+            callback(value) if listener != subscriber
       @
 
     publishAll: (obj)->
@@ -93,10 +93,10 @@ class window.PublishSubscriber
 
           @publish(memberVar, lastPath, publicVar)
 
-    getPublishedChannels: () ->
+    getAllChannels: () ->
       chanlist = []
       for name, channel of @_channels
-        chanlist.push(name) if channel.hasOwnProperty('published')
+        chanlist.push(name) #if channel.hasOwnProperty('published')
       chanlist
 
     publish: (obj, property, channel) ->
@@ -114,6 +114,6 @@ class window.PublishSubscriber
         subName = obj.constructor.name+"_"+property
         @subscribe(channel, subName,()->)
         @_channels[channel].published = true
-        if defaultValue isnt undefined 
+        if defaultValue isnt undefined and isNewChannel
           @setValue(channel, subName, defaultValue)
         subName
