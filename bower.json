@@ -1,9 +1,9 @@
 {
-    "name": "Portrait",
-    "version": "0.0.1",
-    "dependencies": {
-        "underscore": "*",
-        "angular": "*",
-        "requirejs": "*"
-    }
+  "name": "Portrait",
+  "version": "0.0.1",
+  "dependencies": {
+    "underscore": "~1.5.2",
+    "angular-slider": "~0.1.6",
+    "angular": "v1.2.0-rc.3"
+  }
 }

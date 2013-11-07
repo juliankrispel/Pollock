@@ -1,16 +1,19 @@
 {
-    "devDependencies": {
-        "coffee-script": "*",
-        "bower": "*",
-        "grunt": "*",
-        "grunt-cli": "*",
-        "grunt-contrib-coffee": "*",
-        "grunt-contrib-watch": "*",
-        "grunt-contrib-testem": "*",
-        "grunt-contrib-connect": "*",
-        "testem": "*"
-    },
-    "scripts": {
-        "build": "npm install && bower install && grunt"
-    }
+  "devDependencies": {
+    "coffee-script": "*",
+    "bower": "*",
+    "grunt": "*",
+    "grunt-cli": "*",
+    "grunt-contrib-coffee": "*",
+    "grunt-contrib-watch": "*",
+    "grunt-contrib-testem": "*",
+    "grunt-contrib-connect": "*",
+    "testem": "*"
+  },
+  "scripts": {
+    "build": "npm install && bower install && grunt"
+  },
+  "dependencies": {
+    "underscore": "~1.5.2"
+  }
 }

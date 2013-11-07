@@ -1,4 +1,4 @@
-angular.module 'PainterApp', []
+angular.module 'PainterApp', ['uiSlider']
 
 angular.module('PainterApp').controller 'PainterCtrl', ($scope) ->
   $scope.painter = {
@@ -31,7 +31,6 @@ angular.module('PainterApp').directive 'canvasPainter', ->
         for name in list
           do(name) ->
             myPainter.PS.subscribe(name, 'gui', (value) -> 
-              console.log(name, value)
               scope.painter[name] = value
               scope.$apply()
             )
