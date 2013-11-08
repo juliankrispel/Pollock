@@ -20,6 +20,9 @@
 # Range is an ordered tuple of two values: min < max
 class Range
   constructor: (v1, v2) ->
+    @setRange(v1, v2)
+
+  setRange: (v1, v2) ->
     if v1<=v2
       @min = v1
       @max = v2
@@ -155,7 +158,7 @@ class Mutable extends Base
 
   update : ->
     --@ctr
-    if @ctr == 0
+    if @ctr <= 0
       @lastValue.assign(@value)   # backup last state (for interpolation)
       @value.newValue()           # create new value
       @cycle.newValue()           # update cycle
