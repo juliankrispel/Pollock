@@ -22,7 +22,7 @@
       <button ng-click="stop()">Stop</button><br />
       <label for="minBrushSize">Brush Size</label>
       <div style="width: 400px; position: relative; display: block;">
-      <slider floor="0" ceiling="50" step="1" ng-model-low="painter.brushMinSize" ng-model-high="painter.brushMaxSize"></slider>
+      <slider floor="1" ceiling="50" step="1" precision="2" ng-model-low="painter.brushMinSize" ng-model-high="painter.brushMaxSize"></slider>
       </div>
         <label for="brushCount">Brush Count</label>
         <input ng-model="painter.brushCount" type="text"/><br />
@@ -48,6 +48,6 @@
 <script src="../bower_components/underscore/underscore-min.js"></script>
 <script src="../js/painter.js"></script>
 <script src="../bower_components/angular/angular.min.js"></script>
-<script src="../bower_components/angular-slider/angular-slider.min.js"></script>
+<script src="../bower_components/angular-slider/angular-slider-custom.js"></script>
 <script src="../js/ui.js"></script>
 </html>

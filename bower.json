@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "dependencies": {
     "underscore": "~1.5.2",
-    "angular-slider": "~0.1.6",
+    "angular-slider": "https://github.com/juliankrispel/angular-slider.git#0306c0ed701495f85a2e6820a668856e529f7475",
     "angular": "v1.2.0-rc.3"
   }
 }
