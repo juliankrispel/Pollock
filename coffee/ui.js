@@ -20,7 +20,7 @@ angular.module('PainterApp').controller('PainterCtrl', function($scope) {
     ]
   };
   $scope.brushTypes = ['circle', 'scircle', 'square', 'weird', 'sort'];
-  $scope.brushMovements = ['Random', 'Static'];
+  $scope.brushMovements = ['Random', 'HalfCircle'];
   $scope.removeImage = function(index) {
     return $scope.painter.images.splice(index, 1);
   };

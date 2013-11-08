@@ -1,11 +1,12 @@
 # movements need to reside in global namespace to be available
 # to the class switcher
 window.Movement = class Movement extends Base
+ defaults:
+   width: 10
+   height: 10
+ 
 
 window.MovementOne = class MovementOne extends Movement
-  defaults:
-    width: 10
-    height: 10
   public:
     'brushMinSize': 'sizem.value.range.min'
     'brushMaxSize': 'sizem.value.range.max'
@@ -57,10 +58,11 @@ window.MovementOne = class MovementOne extends Movement
     @pos.valueOf().y | 0
 
   size: () ->
-    @bsize.valueOf()
+    @bsize
 
 
-# fixed position, or "no" movement
+# Movement two: move in half-circles
+# State is : center, radius, starting angle
 window.MovementTwo = class MovementTwo extends Movement
   
   public:
@@ -68,23 +70,51 @@ window.MovementTwo = class MovementTwo extends Movement
     'movementMinSize': 'minSize'
     'movementTwoAttribute': 'maxSize'
   defaults:
-    description: 'Movement 2'
-    maxSize: 90
-    minSize: 1
+    description: 'Half Circle Movement'
+
   init: ()->
-    console.log 'hello I\'m Movement 2'
+    @center = new Mutable
+      value: new RandomPosition(new Range(0, @width), new Range(0, @height))
+      upmode: 'discrete'
+      cycle: new RandomIntervalNumber(new Range(1,1))
+    
+    @radius = new Mutable
+      value: new RandomIntervalNumber(new Range(10, 50))
+      upmode: 'discrete'
+      cycle: new RandomIntervalNumber(new Range(1,1))
+
+    @sizem = new Mutable
+      value: new RandomIntervalNumber new Range(3, 8)
+      upmode: 'discrete'
+      cycle: new RandomIntervalNumber new Range(1, 1)
+
+    # initialize values
+    @counter = 1
+    @update()
 
   update: () ->
-    @
+    if --@counter <= 0
+       @sizem.update()
+       @radius.update()
+       r = @radius.value.intValue()
+       # set a new center
+       @center.value.setRange(new Range(r,@width-r), new Range(r, @height-r))
+       @center.update()
+       @counter = Math.PI * @radius.valueOf() / (@sizem.valueOf()/2)   # half circle arc length
+
+    # calculate current position
+    angle = (@sizem.valueOf()/2) * @counter / @radius.valueOf()
+    @X = (@center.value.x.valueOf() + @radius * Math.cos(angle))|0
+    @Y = (@center.value.y.valueOf() + @radius * Math.sin(angle))|0
 
   x: () ->
-    @width/2
+    @X
 
   y: () ->
-    @height/2
+    @Y
 
   size: () ->
-    10
+    +@sizem.value
 
 # --------------------------------------------------------------------
 # ClassSwitcher using the PublishSubscriber mechanism
@@ -132,7 +162,7 @@ class Brush extends Base
         height: h
       classes: 
         'Random' : 'MovementOne'
-        'Static' : 'MovementTwo'
+        'HalfCircle' : 'MovementTwo'
 
   update : ->
     @movement.update()         # switches class
