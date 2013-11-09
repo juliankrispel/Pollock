@@ -20,7 +20,6 @@ angular.module('PainterApp').controller 'PainterCtrl', ($scope) ->
 
 angular.module('PainterApp').directive 'canvasPainter', ->
   (scope, element, attrs) ->
-    window.$s = scope
     scope.start = ->
       startPainter element[0], scope.painter.images, (myPainter) ->
         scope.painter = {

@@ -1,12 +1,12 @@
 # movements need to reside in global namespace to be available
 # to the class switcher
-window.Movement = class Movement extends Base
+class Movement extends Base
  defaults:
    width: 10
    height: 10
  
 
-window.MovementOne = class MovementOne extends Movement
+class RandomMovement extends Movement
   public:
     'brushMinSize': 'sizem.value.range.min'
     'brushMaxSize': 'sizem.value.range.max'
@@ -63,7 +63,7 @@ window.MovementOne = class MovementOne extends Movement
 
 # Movement two: move in half-circles
 # State is : center, radius, starting angle
-window.MovementTwo = class MovementTwo extends Movement
+class HalfPipeMovement extends Movement
   
   public:
     'movementDescription': 'description'
@@ -118,16 +118,15 @@ window.MovementTwo = class MovementTwo extends Movement
 
 # --------------------------------------------------------------------
 # ClassSwitcher using the PublishSubscriber mechanism
-# Note: Classed have reside in global Namespace (window) to be switchable
 
 class ClassSwitcher extends Base
   defaults:
     channel: 'ClassSwitcherChannel'
     default: 'name1'
     params: {}
-    classes:
-      'name1' : 'Class1'
-      'name2' : 'Class2'
+    classes: 
+      'Random' : RandomMovement
+      'HalfPipe' : HalfPipeMovement
 
   init : () ->
     @_class = @default
@@ -138,7 +137,7 @@ class ClassSwitcher extends Base
     if @_class != @_oldClass
       if @classes.hasOwnProperty(@_class)
         @_oldClass = @_class
-        @_value = new window[@classes[@_class]]( @params )
+        @_value = new @classes[@_class]( @params )
 
   val : () ->
     @_value
@@ -160,9 +159,6 @@ class Brush extends Base
       params:
         width: w
         height: h
-      classes: 
-        'Random' : 'MovementOne'
-        'HalfCircle' : 'MovementTwo'
 
   update : ->
     @movement.update()         # switches class
