@@ -33,7 +33,12 @@
         <select id="brushMovementType" ng-model="painter.brushMovementType">
           <option ng-repeat="movement in brushMovements">{{movement}}</option>
         </select>
-        <div style="width: 400px; position: relative; display: block;">
+        <div ng-show="painter.brushMovementType == 'Random'" style="width: 400px; position: relative; display: block;">
+          <label>How would you like your brushstrokes?</label>
+          <select ng-model="painter.movementInterpolation">
+            <option value="linp">Curved</option>
+            <option value="discrete">Normal</option>
+          </select>
           <label>How often to change direction</label>
           <slider floor="1" ceiling="1000" step="1" precision="2" ng-model-low="painter.movementChangeDirectionMin" ng-model-high="painter.movementChangeDirectionMax"></slider>
         </div>

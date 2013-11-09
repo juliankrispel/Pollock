@@ -12,7 +12,7 @@ angular.module('PainterApp').controller 'PainterCtrl', ($scope) ->
     ]
   }
   $scope.brushTypes = ['circle', 'scircle', 'square', 'weird', 'sort']
-  $scope.brushMovements = ['Random', 'HalfCircle']
+  $scope.brushMovements = ['Random', 'HalfPipe']
   $scope.removeImage = (index) ->
     $scope.painter.images.splice(index, 1)
   $scope.addImage = ->

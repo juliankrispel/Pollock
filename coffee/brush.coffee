@@ -12,6 +12,7 @@ class RandomMovement extends Movement
     'brushMaxSize': 'sizem.value.range.max'
     'movementChangeDirectionMin': 'delta.cycle.range.min'
     'movementChangeDirectionMax': 'delta.cycle.range.max'
+    'movementInterpolation': 'delta.upmode'
 
   init: () ->
     @pos = new Mutable
