@@ -116,6 +116,7 @@ class HalfPipeMovement extends Movement
   size: () ->
     +@sizem.value
 
+
 # --------------------------------------------------------------------
 # ClassSwitcher using the PublishSubscriber mechanism
 
@@ -132,7 +133,7 @@ class ClassSwitcher extends Base
     @_class = @default
     @update()
     PS.publish(this, '_class' , @channel)
-    
+
   update : () ->
     if @_class != @_oldClass
       if @classes.hasOwnProperty(@_class)

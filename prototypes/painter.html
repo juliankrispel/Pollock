@@ -33,12 +33,9 @@
         <select id="brushMovementType" ng-model="painter.brushMovementType">
           <option ng-repeat="movement in brushMovements">{{movement}}</option>
         </select>
-        <div>
-          <h2>{{painter.movementDescription}}</h2>
-          <label>Minimum Movement Change</label>
-          <input ng-model="painter.movementChangeDirectionMin" type="number"/>
-          <label>Maximum Movement Change</label>
-          <input ng-model="painter.movementChangeDirectionMax" type="number"/>
+        <div style="width: 400px; position: relative; display: block;">
+          <label>How often to change direction</label>
+          <slider floor="1" ceiling="1000" step="1" precision="2" ng-model-low="painter.movementChangeDirectionMin" ng-model-high="painter.movementChangeDirectionMax"></slider>
         </div>
 
       </div>
