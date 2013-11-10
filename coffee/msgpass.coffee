@@ -6,7 +6,6 @@
 # - each subscriber can set a callback function per channel
 
 class window.PublishSubscriber 
-
     constructor: () ->
         @_channels = {};
         @_subscribers = {};
@@ -41,11 +40,8 @@ class window.PublishSubscriber
             @_subscribers[subscriber] = { _channels : {} }
 
         # subscribe
-        try 
-            callback()
-        catch error
-            console.log('[PublishSubscriber ERR]: ' + subscriber + " tried to register an invalid callback.")
-            callback = ->
+        if(typeof callback != 'function')
+            console.log('[PublishSubscriber ERR]: `typeof` callback != function')
         @_channels[channel]._subscribers[subscriber] = callback;
         @_subscribers[subscriber]._channels[channel] = @_channels[channel];
         @
@@ -70,30 +66,54 @@ class window.PublishSubscriber
         null
 
     setValue: (channel, subscriber, value) =>
-        if not @_channels.hasOwnProperty(channel)
-            @registerChannel(channel, { value: value })
+      # Create a channel if it doesn't exist
+      # for future subscribers
+      if not @_channels.hasOwnProperty(channel)
+        @registerChannel(channel, { value: value })
 
-        # notify only if value actually changes
-        if  @_channels[channel].value != value
-            @_channels[channel].value = value
-            # notify all _subscribers of a channel but the callee
-            for listener, callback of @_channels[channel]._subscribers
-                callback() if listener != subscriber
-        @
+      # notify only if value actually changes
+      if @_channels[channel].value != value
+        @_channels[channel].value = value
+        # notify all _subscribers of a channel but the callee
+        for listener, callback of @_channels[channel]._subscribers
+            callback(value) if listener != subscriber
+      @
 
-    makePublic: (obj, property, channel) ->
+    publishAll: (obj)->
+      # Cancel operation if object doesn't have a 
+      # public declaration
+      if obj['public'] and typeof obj['public'] == 'object'
+        # To register everything in public, loop
+        # through the declaration
+        for publicVar, memberVar of obj['public']
+          paths = memberVar.split('.')
+          lastPath = paths.pop()
+
+          memberVar = useArrayAsDirectory(obj, paths)
+
+          @publish(memberVar, lastPath, publicVar)
+
+    getAllChannels: () ->
+      chanlist = []
+      for name, channel of @_channels
+        chanlist.push(name) #if channel.hasOwnProperty('published')
+      chanlist
+
+    publish: (obj, property, channel) ->
         PS = @
 
         if obj.hasOwnProperty(property)
-            defaultvalue = obj[property]
+            defaultValue = obj[property]
         Object.defineProperty(obj, property, {
             get: () -> PS.getValue(channel,obj.constructor.name)
             set: (val) -> PS.setValue(channel,obj.constructor.name,val)
         })
-        
-        newChannel = not @_channels.hasOwnProperty(channel)
 
-        @subscribe(channel, obj.constructor.name,()->)
-        if defaultvalue != undefined and newChannel
-           @setValue(channel, obj.constructor.name, defaultvalue)
-        @
+        isNewChannel = not @_channels.hasOwnProperty(channel)
+
+        subName = obj.constructor.name+"_"+property
+        @subscribe(channel, subName,()->)
+        @_channels[channel].published = true
+        if defaultValue isnt undefined and isNewChannel
+          @setValue(channel, subName, defaultValue)
+        subName

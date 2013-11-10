@@ -17,30 +17,56 @@
 #   * the interpolate() method interpolates between two class instances, 
 #     given t=0..1
 
-class RandomIntervalNumber
+# Range is an ordered tuple of two values: min < max
+class Range
+  constructor: (v1, v2) ->
+    @setRange(v1, v2)
 
-  constructor : () ->
+  setRange: (v1, v2) ->
+    if v1<=v2
+      @min = v1
+      @max = v2
+    else 
+      @min = v2
+      @max = v1
+
+  mid: () ->
+    (@min+@max)/2
+
+  clone: () ->
+    return new Range(@min, @max)
+
+# An IntervalNumber makes sure its value is between a specific interval
+# that is defined by a Range
+class RandomIntervalNumber
+  constructor: (range)->
     @myClass = RandomIntervalNumber
-    @val = 0
-    @min = 0
-    @max = 1
+    @range = range.clone()
+    @val = @range.mid()
+
+  clone : () ->
+    cloned = new RandomIntervalNumber(@range)
+    cloned.val = @val
+    cloned
 
   assign : (from) ->
-    @setRange(from.min,from.max)
+    @range = from.range.clone()
     @val = from.val
 
   clamp : () ->
     @val = @min if @val < @min
     @val = @max if @val > @max
 
-  setRange : (min, max) ->
-    @min = min
-    @max = max
+  setRange : (range) ->
+    @range = range.clone()
     @clamp()
     @
 
   newValue : ->
-    @val = getRandom(@min, @max)
+    if (@range.min < @range.max)
+      @val = getRandom(@range.min, @range.max)
+    else 
+      @val = @range.min
     @
 
   setValue : (v) ->
@@ -59,21 +85,30 @@ class RandomIntervalNumber
   valueOf : ->
     @val
 
-class RandomPosition
-  constructor : () ->
-    @myClass = RandomPosition
-    @x = new RandomIntervalNumber()
-    @y = new RandomIntervalNumber()
 
-  setRange : (l,r,t,b) ->
-    #@x = new RandomIntervalNumber().setRange(l,r)
-    #@y = new RandomIntervalNumber().setRange(t,b)
-    @x.setRange(l,r)
-    @y.setRange(t,b)
+# RandomPosition's value is a tuple { x:<x>, y:<x> }
+class RandomPosition
+  constructor : (xrng,yrng) ->
+    unless (xrng or yrng)
+      throw(new Error('x and y range must be defined'))
+
+    @myClass = RandomPosition
+    @x = new RandomIntervalNumber(xrng)
+    @y = new RandomIntervalNumber(yrng)
+
+  setRange : (xrng,yrng) ->
+    @x.setRange(xrng)
+    @y.setRange(yrng)
     @
 
+  clone : () ->
+    cloned = new RandomPosition(@x.range, @y.range)
+    cloned.x.val = @x.val
+    cloned.y.val = @y.val
+    cloned
+
   assign : (from) ->
-    @setRange(from.x.min,from.x.max,from.y.min,from.y.max)
+    @setRange(from.x.range, from.y.range)
     @x.val = from.x.val
     @y.val = from.y.val
 
@@ -81,6 +116,10 @@ class RandomPosition
     @x.newValue()
     @y.newValue()
     @
+
+  setValue : (v) ->
+    @x.setValue(v.x)
+    @y.setValue(v.y)
 
   #interpolate between two positions
   interpolate : (from, to, t) ->
@@ -98,45 +137,45 @@ class RandomPosition
 # and the following repetition behavior:
 #   'regular', 'irregular'
 
-class Mutable
+class Mutable extends Base
   # members:
-  constructor: () ->
-    @ctr = 1       # will trigger evaluation on first update
-    @cycle = new RandomIntervalNumber().setRange(5,20)
-    @cycle.setValue(10)         # default
-    @upmode = 'discrete'        # default update mode
-    @cymode = 'regular'         # default cycle mode
-    @value = NaN
-    @lastValue = NaN
+  defaults:
+    ctr: 1       # will trigger evaluation on first update
+    upmode: 'discrete'        # default update mode
+    value: NaN
+    lastValue: NaN
+    cycle: -> new RandomIntervalNumber(new Range(20,100))
+
+  init: () ->
+    @setType(@value)
 
   # setType has to be called until mutable is valid!
   setType: ( val ) ->
     @value = val
-    @lastValue = new @value.myClass()
-    @lastValue.assign(@value)
-    @currentValue = new @value.myClass()
-    @currentValue.assign(@value)
+    @lastValue = @value.clone()
+    @currentValue = @value.clone()
     @
 
   update : ->
     --@ctr
-    if @ctr == 0
-      @lastValue.assign(@value)
-      @value.newValue()
-      @newCycle()
+    if @ctr <= 0
+      @lastValue.assign(@value)   # backup last state (for interpolation)
+      @value.newValue()           # create new value
+      @cycle.newValue()           # update cycle
+      @ctr = @cycle.intValue()    # start new cycle
 
-  newCycle : ->
-    switch @cymode
-      when 'irregular'
-        @cycle.newValue()
-    @ctr = @cycle.intValue()
+  setRegularCycle : ( value ) ->
+    @cycle.setRange(value, value)
+
+  setIrregularCycle : ( min, max ) ->
+    @cycle.setRange(min, max)
 
   valueOf : ->
     switch @upmode
       when 'discrete'
         v = @value.valueOf()
       when 'linp'
-        v = @currentValue.interpolate(@lastValue, @value, @ctr/@cycle.val)
+        v = @currentValue.interpolate(@lastValue, @value, @ctr/@cycle.intValue())
     v
 
 # --------------------------------------------------------

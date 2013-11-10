@@ -1,4 +1,4 @@
-angular.module 'PainterApp', []
+angular.module 'PainterApp', ['uiSlider']
 
 body = document.getElementById('body')
 
@@ -13,6 +13,7 @@ angular.module('PainterApp').controller 'PainterCtrl', ($scope) ->
     ]
   }
   $scope.brushTypes = ['circle', 'scircle', 'square', 'weird', 'sort']
+  $scope.brushMovements = ['Random', 'HalfPipe']
   $scope.removeImage = (index) ->
     $scope.painter.images.splice(index, 1)
 
@@ -36,18 +37,19 @@ angular.module('PainterApp').directive 'canvasPainter', ->
           hasLoaded: true
         }
 
-        list = [ 'brushMinSize', 'brushMaxSize', 'brushCount', 'brushType' ]
+        list = myPainter.PS.getAllChannels()
 
         for name in list
           do(name) ->
+            myPainter.PS.subscribe(name, 'gui', (value) -> 
+              scope.painter[name] = value
+              scope.$apply()
+            )
+
             scope.painter[name] = myPainter.PS.getValue(name)
 
-            myPainter.PS.subscribe(name, 'gui', () -> 
-              scope.painter[name] = myPainter.PS.getValue(name))
-
-            scope.$watch('painter.' + name, ()->
+            scope.$watch 'painter.' + name, ()->
               myPainter.PS.setValue(name, 'gui', scope.painter[name])
-            )
 
         scope.$apply()
 
