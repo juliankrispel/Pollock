@@ -16,7 +16,7 @@ mainLoop = (images) ->
   myPainter.setImageSource imgSource
   myPainter.start()
 
-  myRenderer = new SimpleRenderer
+  myRenderer = new Renderer
   dstContext = dstCanvas.getContext("2d")
   dstContext.fillRect 0, 0, dstCanvas.width, dstCanvas.height
 
