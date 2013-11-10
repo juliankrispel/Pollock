@@ -22,14 +22,13 @@ mainLoop = (images) ->
   imgSource.setSize images[0].width, images[0].height
   i = 0
 
-
   while i < images.length
-    images[i].imca = document.createElement("canvas")
-    images[i].imca.width = images[i].width
-    images[i].imca.height = images[i].height
-    context = images[i].imca.getContext("2d")
-    context.drawImage images[i], 0, 0
-    imgSource.addImage images[i]
+    imgCanvas = new ImageCanvas
+      image: images[i]
+      width: images[i].width
+      height: images[i].height
+
+    imgSource.addImage imgCanvas
     ++i
 
   myPainter.setImageSource imgSource

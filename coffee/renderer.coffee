@@ -55,8 +55,7 @@ class SimpleRenderer extends Base
   renderBrush: (brush, source, destination) ->
 
     # get brush image data and background image data
-    srcContext = source.imca.getContext("2d")
-    srcData = @getBrushData(brush, srcContext)
+    srcData = @getBrushData(brush, source.context2d)
     dstData = @getBrushData(brush, destination)
 
     switch brush.type

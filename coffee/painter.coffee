@@ -1,3 +1,13 @@
+class ImageCanvas extends Base
+  init: () ->
+    unless @width || @height || @image
+      throw new Error('Required attributes missing')
+    @$canvas = document.createElement 'canvas'
+    @$canvas.width = @width
+    @$canvas.height = @height
+    @context2d = @$canvas.getContext '2d'
+    @context2d.drawImage @image, 0, 0
+
 # ImageSource abstracts a set of images, accesible by index
 # width and height of ImageSource correspond to 
 # the maximal width and height of images it contains
