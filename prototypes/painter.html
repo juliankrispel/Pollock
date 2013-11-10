@@ -17,7 +17,8 @@
 </head>
 <body id="body" ng-controller="PainterCtrl">
     <form>
-      <img width="40px" src="{{img.url}}" ng-repeat="img in painter.images"/>
+      <img style="width:40px;" src="{{img.url}}" ng-repeat="img in painter.images"/>
+      <img style="display: none;" class="image" src="{{img.url}}" ng-repeat="img in painter.images"/>
       <button ng-click="start()">Start</button>
       <div ng-show="painter.hasLoaded">
       <button ng-click="stop()">Stop</button><br />

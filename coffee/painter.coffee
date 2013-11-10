@@ -17,10 +17,6 @@ class ImageSource extends Base
     height: 0
     images: []
 
-  setSize: (width, height) =>
-    @width = width
-    @height = height
-
   getImageCount: =>
     @images.length
 

@@ -32,7 +32,7 @@ angular.module('PainterApp').directive 'canvasPainter', ->
       if(scope.painter.images.length < 1)
         return false
 
-      startPainter element[0], scope.painter.images, (myPainter) ->
+      startPainter element[0], document.querySelectorAll '.image', (myPainter) ->
         scope.painter = {
           hasLoaded: true
         }
