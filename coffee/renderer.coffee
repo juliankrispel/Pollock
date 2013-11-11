@@ -7,11 +7,9 @@ class Renderer extends Base
     context.getImageData(x,y,s,s)
 
   getBrushPixelData: (brush, array) ->
-    x = brush.x()
-    y = brush.y()
-    s = brush.size()
-    endX = x + s
-    endY = y + s
+    index = (brush.x() + (brush.y() * brush.imgSrc.width)) * 4
+    endX = x + brush.size()
+    endY = y + brush.size()
     data = new Uint8ClampedArray(s*s*4)
 
     i = 0
@@ -73,7 +71,7 @@ class Renderer extends Base
   renderBrush: (brush, destination) ->
 
     # get brush image data and background image data
-    srcData = @getBrushPixelData(brush, brush.imgSrc.getImageData())
+    srcData = brush.imgSrc.getPixelData(brush.x(), brush.y(), brush.size())
     dstData = @getBrushData(brush, destination)
 
     switch brush.type

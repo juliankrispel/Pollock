@@ -6,6 +6,23 @@ class ImageCanvas extends Base
   getImageData: ->
     @imageData
 
+  getPixelData: (x,y,size) ->
+    index = (x + (y*@width))*4
+    data = new Uint8ClampedArray(size*size*4)
+
+    row = 0
+    column = 0
+
+    while row < size
+      index += (row * @width)
+      while column <= ((row + 1)*size)*4
+        data[column+row*size] = @imageData[index]
+        index++
+        column++
+      row++
+
+    data
+
   imageToImageData: (image) ->
     canvas = document.createElement 'canvas'
     canvas.width = image.width
