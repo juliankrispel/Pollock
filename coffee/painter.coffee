@@ -12,13 +12,15 @@ class ImageCanvas extends Base
 
     row = 0
     column = 0
+    arrIndex = 0
 
     while row < size
       index += (row * @width * 4)
-      while column <= ((row + 1)*size)*4
-        data[column+row*size] = @imageData[index]
+      while column < ((row + 1)*size)*4 + 1
+        data[arrIndex] = @imageData[index]
         index++
         column++
+        arrIndex++
       row++
     data
 

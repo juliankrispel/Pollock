@@ -73,7 +73,6 @@ class Renderer extends Base
     # get brush image data and background image data
     srcData = brush.imgSrc.getPixelData(brush.x(), brush.y(), brush.size())
     dstData = @getBrushData(brush, destination)
-
     switch brush.type
 
       when 'square' then @compositeBlock srcData, dstData.data, @avgblend
