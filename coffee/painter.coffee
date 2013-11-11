@@ -2,14 +2,27 @@ class ImageCanvas extends Base
   defaults:
     offsetX: 0
     offsety: 0
+
+  getImageData: ->
+    @imageData
+
+  imageToImageData: (image) ->
+    canvas = document.createElement 'canvas'
+    canvas.width = image.width
+    canvas.height = image.height
+    context2d = canvas.getContext '2d'
+    context2d.drawImage image, 0, 0
+    imgData = context2d.getImageData 0, 0, image.width, image.height
+    imgData.data
+
   init: () ->
-    unless @width || @height || @image
+    unless @image
       throw new Error('Required attributes missing')
-    @$canvas = document.createElement 'canvas'
-    @$canvas.width = @width
-    @$canvas.height = @height
-    @context2d = @$canvas.getContext '2d'
-    @context2d.drawImage @image, 0, 0
+
+    @width = @image.width
+    @height = @image.height
+
+    @imageData = @imageToImageData @image
 
 # ImageSource abstracts a set of images, accesible by index
 # width and height of ImageSource correspond to 
@@ -24,11 +37,8 @@ class ImageSource extends Base
     height: 400
     images: []
 
-  getImageCount: =>
-    @images.length
-
-  getImage: (index) ->
-    @images[index]
+  getRandomImageCanvas: ->
+    @images[Math.round Math.random() * (@images.length-1)]
 
   addImage: (img) ->
     @images.push img
@@ -68,23 +78,17 @@ class MovingBrushPainter extends Painter
     @brushes = []
     i = 0
     while i <= @brushCount
-      @brushes[i] =  new Brush(@imgSrc.width, @imgSrc.height)
+      @brushes[i] =  new Brush({imgSrc: @imgSrc.getRandomImageCanvas()})
       ++i
   @
 
   paint: (renderer, dest) ->
-    imgIndex = 0
-    imgCount = @imgSrc.getImageCount()
-
-    # render each brush, cycling through input images
     i = 0
     while i < @brushCount
-      src = @imgSrc.getImage imgIndex
       if(!@brushes[i])
-        @brushes[i] = new Brush(@imgSrc.width, @imgSrc.height)
-      renderer.renderBrush @brushes[i], src, dest
-      imgIndex++
-      imgIndex = 0 if imgIndex is imgCount
+        console.log 'brush doesn\'t exist really?'
+        @brushes[i] = new Brush({imgSrc: @imgSrc.getRandomImageCanvas()})
+      renderer.renderBrush @brushes[i], dest
       ++i
 
   update: ->

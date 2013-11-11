@@ -6,6 +6,25 @@ class Renderer extends Base
     s = brush.size()
     context.getImageData(x,y,s,s)
 
+  getBrushPixelData: (brush, array) ->
+    x = brush.x()
+    y = brush.y()
+    s = brush.size()
+    endX = x + s
+    endY = y + s
+    data = new Uint8ClampedArray(s*s*4)
+
+    i = 0
+    while y <= endY
+      while x <= endX*4
+        data[i] = array[x*y*4]
+        x++
+        i++
+      y++
+
+    data
+
+
   alphablend: (src, dst, alpha) ->
     alpha * src + (1 - alpha) * dst | 0
 
@@ -51,16 +70,16 @@ class Renderer extends Base
     if ri > 0
       array.set( right.subarray(0,ri-4), offset+li)
 
-  renderBrush: (brush, source, destination) ->
+  renderBrush: (brush, destination) ->
 
     # get brush image data and background image data
-    srcData = @getBrushData(brush, source.context2d)
+    srcData = @getBrushPixelData(brush, brush.imgSrc.getImageData())
     dstData = @getBrushData(brush, destination)
 
     switch brush.type
 
-      when 'square' then @compositeBlock srcData.data, dstData.data, @avgblend
-      when 'weird' then @compositeBlock srcData.data, dstData.data, @scrblend
+      when 'square' then @compositeBlock srcData, dstData.data, @avgblend
+      when 'weird' then @compositeBlock srcData, dstData.data, @scrblend
       when 'circle', 'scircle'
         x = 0
         y = 0
@@ -71,9 +90,9 @@ class Renderer extends Base
         # take color of center pixel
         if brush.type is "scircle"
           midoff = (cnt+cnt*brush.size())*4
-          R = srcData.data[midoff+0]
-          G = srcData.data[midoff+1]
-          B = srcData.data[midoff+2]
+          R = srcData[midoff+0]
+          G = srcData[midoff+1]
+          B = srcData[midoff+2]
 
         while y < brush.size()
           x = 0
@@ -85,9 +104,9 @@ class Renderer extends Base
             alpha = (cnt - d) / cnt
             alpha = 0  if alpha < 0
             if brush.type is "circle"
-              R = srcData.data[i+0]
-              G = srcData.data[i+1]
-              B = srcData.data[i+2]
+              R = srcData[i+0]
+              G = srcData[i+1]
+              B = srcData[i+2]
             dstData.data[i]     = @alphablend(R, dstData.data[i], alpha)   # srcData.data[i+..]
             dstData.data[i + 1] = @alphablend(G, dstData.data[i + 1], alpha)
             dstData.data[i + 2] = @alphablend(B, dstData.data[i + 2], alpha)

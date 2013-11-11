@@ -12,8 +12,8 @@ class RandomMovement extends Movement
     'movementChangeDirectionMin': 'delta.cycle.range.min'
     'movementChangeDirectionMax': 'delta.cycle.range.max'
     'movementInterpolation': 'delta.upmode'
-    'canvasWidth': 'pos.value.x.range.max'
-    'canvasHeight': 'pos.value.y.range.max'
+#    'canvasWidth': 'pos.value.x.range.max'
+#    'canvasHeight': 'pos.value.y.range.max'
 
   init: () ->
     @pos = new Mutable
@@ -157,13 +157,15 @@ class Brush extends Base
   public: 
     'brushType': 'type'
 
-  init: (w, h) ->
+  init: () ->
     @movement = new ClassSwitcher
       channel: 'brushMovementType'
       default: 'Random'
       params:
-        width: w
-        height: h
+        width: @imgSrc.width
+        height: @imgSrc.width
+        offsetX: @imgSrc.offsetX
+        offsetY: @imgSrc.offsetY
 
   update : ->
     @movement.update()         # switches class
