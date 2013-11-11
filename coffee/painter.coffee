@@ -11,34 +11,51 @@ class ImageCanvas extends Base
     data = new Uint8ClampedArray(size*size*4)
 
     row = 0
-    column = 0
     arrIndex = 0
 
+    imgData = {
+      width: size
+      height: size
+    }
+
     while row < size
-      index += (row * @width * 4)
-      while column < ((row + 1)*size)*4 + 1
-        data[arrIndex] = @imageData[index]
-        index++
-        column++
+      x = index + (row * @width * 4)
+      i = 0
+      while i < size*4
+        data[arrIndex] = @imageData.data[x]
+        x++
         arrIndex++
+        i++
       row++
-    data
+    imgData['data'] = data
+    imgData
 
   imageToImageData: (image) ->
     canvas = document.createElement 'canvas'
-    canvas.width = image.width
-    canvas.height = image.height
+    canvas.width = @width
+    canvas.height = @height
+
     context2d = canvas.getContext '2d'
     context2d.drawImage image, 0, 0
-    imgData = context2d.getImageData 0, 0, image.width, image.height
-    imgData.data
+    imgData = context2d.getImageData 0, 0, canvas.width, canvas.height
+    imgData
 
   init: () ->
     unless @image
       throw new Error('Required attributes missing')
 
-    @width = @image.width
-    @height = @image.height
+    canvasWidth = @PS.getValue('canvasWidth')
+    canvasHeight = @PS.getValue('canvasHeight')
+
+    if(canvasWidth > @image.width)
+      @width = @image.width
+    else
+      @width = canvasWidth
+
+    if(canvasHeight > @image.height)
+      @height = @image.height
+    else
+      @height = canvasHeight
 
     @imageData = @imageToImageData @image
 

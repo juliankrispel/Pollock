@@ -75,8 +75,8 @@ class Renderer extends Base
     dstData = @getBrushData(brush, destination)
     switch brush.type
 
-      when 'square' then @compositeBlock srcData, dstData.data, @avgblend
-      when 'weird' then @compositeBlock srcData, dstData.data, @scrblend
+      when 'square' then @compositeBlock srcData.data, dstData.data, @avgblend
+      when 'weird' then @compositeBlock srcData.data, dstData.data, @scrblend
       when 'circle', 'scircle'
         x = 0
         y = 0
@@ -87,9 +87,9 @@ class Renderer extends Base
         # take color of center pixel
         if brush.type is "scircle"
           midoff = (cnt+cnt*brush.size())*4
-          R = srcData[midoff+0]
-          G = srcData[midoff+1]
-          B = srcData[midoff+2]
+          R = srcData.data[midoff+0]
+          G = srcData.data[midoff+1]
+          B = srcData.data[midoff+2]
 
         while y < brush.size()
           x = 0
@@ -101,9 +101,9 @@ class Renderer extends Base
             alpha = (cnt - d) / cnt
             alpha = 0  if alpha < 0
             if brush.type is "circle"
-              R = srcData[i+0]
-              G = srcData[i+1]
-              B = srcData[i+2]
+              R = srcData.data[i+0]
+              G = srcData.data[i+1]
+              B = srcData.data[i+2]
             dstData.data[i]     = @alphablend(R, dstData.data[i], alpha)   # srcData.data[i+..]
             dstData.data[i + 1] = @alphablend(G, dstData.data[i + 1], alpha)
             dstData.data[i + 2] = @alphablend(B, dstData.data[i + 2], alpha)

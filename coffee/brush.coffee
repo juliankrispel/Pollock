@@ -70,8 +70,6 @@ class HalfPipeMovement extends Movement
     'movementDescription': 'description'
     'movementMinSize': 'minSize'
     'movementTwoAttribute': 'maxSize'
-    'canvasWidth': 'width'
-    'canvasHeight': 'height'
 
   defaults:
     description: 'Half Circle Movement'
@@ -108,14 +106,14 @@ class HalfPipeMovement extends Movement
 
     # calculate current position
     angle = (@sizem.valueOf()/2) * @counter / @radius.valueOf()
-    @X = (@center.value.x.valueOf() + @radius * Math.cos(angle))|0
-    @Y = (@center.value.y.valueOf() + @radius * Math.sin(angle))|0
+    @xPos = (@center.value.x.valueOf() + @radius * Math.cos(angle))|0
+    @yPos = (@center.value.y.valueOf() + @radius * Math.sin(angle))|0
 
   x: () ->
-    @X
+    @xPos
 
   y: () ->
-    @Y
+    @yPos
 
   size: () ->
     +@sizem.value
