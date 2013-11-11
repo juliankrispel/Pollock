@@ -17,7 +17,7 @@ class Renderer extends Base
     i = 0
     while y <= endY
       while x <= endX*4
-        data[i] = array[x*y*4]
+        data[i] = array[x]
         x++
         i++
       y++
