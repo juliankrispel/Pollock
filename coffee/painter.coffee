@@ -14,13 +14,12 @@ class ImageCanvas extends Base
     column = 0
 
     while row < size
-      index += (row * @width)
+      index += (row * @width * 4)
       while column <= ((row + 1)*size)*4
         data[column+row*size] = @imageData[index]
         index++
         column++
       row++
-
     data
 
   imageToImageData: (image) ->

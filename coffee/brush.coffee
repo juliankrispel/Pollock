@@ -163,7 +163,7 @@ class Brush extends Base
       default: 'Random'
       params:
         width: @imgSrc.width
-        height: @imgSrc.width
+        height: @imgSrc.height
         offsetX: @imgSrc.offsetX
         offsetY: @imgSrc.offsetY
 
