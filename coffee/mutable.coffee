@@ -193,9 +193,5 @@ class MutableController
    update : ->
       m.update() for m in @mutables
 
-   log : ->
-      for m in @mutables
-        console.log(m.constructor.name + ":" + m.valueOf())
-
 window.Mutable = Mutable
 window.RandomIntervalNumber = RandomIntervalNumber;

@@ -1,4 +1,7 @@
 class ImageCanvas extends Base
+  defaults:
+    offsetX: 0
+    offsety: 0
   init: () ->
     unless @width || @height || @image
       throw new Error('Required attributes missing')
@@ -12,9 +15,13 @@ class ImageCanvas extends Base
 # width and height of ImageSource correspond to 
 # the maximal width and height of images it contains
 class ImageSource extends Base
+  public:
+    'canvasWidth': 'width'
+    'canvasHeight': 'height'
+
   defaults: 
-    width: 0
-    height: 0
+    width: 600
+    height: 400
     images: []
 
   getImageCount: =>

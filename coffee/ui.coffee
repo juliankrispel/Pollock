@@ -19,7 +19,6 @@ angular.module('PainterApp').controller 'PainterCtrl', ($scope) ->
 
   window.addEventListener('drop', (event)->
     onImageDrop(event, (img)->
-      console.log img.src
       $scope.painter.images.push({url: img.src})
       $scope.$apply();
     )
@@ -32,26 +31,23 @@ angular.module('PainterApp').directive 'canvasPainter', ->
       if(scope.painter.images.length < 1)
         return false
 
-      startPainter element[0], document.querySelectorAll '.image', (myPainter) ->
-        scope.painter = {
-          hasLoaded: true
-        }
+      startPainter element[0], document.querySelectorAll('.image'), (painter) ->
+        bindPainter(painter, scope)
 
-        list = myPainter.PS.getAllChannels()
+bindPainter = (myPainter, scope) ->
+  scope.painter['hasLoaded'] = true
 
-        for name in list
-          do(name) ->
-            myPainter.PS.subscribe(name, 'gui', (value) -> 
-              scope.painter[name] = value
-              scope.$apply()
-            )
+  list = myPainter.PS.getAllChannels()
 
-            scope.painter[name] = myPainter.PS.getValue(name)
-
-            scope.$watch 'painter.' + name, ()->
-              myPainter.PS.setValue(name, 'gui', scope.painter[name])
-
+  for name in list
+    do(name) ->
+      myPainter.PS.subscribe(name, 'gui', (value) -> 
+        scope.painter[name] = value
         scope.$apply()
+      )
+      scope.painter[name] = myPainter.PS.getValue(name)
+      scope.$watch 'painter.' + name, ()->
+        myPainter.PS.setValue(name, 'gui', scope.painter[name])
 
 onImageDrop = (event, callback)->
   event.preventDefault()
@@ -66,11 +62,7 @@ onImageDrop = (event, callback)->
   reader.onload = () ->
     _inputImage = new Image();
     _inputImage.src = reader.result;
-
-    _inputImage.onload = (a,b,c)->
+    _inputImage.onload = ->
       callback(_inputImage)
 
   reader.readAsDataURL(file);
-
-  console.log file
-

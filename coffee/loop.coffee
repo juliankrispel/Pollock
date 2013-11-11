@@ -1,10 +1,8 @@
 myPainter = new MovingBrushPainter
+imgSource = new ImageSource
+dstCanvas = null
 
 mainLoop = (images) ->
-  imgSource = new ImageSource
-    width: images[0].width
-    height: images[0].height
-
   for image in images
     imgCanvas = new ImageCanvas
       image: image
@@ -27,8 +25,6 @@ mainLoop = (images) ->
 
   window.requestAnimationFrame iterate
   null
-
-dstCanvas = null
 
 # main application
 window.startPainter = (renderTarget, images, callback) ->

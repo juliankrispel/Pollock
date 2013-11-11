@@ -4,7 +4,6 @@ class Movement extends Base
  defaults:
    width: 10
    height: 10
- 
 
 class RandomMovement extends Movement
   public:
@@ -13,6 +12,8 @@ class RandomMovement extends Movement
     'movementChangeDirectionMin': 'delta.cycle.range.min'
     'movementChangeDirectionMax': 'delta.cycle.range.max'
     'movementInterpolation': 'delta.upmode'
+    'canvasWidth': 'pos.value.x.range.max'
+    'canvasHeight': 'pos.value.y.range.max'
 
   init: () ->
     @pos = new Mutable
@@ -65,11 +66,13 @@ class RandomMovement extends Movement
 # Movement two: move in half-circles
 # State is : center, radius, starting angle
 class HalfPipeMovement extends Movement
-  
   public:
     'movementDescription': 'description'
     'movementMinSize': 'minSize'
     'movementTwoAttribute': 'maxSize'
+    'canvasWidth': 'width'
+    'canvasHeight': 'height'
+
   defaults:
     description: 'Half Circle Movement'
 

@@ -1,6 +1,5 @@
 # the renderer is actually responsible for copying pixels
 class Renderer extends Base
-
   getBrushData: (brush, context) ->
     x = brush.x()
     y = brush.y()
@@ -109,5 +108,3 @@ class Renderer extends Base
     # write brush back to image
     destination.putImageData dstData, brush.x(), brush.y()
     @
-
-   
