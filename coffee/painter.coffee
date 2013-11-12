@@ -30,27 +30,22 @@ class Image extends Base
     @imageData = @imageToImageData @image
 
   getPixelData: (x, y, size) ->
-    index = (x + (y*@width))*4
-    data = new Uint8ClampedArray(size*size*4)
-
-    row = 0
-    arrIndex = 0
 
     imgData = {
       width: size
       height: size
+      data: new Uint8ClampedArray(size*size*4)
     }
 
+    row = 0
+    srcoffset = (x + (y*@width))*4
+    dstoffset = 0
     while row < size
-      x = index + (row * @width * 4)
-      i = 0
-      while i < size*4
-        data[arrIndex] = @imageData.data[x]
-        x++
-        arrIndex++
-        i++
-      row++
-    imgData['data'] = data
+      imgData.data.set( @imageData.data.subarray(srcoffset, srcoffset+size*4), dstoffset )
+      srcoffset += @width*4
+      dstoffset += size*4
+      ++row
+
     imgData
 
   imageToImageData: (image) ->
