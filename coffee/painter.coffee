@@ -1,7 +1,7 @@
 class ImageCanvas extends Base
   defaults:
     offsetX: 0
-    offsety: 0
+    offsetY: 0
 
   getImageData: ->
     @imageData
@@ -49,10 +49,12 @@ class ImageCanvas extends Base
 
     if(canvasWidth > @image.width)
       @width = @image.width
+      @offsetX = (canvasWidth - @width)/2
     else
       @width = canvasWidth
 
     if(canvasHeight > @image.height)
+      @offsetY = (canvasHeight - @height)/2
       @height = @image.height
     else
       @height = canvasHeight

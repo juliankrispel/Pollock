@@ -79,7 +79,7 @@ class HalfPipeMovement extends Movement
       value: new RandomPosition(new Range(0, @width), new Range(0, @height))
       upmode: 'discrete'
       cycle: new RandomIntervalNumber(new Range(1,1))
-    
+
     @radius = new Mutable
       value: new RandomIntervalNumber(new Range(10, 50))
       upmode: 'discrete'
@@ -169,11 +169,17 @@ class Brush extends Base
     @movement.update()         # switches class
     @movement.val().update()   # update movement
   
-  x : ->
-    @movement.val().x()
+  x : (isRelative) ->
+    if(isRelative)
+      @movement.val().x()
+    else
+      @movement.val().x() + @imgSrc.offsetX
 
-  y : ->
-    @movement.val().y()
+  y : (isRelative) ->
+    if(isRelative)
+      @movement.val().y()
+    else
+      @movement.val().y() + @imgSrc.offsetY
 
   size : ->
     @movement.val().size()

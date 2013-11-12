@@ -1,27 +1,7 @@
 # the renderer is actually responsible for copying pixels
 class Renderer extends Base
-  getBrushData: (brush, context) ->
-    x = brush.x()
-    y = brush.y()
-    s = brush.size()
+  getBrushData: (x, y, s, context) ->
     context.getImageData(x,y,s,s)
-
-  getBrushPixelData: (brush, array) ->
-    index = (brush.x() + (brush.y() * brush.imgSrc.width)) * 4
-    endX = x + brush.size()
-    endY = y + brush.size()
-    data = new Uint8ClampedArray(s*s*4)
-
-    i = 0
-    while y <= endY
-      while x <= endX*4
-        data[i] = array[x]
-        x++
-        i++
-      y++
-
-    data
-
 
   alphablend: (src, dst, alpha) ->
     alpha * src + (1 - alpha) * dst | 0
@@ -70,9 +50,11 @@ class Renderer extends Base
 
   renderBrush: (brush, destination) ->
 
+    s = brush.size()
+
     # get brush image data and background image data
-    srcData = brush.imgSrc.getPixelData(brush.x(), brush.y(), brush.size())
-    dstData = @getBrushData(brush, destination)
+    srcData = brush.imgSrc.getPixelData(brush.x(true), brush.y(true), s)
+    dstData = @getBrushData(brush.x(), brush.y(), s, destination)
     switch brush.type
 
       when 'square' then @compositeBlock srcData.data, dstData.data, @avgblend
