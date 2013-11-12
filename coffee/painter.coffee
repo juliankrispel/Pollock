@@ -86,11 +86,10 @@ class ImageSource extends Base
     @images.push img
 
   init: ->
-    @PS.subscribe('images', 'ImageSource', (value)->
-      console.log 'images have changed', value
+    @PS.subscribe('images', 'ImageSource_domImages', (value)->
+      console.log 'gui has changed ImageSource.domImages', value
     )
 
-# -----------------------------------------------------------------------------
 # The painter is responsible for what is going to get drawn where
 
 # This object just defines the interface
