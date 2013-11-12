@@ -4,12 +4,7 @@ dstCanvas = null
 
 mainLoop = (images) ->
   for image in images
-    imgCanvas = new ImageCanvas
-      image: image
-      width: image.width
-      height: image.height
-
-    imgSource.addImage imgCanvas
+    imgSource.addImage new Image({image: image})
 
   myPainter.setImageSource imgSource
   myPainter.start()

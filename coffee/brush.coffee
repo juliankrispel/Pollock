@@ -168,7 +168,7 @@ class Brush extends Base
   update : ->
     @movement.update()         # switches class
     @movement.val().update()   # update movement
-  
+
   x : (isRelative) ->
     if(isRelative)
       @movement.val().x()

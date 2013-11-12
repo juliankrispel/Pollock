@@ -1,12 +1,35 @@
-class ImageCanvas extends Base
+class Image extends Base
   defaults:
     offsetX: 0
     offsetY: 0
+    width: 0
+    height: 0
 
   getImageData: ->
     @imageData
 
-  getPixelData: (x,y,size) ->
+  init: () ->
+    unless @image
+      throw new Error('Required attributes missing')
+
+    canvasWidth = @PS.getValue('canvasWidth')
+    canvasHeight = @PS.getValue('canvasHeight')
+
+    if(canvasWidth > @image.width)
+      @width = @image.width
+      @offsetX = (canvasWidth - @width)/2
+    else
+      @width = canvasWidth
+
+    if(canvasHeight > @image.height)
+      @height = @image.height
+      @offsetY = (canvasHeight - @height)/2
+    else
+      @height = canvasHeight
+
+    @imageData = @imageToImageData @image
+
+  getPixelData: (x, y, size) ->
     index = (x + (y*@width))*4
     data = new Uint8ClampedArray(size*size*4)
 
@@ -40,26 +63,6 @@ class ImageCanvas extends Base
     imgData = context2d.getImageData 0, 0, canvas.width, canvas.height
     imgData
 
-  init: () ->
-    unless @image
-      throw new Error('Required attributes missing')
-
-    canvasWidth = @PS.getValue('canvasWidth')
-    canvasHeight = @PS.getValue('canvasHeight')
-
-    if(canvasWidth > @image.width)
-      @width = @image.width
-      @offsetX = (canvasWidth - @width)/2
-    else
-      @width = canvasWidth
-
-    if(canvasHeight > @image.height)
-      @offsetY = (canvasHeight - @height)/2
-      @height = @image.height
-    else
-      @height = canvasHeight
-
-    @imageData = @imageToImageData @image
 
 # ImageSource abstracts a set of images, accesible by index
 # width and height of ImageSource correspond to 
@@ -68,17 +71,24 @@ class ImageSource extends Base
   public:
     'canvasWidth': 'width'
     'canvasHeight': 'height'
+    'images': 'domImages'
 
   defaults: 
     width: 600
     height: 400
     images: []
+    domImages: []
 
   getRandomImageCanvas: ->
     @images[Math.round Math.random() * (@images.length-1)]
 
   addImage: (img) ->
     @images.push img
+
+  init: ->
+    @PS.subscribe('images', 'ImageSource', (value)->
+      console.log 'images have changed', value
+    )
 
 # -----------------------------------------------------------------------------
 # The painter is responsible for what is going to get drawn where

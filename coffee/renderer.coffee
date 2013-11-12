@@ -1,4 +1,5 @@
-# the renderer is actually responsible for copying pixels
+# Currently, the renderer is a collection of methods for
+# rendering pixels, usuall by blending two pixel arrays
 class Renderer extends Base
   getBrushData: (x, y, s, context) ->
     context.getImageData(x,y,s,s)
@@ -101,8 +102,6 @@ class Renderer extends Base
           @quickSortStep(dstData.data, offset, brush.size())
           offset += brush.size()*4
           ++y
-    #/switch brush.type
 
-    # write brush back to image
     destination.putImageData dstData, brush.x(), brush.y()
     @

@@ -33,7 +33,7 @@ class window.PublishSubscriber
     subscribe: (channel, subscriber, callback) ->
         if not @_channels.hasOwnProperty(channel)
             #console.error("[PublishSubscriber ERR]: " + subscriber + " tried to subscribe to channel " + channel + ", which doesn't exist.")
-            @registerChannel(channel, { value: "" })
+            @registerChannel(channel, { value: undefined })
 
         # initialize subscriber if not existent
         if not @_subscribers.hasOwnProperty(subscriber)
@@ -61,7 +61,7 @@ class window.PublishSubscriber
 
     getValue: (channel, subscriber) ->
         if @_channels.hasOwnProperty(channel)
-            return @_channels[channel].value
+          return @_channels[channel].value
         console.error("[PublishSubscriber ERR]: " + subscriber + " tried to read from non-existant channel " + channel)
         null
 
@@ -104,14 +104,15 @@ class window.PublishSubscriber
 
         if obj.hasOwnProperty(property)
             defaultValue = obj[property]
+
         Object.defineProperty(obj, property, {
             get: () -> PS.getValue(channel,obj.constructor.name)
             set: (val) -> PS.setValue(channel,obj.constructor.name,val)
         })
 
-        isNewChannel = not @_channels.hasOwnProperty(channel)
+        isNewChannel = not @_channels.hasOwnProperty(channel) or @_channels[channel].value == undefined
 
-        subName = obj.constructor.name+"_"+property
+        subName = obj.constructor.name + "_" + property
         @subscribe(channel, subName,()->)
         @_channels[channel].published = true
         if defaultValue isnt undefined and isNewChannel
