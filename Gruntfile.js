@@ -41,9 +41,11 @@ module.exports = function(grunt){
                         'coffee/ui.coffee'
                     ],
                     'js/test.js': [
-                        'tests/*.coffee',
                         'coffee/util.coffee',
+                        'coffee/base.coffee',
                         'coffee/mutable.coffee',
+                        'coffee/transformation.coffee',
+                        'tests/*.coffee',
                     ],
                     'js/msgpass.js': [
                         'coffee/msgpass.coffee',
