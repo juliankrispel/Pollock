@@ -12,18 +12,19 @@ class CImage
 class Transformation extends Base
   
   defaults:
-    tx: 0
-    ty: 0        # translation
-    sx: 1.0
-    sy: 1.0      # scale
-    angle: 0.0   # rotation
+    tx: 100
+    ty: -100        # translation
+    sx: 0.5
+    sy: 0.5      # scale
+    angle: 45*Math.PI/180   # rotation
   
   transformImage: (context, image) ->
     context.setTransform
-    context.translate(-image.width/2,-image.height/2)
-    context.scale(@sx,@sy)
+    #context.translate(-image.width/2,-image.height/2)
+    #context.scale(@sx,@sy)
+    context.translate(@tx,@ty)
     context.rotate(@angle)
-    context.translate(image.width/2+@tx,image.height/2+@ty)
+    #context.translate(image.width/2+@tx,image.height/2+@ty)
     context.drawImage(image,0,0)
 
 
@@ -65,6 +66,7 @@ class TransformedImage extends CImage
       height: @transheight
     ctx = @transformed.canvas.getContext('2d')
     @transformation.transformImage(ctx, @image)
+    @transformed.imgData = ctx.getImageData 0, 0, @transformed.width, @transformed.height
 
   getPixelData: (x, y, size) ->
 
@@ -78,7 +80,7 @@ class TransformedImage extends CImage
     srcoffset = (x + (y*@transformed.width))*4
     dstoffset = 0
     while row < size
-      imgData.data.set( @transformed.imageData.data.subarray(srcoffset, srcoffset+size*4), dstoffset )
+      imgData.data.set( @transformed.imgData.data.subarray(srcoffset, srcoffset+size*4), dstoffset )
       srcoffset += @transformed.width*4
       dstoffset += size*4
       ++row
@@ -161,7 +163,11 @@ class ImageSource extends Base
     domImages: []
 
   getRandomImageCanvas: ->
-    @images[Math.round Math.random() * (@images.length-1)].transformed
+    @images[Math.round Math.random() * (@images.length-1)]
+
+  getImageCanvas:(index) ->
+    @images[index]
+
 
   # img is CImage
   addImage: (img) ->
@@ -212,17 +218,18 @@ class MovingBrushPainter extends Painter
     @brushes = []
     i = 0
     while i <= @brushCount
-      @brushes[i] =  new Brush({imgSrc: @imgSrc.getRandomImageCanvas()})
+      @brushes[i] =  new Brush()
       ++i
   @
 
   paint: (renderer, dest) ->
     i = 0
+    imgIndex = 0
     while i < @brushCount
       if(!@brushes[i])
-        console.log 'brush doesn\'t exist really?'
-        @brushes[i] = new Brush({imgSrc: @imgSrc.getRandomImageCanvas()})
-      renderer.renderBrush @brushes[i], dest
+        @brushes[i] = new Brush()
+      renderer.renderBrush @brushes[i], @imgSrc.getImageCanvas(imgIndex++), dest
+      imgIndex = 0 if imgIndex==@imgSrc.images.length
       ++i
 
   update: ->
