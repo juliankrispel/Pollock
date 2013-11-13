@@ -4,7 +4,7 @@ dstCanvas = null
 
 mainLoop = (images) ->
   for image in images
-    imgSource.addImage new Image({image: image})
+    imgSource.addImage new CImage({image: image})
 
   myPainter.setImageSource imgSource
   myPainter.start()

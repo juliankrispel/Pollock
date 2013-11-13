@@ -23,8 +23,8 @@ class Transformation extends Base
     context.translate(-image.width/2,-image.height/2)
     context.scale(@sx,@sy)
     context.rotate(@angle)
-    context.translate(image.width/2+tx,image.height/2+ty)
-    context.drawImage(image)
+    context.translate(image.width/2+@tx,image.height/2+@ty)
+    context.drawImage(image,0,0)
 
 
 # CImage holds an Image + the pixel array
@@ -35,12 +35,15 @@ class CImage extends Base
 
   init: () ->
     @canvas = document.createElement 'canvas'
+    if @image != undefined
+      @width = @image.width
+      @height = @image.height
     @canvas.width = @width
     @canvas.height = @height
+    context2d = @canvas.getContext '2d'
     if @image != undefined
-      context2d = @canvas.getContext '2d'
-      context2d.drawImage @image
-    @imgData = context2d.getImageData 0, 0, @canvas.width, @canvas.height
+      context2d.drawImage @image, 0, 0
+    @imgData = context2d.getImageData 0, 0, @width, @height
 
   drawToCanvas: (canvas) ->
     canvas.getContext('2d').putImageData @imgData, 0, 0
@@ -63,6 +66,24 @@ class TransformedImage extends CImage
     ctx = @transformed.canvas.getContext('2d')
     @transformation.transformImage(ctx, @image)
 
+  getPixelData: (x, y, size) ->
+
+    imgData = {
+      width: size
+      height: size
+      data: new Uint8ClampedArray(size*size*4)
+    }
+
+    row = 0
+    srcoffset = (x + (y*@transformed.width))*4
+    dstoffset = 0
+    while row < size
+      imgData.data.set( @transformed.imageData.data.subarray(srcoffset, srcoffset+size*4), dstoffset )
+      srcoffset += @transformed.width*4
+      dstoffset += size*4
+      ++row
+
+    imgData
 
 
 # class Image extends Base
