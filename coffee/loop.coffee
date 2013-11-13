@@ -21,6 +21,8 @@ mainLoop = (images) ->
   window.requestAnimationFrame iterate
   null
 
+window.painter = myPainter
+
 # main application
 window.startPainter = (renderTarget, images, callback) ->
   dstCanvas = renderTarget

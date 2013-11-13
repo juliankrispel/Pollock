@@ -6,7 +6,16 @@ window.addEventListener('dragover', (event)->
   event.preventDefault()
 , false)
 
+painter.PS.setValue('arr', 'gui', [])
 
+painter.PS.subscribe('cow', 'painter', (value)->
+  console.log('mooh', value)
+)
+
+painter.PS.subscribe('images','painter', (value)->
+  console.log( 'dwq', value )
+  console.log painter.PS.getValue('images')
+)
 angular.module('PainterApp').controller 'PainterCtrl', ($scope) ->
   $scope.painter = {
     images: [
@@ -19,7 +28,13 @@ angular.module('PainterApp').controller 'PainterCtrl', ($scope) ->
 
   window.addEventListener('drop', (event)->
     onImageDrop(event, (img)->
+      images = painter.PS.getValue('images')
       $scope.painter.images.push({url: img.src})
+      images.push(document.querySelectorAll('.image'))
+
+      painter.PS.setValue 'arr', 'gui', ['dwq']
+      
+      painter.PS.setValue('images', 'gui', images)
       $scope.$apply();
     )
   , false)
@@ -33,6 +48,7 @@ angular.module('PainterApp').directive 'canvasPainter', ->
 
       startPainter element[0], document.querySelectorAll('.image'), (painter) ->
         bindPainter(painter, scope)
+
 
 bindPainter = (myPainter, scope) ->
   scope.painter['hasLoaded'] = true
@@ -48,6 +64,7 @@ bindPainter = (myPainter, scope) ->
       scope.painter[name] = myPainter.PS.getValue(name)
       scope.$watch 'painter.' + name, ()->
         myPainter.PS.setValue(name, 'gui', scope.painter[name])
+
 
 onImageDrop = (event, callback)->
   event.preventDefault()
