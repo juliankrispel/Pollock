@@ -1,8 +1,6 @@
 # Currently, the renderer is a collection of methods for
 # rendering pixels, usuall by blending two pixel arrays
 class Renderer extends Base
-  getBrushData: (x, y, s, context) ->
-    context.getImageData(x,y,s,s)
 
   alphablend: (src, dst, alpha) ->
     alpha * src + (1 - alpha) * dst | 0
@@ -49,13 +47,14 @@ class Renderer extends Base
     if ri > 0
       array.set( right.subarray(0,ri-4), offset+li)
 
-  renderBrush: (brush, destination) ->
+  renderBrush: (brush, source, destination) ->
 
     s = brush.size()
 
     # get brush image data and background image data
-    srcData = brush.imgSrc.getPixelData(brush.x(true), brush.y(true), s)
-    dstData = @getBrushData(brush.x(), brush.y(), s, destination)
+    srcData = source.getPixelData(brush.x(), brush.y(), s)
+    dstData = destination.getImageData(brush.x(),brush.y(),s,s)
+
     switch brush.type
 
       when 'square' then @compositeBlock srcData.data, dstData.data, @avgblend

@@ -70,16 +70,16 @@ class Mat3
   # scales by (sx,sy) around a point P=(px,py)
   scale: (px, py, sx, sy) ->
     @createTranslation(px,py).multMat(
-        createScale(sx,sy).multMat(
-            createTranslation(-tx,-ty).multMat(@)
+        @createScale(sx,sy).multMat(
+            @createTranslation(-px,-py).multMat(@)
         )
     )
 
   # rotates around a point
   rotate: (px, py, angle) ->
     @createTranslation(px,py).multMat(
-        createRotation(angle).multMat(
-            createTranslation(-tx,-ty).multMat(@)
+        @createRotation(angle).multMat(
+            @createTranslation(-px,-py).multMat(@)
         )
     )
 
