@@ -1,0 +1,72 @@
+<html>
+    <head>
+        <style>
+        
+            .transform{ background: #eee; width: 100%; height: 100%; block; position: absolute; }
+            img{ position: relative; }
+        </style>
+    </head>
+<body>
+    <div class="transform">
+    </div>
+    <img src="img/01.jpg">
+</body>
+<script>
+    var prefixes = ['-moz-', '-webkit-', '-ms-', '-khtml-', '-o-'];
+    function transformImage(el, obj){
+        var css = '';
+        var string = '';
+
+        for (var x in obj){
+            var transformString = obj[x].join(',')
+            string+= x + '(' + transformString + ')';
+        }
+
+        for (var i in prefixes){
+            el.style.setProperty(prefixes[i] + 'transform', string, 'important');
+        }
+    }
+    window.onload = function(){
+        var transform = {
+            'translate': ['0px', '0px']
+        }
+
+        var mousePosition = [NaN, NaN];
+
+        var x = 0;
+        var y = 0;
+        var isMouseDown = false;
+        var $t = document.querySelector('.transform');
+        var $img = document.querySelector('img');
+
+        $t.addEventListener('mousedown', function(){ isMouseDown = true; });
+        $t.addEventListener('mouseup', function(){ isMouseDown = false; });
+        $t.addEventListener('mouseout', function(){ isMouseDown = false; });
+        $t.addEventListener('dragstart', function(){ isMouseDown = false; });
+
+        $t.addEventListener('mousemove', function(e){
+            if(isMouseDown){
+                console.log('rotate');
+            }
+        }, false);
+
+        $img.addEventListener('dragstart', function(e){
+            mousePosition = [e.x, e.y];
+        });
+
+
+        $img.addEventListener('drag', function(e){
+            e.preventDefault();
+            var distanceX = parseInt(transform['translate'][0]) + (e.x - mousePosition[0]) + 'px';
+            var distanceY = parseInt(transform['translate'][1]) + (e.y - mousePosition[1]) + 'px';
+            if((distanceX == 0 && distanceY == 0) || (e.x === 0 && e.y === 0))
+                return ;
+            transform['translate'][0] = parseInt(transform['translate'][0]) + (e.x - mousePosition[0]) + 'px';
+            transform['translate'][1] = parseInt(transform['translate'][1]) + (e.y - mousePosition[1]) + 'px';
+            mousePosition[0] = e.x;
+            mousePosition[1] = e.y;
+            transformImage($img, transform);
+        });
+    }
+</script>
+</html>
