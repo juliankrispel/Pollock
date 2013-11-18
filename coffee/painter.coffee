@@ -127,6 +127,14 @@ class ImageSource extends Base
       transwidth: @width
       transheight: @height
 
+  update: ->
+    for img in @images
+      if img.transwidth != @width or img.transheight != @height
+        img.transwidth = @width
+        img.transheight = @height
+        img.resetTransformation()
+        img.applyTransformation()
+
   init: ->
     @PS.subscribe('images', 'ImageSource', (value)->
       console.log 'images have changed', value
@@ -172,6 +180,7 @@ class MovingBrushPainter extends Painter
   @
 
   paint: (renderer, dest) ->
+    # paint all brushes
     i = 0
     imgIndex = 0
     while i < @brushCount
@@ -182,6 +191,9 @@ class MovingBrushPainter extends Painter
       ++i
 
   update: ->
+    # detect if canvas size has changed
+    @imgSrc.update() 
+
     for br in @brushes
       br.update()
     @
