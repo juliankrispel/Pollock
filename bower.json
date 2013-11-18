@@ -4,6 +4,7 @@
   "dependencies": {
     "underscore": "~1.5.2",
     "angular-slider": "https://github.com/juliankrispel/angular-slider.git#0306c0ed701495f85a2e6820a668856e529f7475",
-    "angular": "v1.2.0-rc.3"
+    "angular": "v1.2.0-rc.3",
+    "x-tag-core": "~0.8.18"
   }
 }
