@@ -12,21 +12,25 @@ class CImage
 class Transformation extends Base
   
   defaults:
-    tx: 100
-    ty: -100        # translation
-    sx: 0.5
-    sy: 0.5      # scale
-    angle: 45*Math.PI/180   # rotation
+    tx: 0
+    ty: 0        # translation
+    sx: 1
+    sy: 1        # scale
+    angle: 0     # rotation
+
+  setTransformation: (tx, ty, sx, sy, angle) ->
+    @tx = tx
+    @ty = ty
+    @sx = sx
+    @sy = sy
+    @angle = angle
   
   transformImage: (context, image) ->
     context.setTransform
-    #context.translate(-image.width/2,-image.height/2)
-    #context.scale(@sx,@sy)
     context.translate(@tx,@ty)
+    context.scale(@sx,@sy)
     context.rotate(@angle)
-    #context.translate(image.width/2+@tx,image.height/2+@ty)
     context.drawImage(image,0,0)
-
 
 # CImage holds an Image + the pixel array
 class CImage extends Base
@@ -57,7 +61,12 @@ class TransformedImage extends CImage
     transformation: new Transformation
 
   init: () ->
+    @resetTransformation()
     @applyTransformation()
+
+  # scale transformed image to source image
+  resetTransformation: () ->
+    @transformation.setTransformation(0,0,@transwidth/@width, @transheight/@height,0)
 
   applyTransformation: () ->
     # create empty image
@@ -86,66 +95,6 @@ class TransformedImage extends CImage
       ++row
 
     imgData
-
-
-# class Image extends Base
-#   defaults:
-#     width: 0
-#     height: 0
-
-#   getImageData: ->
-#     @imageData
-
-#   init: () ->
-#     unless @image
-#       throw new Error('Required attributes missing')
-
-#     canvasWidth = @PS.getValue('canvasWidth')
-#     canvasHeight = @PS.getValue('canvasHeight')
-
-#     if(canvasWidth > @image.width)
-#       @width = @image.width
-#       @offsetX = (canvasWidth - @width)/2
-#     else
-#       @width = canvasWidth
-
-#     if(canvasHeight > @image.height)
-#       @height = @image.height
-#       @offsetY = (canvasHeight - @height)/2
-#     else
-#       @height = canvasHeight
-
-#     @imageData = @imageToImageData @image
-
-#   getPixelData: (x, y, size) ->
-
-#     imgData = {
-#       width: size
-#       height: size
-#       data: new Uint8ClampedArray(size*size*4)
-#     }
-
-#     row = 0
-#     srcoffset = (x + (y*@width))*4
-#     dstoffset = 0
-#     while row < size
-#       imgData.data.set( @imageData.data.subarray(srcoffset, srcoffset+size*4), dstoffset )
-#       srcoffset += @width*4
-#       dstoffset += size*4
-#       ++row
-
-#     imgData
-
-#   imageToImageData: (image) ->
-#     canvas = document.createElement 'canvas'
-#     canvas.width = @width
-#     canvas.height = @height
-
-#     context2d = canvas.getContext '2d'
-#     context2d.drawImage image, 0, 0
-#     imgData = context2d.getImageData 0, 0, canvas.width, canvas.height
-#     imgData
-
 
 # ImageSource abstracts a set of images, accesible by index
 # width and height of ImageSource correspond to 
@@ -177,6 +126,14 @@ class ImageSource extends Base
       image: img.image
       transwidth: @width
       transheight: @height
+
+  update: ->
+    for img in @images
+      if img.transwidth != @width or img.transheight != @height
+        img.transwidth = @width
+        img.transheight = @height
+        img.resetTransformation()
+        img.applyTransformation()
 
   init: ->
     @PS.subscribe('images', 'ImageSource_domImages', (value)->
@@ -222,6 +179,7 @@ class MovingBrushPainter extends Painter
   @
 
   paint: (renderer, dest) ->
+    # paint all brushes
     i = 0
     imgIndex = 0
     while i < @brushCount
@@ -232,6 +190,9 @@ class MovingBrushPainter extends Painter
       ++i
 
   update: ->
+    # detect if canvas size has changed
+    @imgSrc.update() 
+
     for br in @brushes
       br.update()
     @

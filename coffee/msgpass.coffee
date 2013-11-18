@@ -105,14 +105,15 @@ class window.PublishSubscriber
         if obj.hasOwnProperty(property)
             defaultValue = obj[property]
 
+        subName = obj.constructor.name + "_" + property
+
         Object.defineProperty(obj, property, {
-            get: () -> PS.getValue(channel,obj.constructor.name)
-            set: (val) -> PS.setValue(channel,obj.constructor.name,val)
+            get: () -> PS.getValue(channel,subName)
+            set: (val) -> PS.setValue(channel,subName,val)
         })
 
         isNewChannel = not @_channels.hasOwnProperty(channel) or @_channels[channel].value == undefined
 
-        subName = obj.constructor.name + "_" + property
         @subscribe(channel, subName,()->)
         @_channels[channel].published = true
         if defaultValue isnt undefined and isNewChannel
