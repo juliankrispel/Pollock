@@ -1,8 +1,11 @@
 <html>
     <head>
         <style>
-        
-            .transform{ background: #eee; width: 100%; height: 100%; block; position: absolute; }
+            body{
+                padding: 0;
+                margin: 0;
+            }
+            .transform{ background: #eee; width: 100%; min-height: 1000px; height: 100%; block; position: fixed; }
             img{ position: relative; }
         </style>
     </head>
@@ -12,7 +15,43 @@
     <img src="img/01.jpg">
 </body>
 <script>
+
+    var getDotProduct = function(a,b) {
+        var n = 0, lim = Math.min(a.length,b.length);
+        for (var i = 0; i < lim; i++) n += a[i] * b[i];
+        return n;
+    }
+
+    var radiansToDegrees = function(radians){
+        return radians * (180 / Math.PI);
+    }
+
+    var getVectorLength = function(v){
+        var sum = 0;
+        for (var i = 0; i < v.length; i++){
+            sum+=v[i]*v[i];
+        }
+        return Math.sqrt(sum);
+    }
+
+    var getAngleBetweenVectors = function(a, b){
+        return Math.acos(getDotProduct(a,b)/(getVectorLength(a)*getVectorLength(b)));
+    }
+
+    var getVectorOrientation = function(a, b, c){
+        var direction = (a[0]-c[0])*(b[1]-c[1])-(a[1]-c[1])*(b[0]-c[0]);
+        if(direction > 0){
+            return 'right';
+        }else if(direction < 0){
+            return 'left';
+        }else if(direction === 0){
+            return 'none';
+        }else
+            throw(new Error(""));
+    }
+
     var prefixes = ['-moz-', '-webkit-', '-ms-', '-khtml-', '-o-'];
+
     function transformImage(el, obj){
         var css = '';
         var string = '';
@@ -26,29 +65,54 @@
             el.style.setProperty(prefixes[i] + 'transform', string, 'important');
         }
     }
+
     window.onload = function(){
         var transform = {
-            'translate': ['0px', '0px']
+            'translate': ['0px', '0px'],
+            'rotate': ['0deg']
         }
 
         var mousePosition = [NaN, NaN];
 
         var x = 0;
         var y = 0;
-        var isMouseDown = false;
+        var isMousedown = false;
         var $t = document.querySelector('.transform');
         var $img = document.querySelector('img');
 
-        $t.addEventListener('mousedown', function(){ isMouseDown = true; });
-        $t.addEventListener('mouseup', function(){ isMouseDown = false; });
-        $t.addEventListener('mouseout', function(){ isMouseDown = false; });
-        $t.addEventListener('dragstart', function(){ isMouseDown = false; });
+        $t.addEventListener('mousedown', function(){  isMousedown = true; mousePosition = [NaN, NaN]; });
+        $t.addEventListener('mouseup', function(){    isMousedown = false; mousePosition = [NaN, NaN]; });
+        $t.addEventListener('mouseout', function(){  isMousedown = false; mousePosition = [NaN, NaN]; });
 
         $t.addEventListener('mousemove', function(e){
-            if(isMouseDown){
-                console.log('rotate');
+            if(!isMousedown)
+                return ;
+
+            var bbox = $img.getBoundingClientRect();
+            if(!mousePosition[0]){
+                mousePosition = [e.x, e.y];
+                return ;
             }
-        }, false);
+
+            var a = [bbox.left + (bbox.width/2), bbox.top + (bbox.height/2)];
+            var b = mousePosition;
+            var c = [e.x, e.y];
+            mousePosition = c;
+
+            var direction = getVectorOrientation(a,b,c);
+
+            var vektorA = [b[0] - a[0], b[1] - a[1]];
+            var vektorB = [c[0] - a[0], c[1] - a[1]];
+            var angle = radiansToDegrees(getAngleBetweenVectors(vektorA, vektorB));
+
+            if(direction === 'right'){
+                transform['rotate'][0] = parseFloat(transform['rotate'][0]) + angle + 'deg';
+            }else if(direction === 'left'){
+                transform['rotate'][0] = parseFloat(transform['rotate'][0]) - angle + 'deg';
+            }
+
+            transformImage($img, transform);
+        });
 
         $img.addEventListener('dragstart', function(e){
             mousePosition = [e.x, e.y];
