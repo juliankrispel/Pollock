@@ -6,13 +6,130 @@
                 margin: 0;
             }
             .transform{ background: #eee; width: 100%; min-height: 1000px; height: 100%; block; position: fixed; }
-            img{ position: relative; }
+
+            .container{ 
+                position: relative; 
+                display: inline-block;
+                border: 1px solid rgba(0,0,0,.5);
+            }
+
+            img{ 
+                cursor: move;
+                position: relative;
+                display: block;
+            }
+
+            .handle-tl, .handle-tr, .handle-bl, .handle-br, .handle-l, .handle-r, .handle-t, .handle-b{ 
+                position: absolute; 
+                width: 6px; 
+                height: 6px;
+                background: transparent; 
+                border: 1px solid rgba(0,0,0,.5);
+                cursor: move;
+                display: block;
+                z-index: 999;
+                background: #eee;
+            }
+
+            .handle-tl{
+                top: -4px;
+                left: -4px;
+                cursor: nwse-resize;
+            }
+
+            .handle-tr{
+                top: -4px;
+                right: -4px;
+                cursor: nesw-resize;
+            }
+
+            .handle-bl{
+                bottom: -4px;
+                left: -4px;
+                cursor: nesw-resize;
+            }
+
+            .handle-br{
+                bottom: -4px;
+                right: -4px;
+                cursor: nwse-resize;
+            }
+
+            .handle-t{
+                top: -4px;
+                left: 50%;
+                margin-left: -3px;
+                cursor: ns-resize;
+            }
+
+           .handle-r{
+                top: 50%;
+                margin-top: -3px;
+                right: -4px;
+                cursor: ew-resize;
+            }
+
+           .handle-b{
+                bottom: -4px;
+                left: 50%;
+                margin-left: -3px;
+                cursor: ns-resize;
+            }
+
+           .handle-l{
+                top: 50%;
+                left: -4px;
+                margin-top: -3px;
+                cursor: ew-resize;
+            }
+
+            .handle-tl--large, .handle-tr--large, .handle-bl--large, .handle-br--large{
+                border: none;
+                width: 15px;
+                height: 15px;
+                background: none;
+                cursor: all-scroll;
+            }
+
+            .handle-tl--large{
+                top: -15px;
+                left: -15px;
+            }
+
+            .handle-tr--large{
+                top: -15px;
+                right: -15px;
+            }
+
+            .handle-bl--large{
+                bottom: -15px;
+                left: -15px;
+            }
+
+            .handle-br--large{
+                bottom: -15px;
+                right: -15px;
+            }
         </style>
     </head>
 <body>
     <div class="transform">
     </div>
-    <img src="img/01.jpg">
+    <div class="container">
+        <div class="handle-tl handle-tl--large"></div>
+        <div draggable="true" class="handle-tl scale-tl"></div>
+        <div class="handle-tr handle-tr--large"></div>
+        <div draggable="true" class="handle-tr scale-tr"></div>
+        <div class="handle-br handle-br--large"></div>
+        <div draggable="true" class="handle-br scale-br"></div>
+        <div class="handle-bl handle-bl--large"></div>
+        <div draggable="true" class="handle-bl scale-bl"></div>
+        <div class="handle-t"></div>
+        <div class="handle-l"></div>
+        <div class="handle-b"></div>
+        <div class="handle-r"></div>
+        <img src="img/01.jpg"/>
+    </div>
 </body>
 <script>
 
@@ -69,26 +186,31 @@
     window.onload = function(){
         var transform = {
             'translate': ['0px', '0px'],
-            'rotate': ['0deg']
+            'rotate': ['0deg'],
+            'scaleX': [1],
+            'scaleY': [1]
         }
 
         var mousePosition = [NaN, NaN];
+        var draggingElement = false;
 
         var x = 0;
         var y = 0;
         var isMousedown = false;
         var $t = document.querySelector('.transform');
+        var $container = document.querySelector('.container');
         var $img = document.querySelector('img');
 
-        $t.addEventListener('mousedown', function(){  isMousedown = true; mousePosition = [NaN, NaN]; });
-        $t.addEventListener('mouseup', function(){    isMousedown = false; mousePosition = [NaN, NaN]; });
-        $t.addEventListener('mouseout', function(){  isMousedown = false; mousePosition = [NaN, NaN]; });
+        window.addEventListener('mousedown', function(){  isMousedown = true; mousePosition = [NaN, NaN]; });
+        window.addEventListener('mouseup', function(){    isMousedown = false; mousePosition = [NaN, NaN]; });
+        window.addEventListener('mouseout', function(){   isMousedown = false; mousePosition = [NaN, NaN]; });
+        window.addEventListener('dragend', function(){   isMousedown = false; mousePosition = [NaN, NaN]; });
 
         $t.addEventListener('mousemove', function(e){
             if(!isMousedown)
                 return ;
 
-            var bbox = $img.getBoundingClientRect();
+            var bbox = $container.getBoundingClientRect();
             if(!mousePosition[0]){
                 mousePosition = [e.x, e.y];
                 return ;
@@ -111,13 +233,12 @@
                 transform['rotate'][0] = parseFloat(transform['rotate'][0]) - angle + 'deg';
             }
 
-            transformImage($img, transform);
+            transformImage($container, transform);
         });
 
         $img.addEventListener('dragstart', function(e){
             mousePosition = [e.x, e.y];
         });
-
 
         $img.addEventListener('drag', function(e){
             e.preventDefault();
@@ -129,8 +250,105 @@
             transform['translate'][1] = parseInt(transform['translate'][1]) + (e.y - mousePosition[1]) + 'px';
             mousePosition[0] = e.x;
             mousePosition[1] = e.y;
-            transformImage($img, transform);
+            transformImage($container, transform);
         });
+
+        var $scaletl = document.querySelector('.scale-tl');
+        var $scaletr = document.querySelector('.scale-tr');
+        var $scalebl = document.querySelector('.scale-bl');
+        var $scalebr = document.querySelector('.scale-br');
+
+        $scaletl.addEventListener('dragstart', function(e){
+            mousePosition = [e.x, e.y];
+        });
+
+
+        $scaletl.addEventListener('drag', function(e){
+            if(e.x == 0 && e.y == 0)
+                return ;
+            var xDistance = e.x - mousePosition[0];
+            var yDistance = e.y - mousePosition[1];
+            var bbox = $container.getBoundingClientRect();
+            var remainingWidth = bbox.width - xDistance;
+            var remainingHeight = bbox.height - yDistance;
+            transform['scaleX'][0] =  (remainingWidth / bbox.width) * parseFloat(transform['scaleX'][0]);
+            transform['scaleY'][0] =  (remainingHeight / bbox.height) * parseFloat(transform['scaleY'][0]);
+            transform['translate'][0] = parseFloat(transform['translate'][0]) + (xDistance/2) + 'px';
+            transform['translate'][1] = parseFloat(transform['translate'][1]) + (yDistance/2) + 'px';
+
+            if(mousePosition[0])
+                mousePosition = [e.x, e.y];
+            transformImage($container, transform);
+        });
+
+        $scalebr.addEventListener('dragstart', function(e){
+            mousePosition = [e.x, e.y];
+        });
+
+        $scalebr.addEventListener('drag', function(e){
+            if(e.x == 0 && e.y == 0)
+                return ;
+            var xDistance = mousePosition[0] - e.x;
+            var yDistance = mousePosition[1] - e.y;
+            var bbox = $container.getBoundingClientRect();
+            var remainingWidth = bbox.width - xDistance;
+            var remainingHeight = bbox.height - yDistance;
+            transform['scaleX'][0] =  (remainingWidth / bbox.width) * parseFloat(transform['scaleX'][0]);
+            transform['scaleY'][0] =  (remainingHeight / bbox.height) * parseFloat(transform['scaleY'][0]);
+            transform['translate'][0] = parseFloat(transform['translate'][0]) - (xDistance/2) + 'px';
+            transform['translate'][1] = parseFloat(transform['translate'][1]) - (yDistance/2) + 'px';
+
+            if(mousePosition[0])
+                mousePosition = [e.x, e.y];
+            transformImage($container, transform);
+        });
+
+        $scalebl.addEventListener('dragstart', function(e){
+            mousePosition = [e.x, e.y];
+        });
+
+        $scalebl.addEventListener('drag', function(e){
+            if(e.x == 0 && e.y == 0)
+                return ;
+            var xDistance = e.x - mousePosition[0];
+            var yDistance = mousePosition[1] - e.y;
+            var bbox = $container.getBoundingClientRect();
+            var remainingWidth = bbox.width - xDistance;
+            var remainingHeight = bbox.height - yDistance;
+            transform['scaleX'][0] =  (remainingWidth / bbox.width) * parseFloat(transform['scaleX'][0]);
+            transform['scaleY'][0] =  (remainingHeight / bbox.height) * parseFloat(transform['scaleY'][0]);
+            transform['translate'][0] = parseFloat(transform['translate'][0]) + (xDistance/2) + 'px';
+            transform['translate'][1] = parseFloat(transform['translate'][1]) - (yDistance/2) + 'px';
+
+            if(mousePosition[0])
+                mousePosition = [e.x, e.y];
+            transformImage($container, transform);
+        });
+
+        $scaletr.addEventListener('dragstart', function(e){
+            mousePosition = [e.x, e.y];
+        });
+
+        $scaletr.addEventListener('drag', function(e){
+            if(e.x == 0 && e.y == 0)
+                return ;
+            var xDistance = mousePosition[0] - e.x;
+            var yDistance = e.y - mousePosition[1];
+            var bbox = $container.getBoundingClientRect();
+            var remainingWidth = bbox.width - xDistance;
+            var remainingHeight = bbox.height - yDistance;
+            transform['scaleX'][0] =  (remainingWidth / bbox.width) * parseFloat(transform['scaleX'][0]);
+            transform['scaleY'][0] =  (remainingHeight / bbox.height) * parseFloat(transform['scaleY'][0]);
+            transform['translate'][0] = parseFloat(transform['translate'][0]) - (xDistance/2) + 'px';
+            transform['translate'][1] = parseFloat(transform['translate'][1]) + (yDistance/2) + 'px';
+
+            if(mousePosition[0])
+                mousePosition = [e.x, e.y];
+            transformImage($container, transform);
+        });
+
+
+
     }
 </script>
 </html>
