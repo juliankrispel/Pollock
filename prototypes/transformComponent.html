@@ -290,48 +290,48 @@
                 var yDistance = mousePosition[1] -y;
             }
 
-            var bbox = $img.getBoundingClientRect();
+            var w = $img.clientWidth * parseFloat(transform['scaleX']);
+            var h = $img.clientHeight * parseFloat(transform['scaleY']);
 
             if(keepRatio){
                 if(Math.abs(xDistance) > Math.abs(yDistance)){
-                    yDistance = (xDistance / bbox.width) * bbox.height;
+                    yDistance = (xDistance / w) * h;
                 }else{
-                    xDistance = (yDistance / bbox.width) * bbox.height;
+                    xDistance = (yDistance / h) * w;
                 }
             }
 
-
-            var remainingWidth = bbox.width - xDistance;
-            var remainingHeight = bbox.height - yDistance;
+            var remainingWidth = w - xDistance;
+            var remainingHeight = h - yDistance;
 
 
             if(remainingWidth < 5 || remainingHeight < 5)
                 return ;
 
             if(direction === 'tl'){
-                transform['scaleX'][0] =  (remainingWidth / bbox.width) * parseFloat(transform['scaleX'][0]);
-                transform['scaleY'][0] =  (remainingHeight / bbox.height) * parseFloat(transform['scaleY'][0]);
+                transform['scaleX'][0] =  (remainingWidth / w) * parseFloat(transform['scaleX'][0]);
+                transform['scaleY'][0] =  (remainingHeight / h) * parseFloat(transform['scaleY'][0]);
                 transform['translate'][0] = parseFloat(transform['translate'][0]) - (xDistance/2) + 'px';
                 transform['translate'][1] = parseFloat(transform['translate'][1]) - (yDistance/2) + 'px';
                 containerTransform['translate'][0] = parseFloat(containerTransform['translate'][0]) + xDistance + 'px';
                 containerTransform['translate'][1] = parseFloat(containerTransform['translate'][1]) + yDistance + 'px';
             }else if(direction === 'tr'){
-                transform['scaleX'][0] =  (remainingWidth / bbox.width) * parseFloat(transform['scaleX'][0]);
-                transform['scaleY'][0] =  (remainingHeight / bbox.height) * parseFloat(transform['scaleY'][0]);
+                transform['scaleX'][0] =  (remainingWidth / w) * parseFloat(transform['scaleX'][0]);
+                transform['scaleY'][0] =  (remainingHeight / h) * parseFloat(transform['scaleY'][0]);
                 transform['translate'][0] = parseFloat(transform['translate'][0]) - (xDistance/2) + 'px';
                 transform['translate'][1] = parseFloat(transform['translate'][1]) - (yDistance/2) + 'px';
 //                containerTransform['translate'][0] = parseFloat(containerTransform['translate'][0]) + xDistance + 'px';
                 containerTransform['translate'][1] = parseFloat(containerTransform['translate'][1]) + yDistance + 'px';
             }else if(direction === 'br'){
-                transform['scaleX'][0] =  (remainingWidth / bbox.width) * parseFloat(transform['scaleX'][0]);
-                transform['scaleY'][0] =  (remainingHeight / bbox.height) * parseFloat(transform['scaleY'][0]);
+                transform['scaleX'][0] =  (remainingWidth / w) * parseFloat(transform['scaleX'][0]);
+                transform['scaleY'][0] =  (remainingHeight / h) * parseFloat(transform['scaleY'][0]);
                 transform['translate'][0] = parseFloat(transform['translate'][0]) - (xDistance/2) + 'px';
                 transform['translate'][1] = parseFloat(transform['translate'][1]) - (yDistance/2) + 'px';
 //                containerTransform['translate'][0] = parseFloat(containerTransform['translate'][0]) + xDistance + 'px';
 //                containerTransform['translate'][1] = parseFloat(containerTransform['translate'][1]) + yDistance + 'px';
             }else if(direction === 'bl'){
-                transform['scaleX'][0] =  (remainingWidth / bbox.width) * parseFloat(transform['scaleX'][0]);
-                transform['scaleY'][0] =  (remainingHeight / bbox.height) * parseFloat(transform['scaleY'][0]);
+                transform['scaleX'][0] =  (remainingWidth / w) * parseFloat(transform['scaleX'][0]);
+                transform['scaleY'][0] =  (remainingHeight / h) * parseFloat(transform['scaleY'][0]);
                 transform['translate'][0] = parseFloat(transform['translate'][0]) - (xDistance/2) + 'px';
                 transform['translate'][1] = parseFloat(transform['translate'][1]) - (yDistance/2) + 'px';
                 containerTransform['translate'][0] = parseFloat(containerTransform['translate'][0]) + xDistance + 'px';
@@ -343,8 +343,8 @@
             transformImage($img, transform);
             transformImage($container, containerTransform);
 
-            $imgcontainer.style.width = bbox.width;
-            $imgcontainer.style.height = bbox.height;
+            $imgcontainer.style.width = w;
+            $imgcontainer.style.height = h;
         }
 
         $scaletl.addEventListener('drag', function(e){
