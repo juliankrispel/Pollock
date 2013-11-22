@@ -50,10 +50,17 @@ class Renderer extends Base
   renderBrush: (brush, source, destination) ->
 
     s = brush.size()
+    brx = brush.x()
+    bry = brush.y()
+    brx = 0 if brx<0
+    brx = (destination.width-s) if brx>(destination.width-s)
+    bry = 0 if bry<0
+    bry = (destination.height-s) if bry>(destination.height-s)
+
 
     # get brush image data and background image data
-    srcData = source.getPixelData(brush.x(), brush.y(), s)
-    dstData = destination.getImageData(brush.x(),brush.y(),s,s)
+    srcData = source.getPixelData(brx, bry, s)
+    dstData = destination.getPixelData(brx, bry, s)
 
     switch brush.type
 
@@ -102,5 +109,5 @@ class Renderer extends Base
           offset += brush.size()*4
           ++y
 
-    destination.putImageData dstData, brush.x(), brush.y()
+    destination.putPixelData(brx, bry, s, dstData)
     @

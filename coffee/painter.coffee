@@ -1,6 +1,4 @@
 
-class CImage 
-
 # Painter needs to manage:
 # - the background/painting canvas (+public channels)
 # - the list of input images + their transformations
@@ -53,6 +51,33 @@ class CImage extends Base
   drawToCanvas: (canvas) ->
     canvas.getContext('2d').putImageData @imgData, 0, 0
 
+  getPixelData: (x, y, size) ->
+    imgData = {
+      width: size
+      height: size
+      data: new Uint8ClampedArray(size*size*4)
+    }
+    row = 0
+    srcoffset = (x + (y*@width))*4
+    dstoffset = 0
+    while row < size
+      imgData.data.set( @imgData.data.subarray(srcoffset, srcoffset+size*4), dstoffset )
+      srcoffset += @width*4
+      dstoffset += size*4
+      ++row
+    imgData
+
+  putPixelData: (x, y, size, src) ->
+    row = 0
+    srcoffset = 0
+    dstoffset = (x + (y*@width))*4
+    while row < size
+      @imgData.data.set( src.data.subarray(srcoffset, srcoffset+size*4), dstoffset )
+      dstoffset += @width*4
+      srcoffset += size*4
+      ++row
+    @
+
 # TransformedImage 
 class TransformedImage extends CImage
   defaults:
@@ -78,13 +103,11 @@ class TransformedImage extends CImage
     @transformed.imgData = ctx.getImageData 0, 0, @transformed.width, @transformed.height
 
   getPixelData: (x, y, size) ->
-
     imgData = {
       width: size
       height: size
       data: new Uint8ClampedArray(size*size*4)
     }
-
     row = 0
     srcoffset = (x + (y*@transformed.width))*4
     dstoffset = 0
@@ -93,23 +116,25 @@ class TransformedImage extends CImage
       srcoffset += @transformed.width*4
       dstoffset += size*4
       ++row
-
     imgData
+  
+  putPixelData: (x, y, size, data) ->
+    throw new Error 'putPixelData is not defined for transformed images.'
 
 # ImageSource abstracts a set of images, accesible by index
 # width and height of ImageSource correspond to 
 # the maximal width and height of images it contains
 class ImageSource extends Base
   public:
+    'images': 'domImages'
     'canvasWidth': 'width'
     'canvasHeight': 'height'
-    'images': 'domImages'
 
   defaults: 
-    width: 600
-    height: 400
     images: []
     domImages: []
+    width: 640
+    height: 400
 
   getRandomImageCanvas: ->
     @images[Math.round Math.random() * (@images.length-1)]
@@ -146,6 +171,9 @@ class ImageSource extends Base
 class Painter extends Base
   #constructor: () ->
   #  @PS = new PublishSubscriber();
+  public:
+    'canvasWidth': 'width'
+    'canvasHeight': 'height'
 
   # the Painter interface
   defaults:
@@ -168,8 +196,15 @@ class MovingBrushPainter extends Painter
 
   public: 
     'brushCount': 'brushCount'
+    'canvasWidth': 'width'
+    'canvasHeight': 'height'   
 
   start: =>
+    # initialize background image
+    @background = new CImage
+      width: @width
+      height: @height
+
     # initialize brushes
     @brushes = []
     i = 0
@@ -185,9 +220,12 @@ class MovingBrushPainter extends Painter
     while i < @brushCount
       if(!@brushes[i])
         @brushes[i] = new Brush()
-      renderer.renderBrush @brushes[i], @imgSrc.getImageCanvas(imgIndex++), dest
+      renderer.renderBrush @brushes[i], @imgSrc.getImageCanvas(imgIndex++), @background
       imgIndex = 0 if imgIndex==@imgSrc.images.length
       ++i
+
+    # paint background image to canvas
+    dest.putImageData @background.imgData, 0, 0
 
   update: ->
     # detect if canvas size has changed
