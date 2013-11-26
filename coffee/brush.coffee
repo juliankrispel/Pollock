@@ -1,9 +1,7 @@
 # movements need to reside in global namespace to be available
 # to the class switcher
 class Movement extends Base
- defaults:
-   width: 0
-   height: 0
+
 
 class RandomMovement extends Movement
   public:
@@ -17,7 +15,7 @@ class RandomMovement extends Movement
 
   init: () ->
     @pos = new Mutable
-      value: new RandomPosition(new Range(0, @width), new Range(0, @height))
+      value: new RandomPosition(new Range(0, PS.getValue('canvasWidth')), new Range(0, PS.getValue('canvasHeight')))
       upmode: 'discrete'
       cycle: new RandomIntervalNumber(new Range(50,1000))
 
@@ -78,7 +76,7 @@ class HalfPipeMovement extends Movement
 
   init: ()->
     @center = new Mutable
-      value: new RandomPosition(new Range(0, @width), new Range(0, @height))
+      value: new RandomPosition(new Range(0, PS.getValue('canvasWidth')), new Range(0, PS.getValue('canvasHeight')))
       upmode: 'discrete'
       cycle: new RandomIntervalNumber(new Range(1,1))
 
