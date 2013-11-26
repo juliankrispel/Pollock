@@ -49,6 +49,7 @@ class Renderer extends Base
 
   renderBrush: (brush, source, destination) ->
 
+    # bounds check
     s = brush.size()
     brx = brush.x()
     bry = brush.y()

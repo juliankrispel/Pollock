@@ -2,8 +2,8 @@
 # to the class switcher
 class Movement extends Base
  defaults:
-   width: 10
-   height: 10
+   width: 0
+   height: 0
 
 class RandomMovement extends Movement
   public:
@@ -70,6 +70,8 @@ class HalfPipeMovement extends Movement
     'movementDescription': 'description'
     'movementMinSize': 'minSize'
     'movementTwoAttribute': 'maxSize'
+    'canvasWidth': 'center.value.x.range.max'
+    'canvasHeight': 'center.value.y.range.max'
 
   defaults:
     description: 'Half Circle Movement'
@@ -100,7 +102,6 @@ class HalfPipeMovement extends Movement
        @radius.update()
        r = @radius.value.intValue()
        # set a new center
-       @center.value.setRange(new Range(r,@width-r), new Range(r, @height-r))
        @center.update()
        @counter = Math.PI * @radius.valueOf() / (@sizem.valueOf()/2)   # half circle arc length
 
@@ -108,6 +109,7 @@ class HalfPipeMovement extends Movement
     angle = (@sizem.valueOf()/2) * @counter / @radius.valueOf()
     @xPos = (@center.value.x.valueOf() + @radius * Math.cos(angle))|0
     @yPos = (@center.value.y.valueOf() + @radius * Math.sin(angle))|0
+    @msize = +@sizem.value | 0
 
   x: () ->
     @xPos
@@ -116,7 +118,7 @@ class HalfPipeMovement extends Movement
     @yPos
 
   size: () ->
-    +@sizem.value
+    @msize
 
 
 # --------------------------------------------------------------------
