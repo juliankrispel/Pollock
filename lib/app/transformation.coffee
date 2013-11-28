@@ -61,10 +61,6 @@ class Mat3
     factor = -angle*(PI/180) # Make factor negative so it rotates clockwise
     c = Math.cos(factor) 
     s = Math.sin(factor)
-    if (1/1000000) > c
-        c = 0
-    if (1/1000000) > s
-        s = 0
     new Mat3([c,-s,0,s,c,0,0,0,1])
 
   # translates by the translation vector (tx,ty)
