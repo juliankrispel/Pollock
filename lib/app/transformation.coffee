@@ -1,5 +1,4 @@
 class Mat3
-
   constructor: (init) ->
     if init is undefined
         @_m = new Float32Array([1,0,0,0,1,0,0,0,1]);
@@ -59,8 +58,9 @@ class Mat3
     new Mat3([sx,0,0,0,sy,0,0,0,1])
 
   createRotation: (angle) ->
-    c=Math.cos(angle)
-    s=Math.sin(angle)
+    factor = -angle*(PI/180) # Make factor negative so it rotates clockwise
+    c = parseFloat(Math.cos(factor).toFixed(15))
+    s = parseFloat(Math.sin(factor).toFixed(15))
     new Mat3([c,-s,0,s,c,0,0,0,1])
 
   # translates by the translation vector (tx,ty)
@@ -83,11 +83,10 @@ class Mat3
         )
     )
 
+window.Mat3 = Mat3
 
 class ImageTransform
-
   transformImage: (image, transformation, w, h) ->
-
     img = {
         width: w
         height: h

@@ -28,23 +28,27 @@ module.exports = function(grunt){
                 },
                 files: {
                     'js/painter.js': [
-                        'coffee/util.coffee',
-                        'coffee/msgpass.coffee',
-                        'coffee/base.coffee',
-                        'coffee/mutable.coffee',
-                        'coffee/brush.coffee',
-                        'coffee/painter.coffee',
-                        'coffee/renderer.coffee',
-                        'coffee/loop.coffee',
+                        'lib/app/util.coffee',
+                        'lib/app/msgpass.coffee',
+                        'lib/app/base.coffee',
+                        'lib/app/mutable.coffee',
+                        'lib/app/brush.coffee',
+                        'lib/app/painter.coffee',
+                        'lib/app/renderer.coffee',
+                        'lib/app/loop.coffee'
                     ],
                     'js/ui.js': [
-                        'coffee/ui.coffee'
+                        'lib/ui/ui.coffee'
+                    ],
+                    'js/gui-components.js': [
+                        'lib/app/transformation.coffee',
+                        'xtags/*.coffee'
                     ],
                     'js/test.js': [
-                        'coffee/util.coffee',
-                        'coffee/base.coffee',
-                        'coffee/mutable.coffee',
-                        'coffee/transformation.coffee',
+                        'lib/app/util.coffee',
+                        'lib/app/base.coffee',
+                        'lib/app/mutable.coffee',
+                        'lib/app/transformation.coffee',
                         'tests/*.coffee',
                     ],
                     'js/msgpass.js': [
@@ -55,7 +59,7 @@ module.exports = function(grunt){
         },
         watch: {
             coffee: {
-                files: ['coffee/*.coffee', 'tests/*.coffee'],
+                files: ['lib/app/*.coffee', 'lib/ui/*.coffee',  'xtags/*.coffee', 'tests/*.coffee'],
                 tasks: 'coffee'
             }
         }
@@ -63,4 +67,4 @@ module.exports = function(grunt){
     grunt.registerTask('default',[
         'coffee', 'connect', 'watch'
     ]);
-}
+};
