@@ -100,12 +100,12 @@ xtag.register "x-painter-transform",
 
       px = px || @anchorPoint[0]
       py = py || @anchorPoint[1]
-      @t['scale'] = @t['scale'].scale()
+      @t['scale'] = @t['scale'].scale(px, py, sx, sy)
       @transform()
 
     rotateMatrix: (angle, px, py) ->
       if(!angle)
-        throw new Error 'scaleMatrix() - sx and sy are required'
+        throw new Error 'rotateMatrix() - angle is required'
 
       px = px || @anchorPoint[0]
       py = py || @anchorPoint[1]
