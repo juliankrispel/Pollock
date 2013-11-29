@@ -43,9 +43,9 @@ getAngleBetweenVectors = (a, b) ->
 getVectorOrientation = (a, b, c) ->
   direction = (a[0]-c[0]) * (b[1]-c[1]) - (a[1]-c[1]) * (b[0]-c[0])
   if direction > 0
-    1
-  else if direction < 0
     -1
+  else if direction < 0
+    1
   else if direction is 0
     0
   else
@@ -104,15 +104,30 @@ xtag.register "x-painter-transform",
       # involves reordering the matrix
       [m[0], m[3], m[1], m[4], m[2], m[5]]
 
-    processMouseMovement: (type, startX, startY, endX, endY, anchorX, anchorY) ->
+    processMouseMovement: (type, startX, startY, endX, endY, anchorX, anchorY, isShiftPressed) ->
       switch type
         when 'scale'
           bbox = @container.getBoundingClientRect()
           origin = [bbox.left + bbox.width/2, bbox.top + bbox.height/2]
           a = [startX - origin[0], startY - origin[1]]
           b = [endX - origin[0], endY - origin[1]]
+          sx = (endX - origin[0])/(startX - origin[0])
+          sy = (endY - origin[1])/(startY - origin[1])
 
-          @scaleEl(b[0]/a[0], b[1]/a[1])
+          if(isShiftPressed)
+            if(sx && sy > 1)
+              if(sx > sy) 
+                sy = sx
+              else 
+                sx = sy
+            else
+              if(sx < sy) 
+                sy = sx
+              else 
+                sx = sy
+
+
+          @scaleEl(sx, sy)
 
         when 'rotate'
           a = [anchorX, anchorY]
@@ -152,7 +167,7 @@ xtag.register "x-painter-transform",
 
     'mousemove': (e)->
       if(@mousedown)
-        @processMouseMovement(@mousedown.type, @mousedown.x, @mousedown.y, e.x, e.y, @anchorPoint[0], @anchorPoint[1])
+        @processMouseMovement(@mousedown.type, @mousedown.x, @mousedown.y, e.x, e.y, @anchorPoint[0], @anchorPoint[1], e.shiftKey)
         @mousedown.x = e.x
         @mousedown.y = e.y
 
