@@ -53,9 +53,6 @@ getVectorOrientation = (a, b, c) ->
 
 prefixes = ["-moz-", "-webkit-", "-ms-", "-khtml-", "-o-", ""]
 
-
-
-
 xtag.register "x-painter-transform",
   lifecycle:
     created: ->
@@ -145,7 +142,6 @@ xtag.register "x-painter-transform",
         when 'translate'
           @translateEl(endX-startX, endY-startY)
 
-
     translateEl: (x, y) ->
       @t['translate'] = @t['translate'].translate(x,y)
       @transform()
@@ -173,11 +169,3 @@ xtag.register "x-painter-transform",
 
     'mouseup': (e)->
       @mousedown = false
-
-#    'mouseout': (e)->
-#      @mousedown = false
-#    'mouseout': (e)->
-#      if(@mousedown)
-#        @processMouseMovement(@mousedown.type, @mousedown.x, @mousedown.y, e.x, e.y, @anchorPoint[0], @anchorPoint[1])
-#      @mousedown = false
-
