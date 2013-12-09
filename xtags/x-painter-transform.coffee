@@ -60,8 +60,8 @@ xtag.register "x-painter-transform",
 
       @container = document.createElement('div')
       @container.className = 'transformation-container'
-      @container.innerHTML = template+@innerHTML
-      @innerHTML = ''
+      @container.innerHTML = @innerHTML
+      @innerHTML = template
 
       @appendChild(@container)
 
@@ -70,8 +70,6 @@ xtag.register "x-painter-transform",
         'scale': new Mat3
         'translate': new Mat3
       }
-
-      # Empty 
 
       #set default anchorPoint
       @anchorPoint = [@container.offsetWidth/2, @container.offsetHeight/2]
