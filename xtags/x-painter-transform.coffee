@@ -16,7 +16,7 @@ cumulativeOffset = (element) ->
     { top: top, left: left }
 
 template = '<div data-type="translate" class="transformation-handle__translate"></div>
-  <div class="anchorpoint"></div>
+  <div data-type="origin" class="anchorpoint"></div>
   <div data-type="rotate" class="transformation-handle transformation-handle__top-left tranformation-handle__rotate"><div data-type="scale" class="transformation-handle__scale"></div></div>
   <div data-type="rotate" class="transformation-handle transformation-handle__top-right transformation-handle__rotate"><div data-type="scale" class="transformation-handle__scale"></div></div>
   <div data-type="rotate" class="transformation-handle transformation-handle__bottom-left transformation-handle__rotate"><div data-type="scale" class="transformation-handle__scale"></div></div>
@@ -152,22 +152,27 @@ xtag.register "x-painter-transform",
       for prefix in prefixes
         @container.style.setProperty("#{prefix}transform", css)
 
-    processMouseMovement: (type, MstartX, MstartY, MendX, MendY, isShiftPressed) ->
+    processMouseMovement: (type, fromX, fromY, toX, toY, isShiftPressed) ->
+
       #Convert mouse coordinates to the picture plane
-      start = @inverseMatrix.multVec([MstartX, MstartY, 1])
+      start = @inverseMatrix.multVec([fromX, fromY, 1])
       startX = start[0]
       startY = start[1]
 
-      end = @inverseMatrix.multVec([MendX, MendY, 1])
+      end = @inverseMatrix.multVec([toX, toY, 1])
       endX = end[0]
       endY = end[1]
 
       switch type
+        when 'origin'
+          @anchorPoint[0] += toX-fromX
+          @anchorPoint[1] += toY-fromY
+          @transform()
+
         when 'scale'
-          originX = @anchorPoint[0]
-          originY = @anchorPoint[1]
-          sx = (endX - originX)/(startX - originX)
-          sy = (endY - originY)/(startY - originY)
+          origin = @anchorPoint
+          sx = (endX - origin[0])/(startX - origin[0])
+          sy = (endY - origin[1])/(startY - origin[1])
 
           if(isShiftPressed)
             if(sx && sy > 1)
@@ -199,7 +204,7 @@ xtag.register "x-painter-transform",
             @rotateEl(direction*angle)
         when 'translate'
           # translation is carried out in mouse coordinate system
-          @translateEl(MendX-MstartX, MendY-MstartY)
+          @translateEl(toX-fromX, toY-fromY)
 
     translateEl: (x, y) ->
       @tValues['translate'][0] += x
@@ -223,14 +228,16 @@ xtag.register "x-painter-transform",
 
   events: 
     'mousedown': (e)->
-      if(e.srcElement.dataset.type)
-        @mousedown = {type: e.srcElement.dataset.type, x: e.x, y: e.y}
+      if(e.target.dataset.type)
+        @mousedown = {
+          type: e.target.dataset.type
+          e: e
+        }
 
     'mousemove': (e)->
       if(@mousedown)
-        @processMouseMovement(@mousedown.type, @mousedown.x, @mousedown.y, e.x, e.y, e.shiftKey)
-        @mousedown.x = e.x
-        @mousedown.y = e.y
+        @processMouseMovement(@mousedown.type, @mousedown.e.pageX, @mousedown.e.pageY, e.pageX, e.pageY, e.shiftKey)
+        @mousedown.e = e
 
     'mouseup': (e)->
       @mousedown = false

@@ -2,11 +2,14 @@
   <head>
     <script src="../bower_components/x-tag-core/dist/x-tag-core.js"></script>
     <style>
+        body{margin: 0;
+        padding: 0;}
 
       x-painter-transform{
         display: block;
         position: relative;
         background: #f33;
+        overflow: hidden;
     }
 
       x-painter-transform .anchorpoint{
@@ -16,6 +19,7 @@
         left: 50%;
         width: 10px;
         height: 10px;
+        margin: -5px;
         background: #00f;
         z-index: 999;
       }
