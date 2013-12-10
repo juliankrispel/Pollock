@@ -114,6 +114,9 @@ xtag.register "x-painter-transform",
         'translate': new Mat3
       }
 
+      @matrix = new Mat3
+      @inverseMatrix = @matrix.inverse()
+
       @tValues = {
         rotate: 0
         scale: [1, 1]
@@ -137,11 +140,12 @@ xtag.register "x-painter-transform",
       @querySelector('.anchorpoint').style.setProperty('left', @anchorPoint[0] + @tValues['translate'][0])
       @querySelector('.anchorpoint').style.setProperty('top', @anchorPoint[1] + @tValues['translate'][1])
 
-      matrix = transformMatrix(@t)
-      css = "matrix(#{matrixToCss(matrix._m)})"
+      @matrix = transformMatrix(@t)
+      @inverseMatrix = @matrix.inverse()
+      css = "matrix(#{matrixToCss(@matrix._m)})"
 
       for handle of @handles
-        coord = transformCoordinates(@handles[handle], matrix)
+        coord = transformCoordinates(@handles[handle], @matrix)
         @querySelector(".#{handle}").style.setProperty('left', coord[0])
         @querySelector(".#{handle}").style.setProperty('top', coord[1])
 
@@ -149,7 +153,16 @@ xtag.register "x-painter-transform",
       for prefix in prefixes
         @container.style.setProperty("#{prefix}transform", css)
 
-    processMouseMovement: (type, startX, startY, endX, endY, anchorX, anchorY, isShiftPressed) ->
+    processMouseMovement: (type, startX, startY, endX, endY, isShiftPressed) ->
+      #Convert mouse coordinates to the picture plane
+      start = @inverseMatrix.multVec([startX, startY, 1])
+      startX = start[0]
+      startY = start[1]
+
+      end = @inverseMatrix.multVec([endX, endY, 1])
+      endX = end[0]
+      endY = end[1]
+
       switch type
         when 'scale'
           origin = @anchorPoint
@@ -170,13 +183,10 @@ xtag.register "x-painter-transform",
               else 
                 sx = sy
 
-
-          console.log sx, sy
-
           @scaleEl(sx, sy)
 
         when 'rotate'
-          a = [anchorX, anchorY]
+          a = @anchorPoint
           b = [startX, startY]
           c = [endX, endY]
 
@@ -218,7 +228,7 @@ xtag.register "x-painter-transform",
 
     'mousemove': (e)->
       if(@mousedown)
-        @processMouseMovement(@mousedown.type, @mousedown.x, @mousedown.y, e.x, e.y, @anchorPoint[0], @anchorPoint[1], e.shiftKey)
+        @processMouseMovement(@mousedown.type, @mousedown.x, @mousedown.y, e.x, e.y, e.shiftKey)
         @mousedown.x = e.x
         @mousedown.y = e.y
 

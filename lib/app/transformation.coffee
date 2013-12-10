@@ -6,7 +6,7 @@ class Mat3
         @_m = new Float32Array(init)
 
   multVec: (v) ->
-    r=new Float32Array([0,0,0]);
+    r=new Float32Array(3);
     r[0] = @_m[0]*v[0]+@_m[1]*v[1]+@_m[2]*v[2];
     r[1] = @_m[3]*v[0]+@_m[4]*v[1]+@_m[5]*v[2];
     r[2] = @_m[6]*v[0]+@_m[7]*v[1]+@_m[8]*v[2];
@@ -38,7 +38,7 @@ class Mat3
     @_m[1]*@_m[3]*@_m[8]-@_m[0]*@_m[5]*@_m[7]
 
   inverse: () ->
-    d = 1.0/determinant()
+    d = 1.0 / @determinant()
     m = new Mat3()
     m._m[0] = d*(@_m[4]*@_m[8]-@_m[5]*@_m[7])
     m._m[1] = d*(@_m[2]*@_m[7]-@_m[1]*@_m[8])
