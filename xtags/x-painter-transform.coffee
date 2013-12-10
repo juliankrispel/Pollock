@@ -164,10 +164,10 @@ xtag.register "x-painter-transform",
 
       switch type
         when 'scale'
-          originX = @anchorPoint[0] + @tValues['translate'][0]
-          originY = @anchorPoint[1] + @tValues['translate'][1]
-          sx = (MendX - originX)/(MstartX - originX)
-          sy = (MendY - originY)/(MstartY - originY)
+          originX = @anchorPoint[0]
+          originY = @anchorPoint[1]
+          sx = (endX - originX)/(startX - originX)
+          sy = (endY - originY)/(startY - originY)
 
           if(isShiftPressed)
             if(sx && sy > 1)
