@@ -167,7 +167,8 @@ xtag.register "x-painter-transform",
         when 'origin'
           @anchorPoint[0] += toX-fromX
           @anchorPoint[1] += toY-fromY
-          @transform()
+          @translateEl(fromX-toX, fromY-toY)
+          @translateEl(toX-fromX, toY-fromY)
 
         when 'scale'
           origin = @anchorPoint
