@@ -126,8 +126,6 @@ xtag.register "x-painter-transform",
 
       #set default anchorPoint
       @anchorPoint = [@dataset.width/2, @dataset.height/2]
-      @querySelector('.anchorpoint').style.setProperty('left', @anchorPoint[0] + @tValues['translate'][0])
-      @querySelector('.anchorpoint').style.setProperty('top', @anchorPoint[1] + @tValues['translate'][1])
       @transform()
 
       # bind to window for debugging - 
@@ -136,10 +134,12 @@ xtag.register "x-painter-transform",
 
   methods:
     transform: ()->
-      @querySelector('.anchorpoint').style.setProperty('left', @anchorPoint[0] + @tValues['translate'][0])
-      @querySelector('.anchorpoint').style.setProperty('top', @anchorPoint[1] + @tValues['translate'][1])
-
       @matrix = transformMatrix(@t)
+
+      transformedAnchor = @matrix.multVec([@anchorPoint[0], @anchorPoint[1], 1])
+      @querySelector('.anchorpoint').style.setProperty('left', transformedAnchor[0])
+      @querySelector('.anchorpoint').style.setProperty('top', transformedAnchor[1])
+
       @inverseMatrix = @matrix.inverse()
       css = "matrix(#{matrixToCss(@matrix._m)})"
 
@@ -156,24 +156,23 @@ xtag.register "x-painter-transform",
 
       #Convert mouse coordinates to the picture plane
       start = @inverseMatrix.multVec([fromX, fromY, 1])
-      startX = start[0]
-      startY = start[1]
+      tFromX = start[0]
+      tFromY = start[1]
 
       end = @inverseMatrix.multVec([toX, toY, 1])
-      endX = end[0]
-      endY = end[1]
+      tToX = end[0]
+      tToY = end[1]
 
       switch type
         when 'origin'
-          @anchorPoint[0] += toX-fromX
-          @anchorPoint[1] += toY-fromY
-          @translateEl(fromX-toX, fromY-toY)
-          @translateEl(toX-fromX, toY-fromY)
+          @anchorPoint[0] += tToX-tFromX
+          @anchorPoint[1] += tToY-tFromY
+          @transform()
 
         when 'scale'
           origin = @anchorPoint
-          sx = (endX - origin[0])/(startX - origin[0])
-          sy = (endY - origin[1])/(startY - origin[1])
+          sx = (tToX - origin[0])/(tFromX - origin[0])
+          sy = (tToY - origin[1])/(tFromY - origin[1])
 
           if(isShiftPressed)
             if(sx && sy > 1)
@@ -191,8 +190,8 @@ xtag.register "x-painter-transform",
 
         when 'rotate'
           a = @anchorPoint
-          b = [startX, startY]
-          c = [endX, endY]
+          b = [tFromX, tFromY]
+          c = [tToX, tToY]
 
           direction = getVectorOrientation(a,b,c)
 
