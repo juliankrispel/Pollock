@@ -124,16 +124,16 @@ xtag.register "x-painter-transform",
       @dataset.height = @container.offsetHeight
 
       #set default anchorPoint
-      @anchorPoint = getCenterPoint(@tValues, @dataset.width, @dataset.height)
+      @anchorPoint = [@dataset.width/2, @dataset.height/2]
       @querySelector('.anchorpoint').style.setProperty('left', @anchorPoint[0] + @tValues['translate'][0])
       @querySelector('.anchorpoint').style.setProperty('top', @anchorPoint[1] + @tValues['translate'][1])
+
       # bind to window for debugging - 
       # TODO: Remove as soon as this is more or lessa working
       window.el = @
 
   methods:
     transform: ()->
-      @anchorPoint = getCenterPoint(@tValues, @dataset.width, @dataset.height)
       @querySelector('.anchorpoint').style.setProperty('left', @anchorPoint[0] + @tValues['translate'][0])
       @querySelector('.anchorpoint').style.setProperty('top', @anchorPoint[1] + @tValues['translate'][1])
 
