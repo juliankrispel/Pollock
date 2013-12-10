@@ -9,6 +9,17 @@
         background: #f33;
     }
 
+      x-painter-transform .anchorpoint{
+        display: block;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 10px;
+        height: 10px;
+        background: #00f;
+        z-index: 999;
+      }
+
       x-painter-transform *{
         -webkit-user-drag: none;
         -webkit-user-select: none; /* Chrome/Safari */        
@@ -24,6 +35,13 @@
         display: inline-block;
         position: relative;
         pointer-events: none;
+
+        /* Reset CSS transform origin to top left */
+        transform-origin: 0 0 0;
+        -o-transform-origin: 0 0 0;
+        -moz-transform-origin: 0 0 0;
+        -ms-transform-origin: 0 0 0;
+        -webkit-transform-origin: 0 0 0;
       }
 
       .transformation-handle{
@@ -49,7 +67,7 @@
 
       .transformation-handle div{
         background: #000;
-        position: absolute;;
+        position: absolute;
         width: 12px;
         height: 12px;
       }

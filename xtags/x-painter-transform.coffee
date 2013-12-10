@@ -3,7 +3,20 @@ PI = Math.PI
 radiansToDegrees = (radians) ->
     return radians * (180 / Math.PI);
 
+# Taken from http://stackoverflow.com/a/1480137/1333809
+cumulativeOffset = (element) ->
+    top = 0
+    left = 0
+
+    while element
+        top += element.offsetTop  || 0
+        left += element.offsetLeft || 0
+        element = element.offsetParent
+
+    { top: top, left: left }
+
 template = '<div data-type="translate" class="transformation-handle__translate"></div>
+  <div class="anchorpoint"></div>
   <div data-type="rotate" class="transformation-handle transformation-handle__top-left tranformation-handle__rotate"><div data-type="scale" class="transformation-handle__scale"></div></div>
   <div data-type="rotate" class="transformation-handle transformation-handle__top-right transformation-handle__rotate"><div data-type="scale" class="transformation-handle__scale"></div></div>
   <div data-type="rotate" class="transformation-handle transformation-handle__bottom-left transformation-handle__rotate"><div data-type="scale" class="transformation-handle__scale"></div></div>
@@ -37,6 +50,29 @@ getVectorLength = (v) ->
     i++
   Math.sqrt sum
 
+matrixToCss = (m) ->
+  # Mat3 is row-oriented, the CSS Matrix is column-oriented
+  # and has the last rows cut off, getting a correct CSS Matrix
+  # involves reordering the matrix
+  [m[0], m[3], m[1], m[4], m[2], m[5]]
+
+transformMatrix = (t)->
+  # get dot product of all matrices in the correct 
+  # order ( scale * rotate * translate )
+  t['translate'].multMat(t['rotate'].multMat(t['scale']))
+
+transformCoordinates = (coord, matrix) ->
+  v = [
+    coord[0]
+    coord[1]
+    1
+  ]
+  matrix.multVec(v)
+
+getCenterPoint = (tValues, width, height) ->
+  [(tValues['scale'][0]*width/2),
+  (tValues['scale'][1]*height/2)]
+
 getAngleBetweenVectors = (a, b) ->
   Math.acos getDotProduct(a, b) / (getVectorLength(a) * getVectorLength(b))
 
@@ -65,45 +101,58 @@ xtag.register "x-painter-transform",
 
       @appendChild(@container)
 
+      @handles = {
+        'transformation-handle__top-left': [0, 0]
+        'transformation-handle__top-right': [@container.offsetWidth, 0]
+        'transformation-handle__bottom-right': [@container.offsetWidth, @container.offsetHeight]
+        'transformation-handle__bottom-left': [0, @container.offsetHeight]
+      }
+
       @t = {
         'rotate': new Mat3
         'scale': new Mat3
         'translate': new Mat3
       }
 
-      #set default anchorPoint
-      @anchorPoint = [@container.offsetWidth/2, @container.offsetHeight/2]
-      console.log(@anchorPoint)
+      @tValues = {
+        rotate: 0
+        scale: [1, 1]
+        translate: [0, 0]
+      }
 
+      @dataset.width = @container.offsetWidth
+      @dataset.height = @container.offsetHeight
+
+      #set default anchorPoint
+      @anchorPoint = getCenterPoint(@tValues, @dataset.width, @dataset.height)
+      @querySelector('.anchorpoint').style.setProperty('left', @anchorPoint[0] + @tValues['translate'][0])
+      @querySelector('.anchorpoint').style.setProperty('top', @anchorPoint[1] + @tValues['translate'][1])
       # bind to window for debugging - 
       # TODO: Remove as soon as this is more or lessa working
       window.el = @
 
   methods:
     transform: ()->
-      bbox = @container.getBoundingClientRect()
-      @anchorPoint = [bbox.left + bbox.width/2, bbox.top + bbox.height/2]
+      @anchorPoint = getCenterPoint(@tValues, @dataset.width, @dataset.height)
+      @querySelector('.anchorpoint').style.setProperty('left', @anchorPoint[0] + @tValues['translate'][0])
+      @querySelector('.anchorpoint').style.setProperty('top', @anchorPoint[1] + @tValues['translate'][1])
 
-      css = "matrix(#{@getTransformedCSSMatrix()})"
+      matrix = transformMatrix(@t)
+      css = "matrix(#{matrixToCss(matrix._m)})"
+
+      for handle of @handles
+        coord = transformCoordinates(@handles[handle], matrix)
+        @querySelector(".#{handle}").style.setProperty('left', coord[0])
+        @querySelector(".#{handle}").style.setProperty('top', coord[1])
+
       @container.style.setProperty 'background-color', 'red'
       for prefix in prefixes
         @container.style.setProperty("#{prefix}transform", css)
 
-    getTransformedCSSMatrix: () ->
-      # get dot product of all matrices in the correct 
-      # order ( scale * rotate * translate )
-      m = @t['translate'].multMat(@t['rotate'].multMat(@t['scale']))._m
-
-      # Mat3 is row-oriented, the CSS Matrix is column-oriented
-      # and has the last rows cut off, getting a correct CSS Matrix
-      # involves reordering the matrix
-      [m[0], m[3], m[1], m[4], m[2], m[5]]
-
     processMouseMovement: (type, startX, startY, endX, endY, anchorX, anchorY, isShiftPressed) ->
       switch type
         when 'scale'
-          bbox = @container.getBoundingClientRect()
-          origin = [bbox.left + bbox.width/2, bbox.top + bbox.height/2]
+          origin = @anchorPoint
           a = [startX - origin[0], startY - origin[1]]
           b = [endX - origin[0], endY - origin[1]]
           sx = (endX - origin[0])/(startX - origin[0])
@@ -122,6 +171,8 @@ xtag.register "x-painter-transform",
                 sx = sy
 
 
+          console.log sx, sy
+
           @scaleEl(sx, sy)
 
         when 'rotate'
@@ -134,23 +185,29 @@ xtag.register "x-painter-transform",
           vektorA = [b[0] - a[0], b[1] - a[1]]
           vektorB = [c[0] - a[0], c[1] - a[1]]
 
-          angle = radiansToDegrees(getAngleBetweenVectors(vektorA, vektorB));
+          angle = radiansToDegrees(getAngleBetweenVectors(vektorA, vektorB))
 
           @rotateEl(direction*angle)
         when 'translate'
           @translateEl(endX-startX, endY-startY)
 
     translateEl: (x, y) ->
-      @t['translate'] = @t['translate'].translate(x,y)
+      @tValues['translate'][0] += x
+      @tValues['translate'][1] += y
+      m = new Mat3
+      @t['translate'] = m.translate(@tValues['translate'][0], @tValues['translate'][1])
       @transform()
 
     scaleEl: (sx, sy) ->
-      @t['scale'] = @t['scale'].scale(0, 0, sx, sy)
+      @tValues['scale'][0]*=sx
+      @tValues['scale'][1]*=sy
+      m = new Mat3
+      @t['scale'] = m.scale(@anchorPoint[0], @anchorPoint[1], @tValues['scale'][0], @tValues['scale'][1])
       @transform()
 
     rotateEl: (angle, px, py) ->
-      px = 0
-      py = 0
+      px = @anchorPoint[0]
+      py = @anchorPoint[1]
       @t['rotate'] = @t['rotate'].rotate(px, py, angle)
       @transform()
 
