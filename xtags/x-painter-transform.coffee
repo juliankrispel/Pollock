@@ -153,13 +153,13 @@ xtag.register "x-painter-transform",
       for prefix in prefixes
         @container.style.setProperty("#{prefix}transform", css)
 
-    processMouseMovement: (type, startX, startY, endX, endY, isShiftPressed) ->
+    processMouseMovement: (type, MstartX, MstartY, MendX, MendY, isShiftPressed) ->
       #Convert mouse coordinates to the picture plane
-      start = @inverseMatrix.multVec([startX, startY, 1])
+      start = @inverseMatrix.multVec([MstartX, MstartY, 1])
       startX = start[0]
       startY = start[1]
 
-      end = @inverseMatrix.multVec([endX, endY, 1])
+      end = @inverseMatrix.multVec([MendX, MendY, 1])
       endX = end[0]
       endY = end[1]
 
@@ -199,7 +199,8 @@ xtag.register "x-painter-transform",
 
           @rotateEl(direction*angle)
         when 'translate'
-          @translateEl(endX-startX, endY-startY)
+          # translation is carried out in mouse coordinate system
+          @translateEl(MendX-MstartX, MendY-MstartY)
 
     translateEl: (x, y) ->
       @tValues['translate'][0] += x
