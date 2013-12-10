@@ -82,10 +82,8 @@ getVectorOrientation = (a, b, c) ->
     -1
   else if direction < 0
     1
-  else if direction is 0
-    0
   else
-    throw (new Error(""))
+    0
 
 prefixes = ["-moz-", "-webkit-", "-ms-", "-khtml-", "-o-", ""]
 
@@ -130,6 +128,7 @@ xtag.register "x-painter-transform",
       @anchorPoint = [@dataset.width/2, @dataset.height/2]
       @querySelector('.anchorpoint').style.setProperty('left', @anchorPoint[0] + @tValues['translate'][0])
       @querySelector('.anchorpoint').style.setProperty('top', @anchorPoint[1] + @tValues['translate'][1])
+      @transform()
 
       # bind to window for debugging - 
       # TODO: Remove as soon as this is more or lessa working
@@ -165,11 +164,10 @@ xtag.register "x-painter-transform",
 
       switch type
         when 'scale'
-          origin = @anchorPoint
-          a = [startX - origin[0], startY - origin[1]]
-          b = [endX - origin[0], endY - origin[1]]
-          sx = (endX - origin[0])/(startX - origin[0])
-          sy = (endY - origin[1])/(startY - origin[1])
+          originX = @anchorPoint[0] + @tValues['translate'][0]
+          originY = @anchorPoint[1] + @tValues['translate'][1]
+          sx = (MendX - originX)/(MstartX - originX)
+          sy = (MendY - originY)/(MstartY - originY)
 
           if(isShiftPressed)
             if(sx && sy > 1)
@@ -197,7 +195,8 @@ xtag.register "x-painter-transform",
 
           angle = radiansToDegrees(getAngleBetweenVectors(vektorA, vektorB))
 
-          @rotateEl(direction*angle)
+          if(direction != 0)
+            @rotateEl(direction*angle)
         when 'translate'
           # translation is carried out in mouse coordinate system
           @translateEl(MendX-MstartX, MendY-MstartY)
