@@ -58,9 +58,9 @@ class Mat3
     new Mat3([sx,0,0,0,sy,0,0,0,1])
 
   createRotation: (angle) ->
-    factor = -angle*(PI/180) # Make factor negative so it rotates clockwise
-    c = Math.cos(factor) 
-    s = Math.sin(factor)
+    #factor = -angle*(PI/180) # Make factor negative so it rotates clockwise
+    c = Math.cos(angle) 
+    s = Math.sin(angle)
     new Mat3([c,-s,0,s,c,0,0,0,1])
 
   # translates by the translation vector (tx,ty)

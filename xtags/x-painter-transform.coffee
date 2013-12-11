@@ -69,10 +69,6 @@ transformCoordinates = (coord, matrix) ->
   ]
   matrix.multVec(v)
 
-getCenterPoint = (tValues, width, height) ->
-  [(tValues['scale'][0]*width/2),
-  (tValues['scale'][1]*height/2)]
-
 getAngleBetweenVectors = (a, b) ->
   Math.acos getDotProduct(a, b) / (getVectorLength(a) * getVectorLength(b))
 
@@ -153,7 +149,7 @@ xtag.register "x-painter-transform",
         @container.style.setProperty("#{prefix}transform", css)
 
     processMouseMovement: (type, fromX, fromY, toX, toY, isShiftPressed) ->
-
+      
       #Convert mouse coordinates to the picture plane
       start = @inverseMatrix.multVec([fromX, fromY, 1])
       tFromX = start[0]
@@ -198,32 +194,31 @@ xtag.register "x-painter-transform",
           vektorA = [b[0] - a[0], b[1] - a[1]]
           vektorB = [c[0] - a[0], c[1] - a[1]]
 
-          angle = radiansToDegrees(getAngleBetweenVectors(vektorA, vektorB))
-
+          angle = getAngleBetweenVectors(vektorA, vektorB)
           if(direction != 0)
-            @rotateEl(direction*angle)
+            @rotateEl(-direction*angle)
         when 'translate'
           # translation is carried out in mouse coordinate system
           @translateEl(toX-fromX, toY-fromY)
 
     translateEl: (x, y) ->
-      @tValues['translate'][0] += x
-      @tValues['translate'][1] += y
+      @tValues.translate[0] += x
+      @tValues.translate[1] += y
       m = new Mat3
-      @t['translate'] = m.translate(@tValues['translate'][0], @tValues['translate'][1])
+      @t['translate'] = m.translate(@tValues.translate[0], @tValues.translate[1])
       @transform()
 
     scaleEl: (sx, sy) ->
-      @tValues['scale'][0]*=sx
-      @tValues['scale'][1]*=sy
+      @tValues.scale[0]*=sx
+      @tValues.scale[1]*=sy
       m = new Mat3
-      @t['scale'] = m.scale(@anchorPoint[0], @anchorPoint[1], @tValues['scale'][0], @tValues['scale'][1])
+      @t['scale'] = m.scale(@anchorPoint[0], @anchorPoint[1], @tValues.scale[0], @tValues.scale[1])
       @transform()
 
     rotateEl: (angle, px, py) ->
-      px = @anchorPoint[0]
-      py = @anchorPoint[1]
-      @t['rotate'] = @t['rotate'].rotate(px, py, angle)
+      @tValues.rotate += angle
+      m = new Mat3
+      @t['rotate'] = m.rotate(@anchorPoint[0], @anchorPoint[1], @tValues.rotate)
       @transform()
 
   events: 
