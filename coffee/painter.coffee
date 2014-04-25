@@ -1,4 +1,3 @@
-
 # Painter needs to manage:
 # - the background/painting canvas (+public channels)
 # - the list of input images + their transformations
@@ -144,6 +143,7 @@ class ImageSource extends Base
 
 
   # img is CImage
+
   addImage: (img) ->
     @images.push new TransformedImage
       width: img.width

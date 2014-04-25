@@ -1,6 +1,6 @@
 angular.module 'PainterApp', ['uiSlider']
 
-body = document.getElementById('body')
+$canvas = document.querySelector('canvas')
 
 window.addEventListener('dragover', (event)->
   event.preventDefault()
@@ -8,19 +8,25 @@ window.addEventListener('dragover', (event)->
 
 painter.PS.setValue('arr', 'gui', [])
 
-painter.PS.subscribe('cow', 'painter', (value)->
-  console.log('mooh', value)
-)
-
 painter.PS.subscribe('images','painter', (value)->
-  console.log( 'dwq', value )
   console.log painter.PS.getValue('images')
 )
+
 angular.module('PainterApp').controller 'PainterCtrl', ($scope) ->
+  bbox = document.body.getBoundingClientRect()
   $scope.painter = {
+    canvasHeight: bbox.height
+    canvasWidth: bbox.width
     images: [
     ]
   }
+
+  window.onresize = ()->
+    bbox = document.body.getBoundingClientRect()
+    $scope.painter.canvasHeight = bbox.height
+    $scope.painter.canvasWidth = bbox.width
+    $scope.$apply()
+
   $scope.brushTypes = ['circle', 'scircle', 'square', 'weird', 'sort']
   $scope.brushMovements = ['Random', 'HalfPipe']
   $scope.removeImage = (index) ->
@@ -32,27 +38,26 @@ angular.module('PainterApp').controller 'PainterCtrl', ($scope) ->
       $scope.painter.images.push({url: img.src})
       images.push(document.querySelectorAll('.image'))
 
-      painter.PS.setValue 'arr', 'gui', ['dwq']
-      
       painter.PS.setValue('images', 'gui', images)
       $scope.$apply();
     )
   , false)
 
+  $scope.start = ->
+    if($scope.painter.images.length < 1)
+      return false
 
-angular.module('PainterApp').directive 'canvasPainter', ->
-  (scope, element, attrs) ->
-    scope.start = ->
-      if(scope.painter.images.length < 1)
-        return false
+    startPainter $canvas, document.querySelectorAll('.image'), (painter) ->
+      bindPainter(painter, $scope)
 
-      startPainter element[0], document.querySelectorAll('.image'), (painter) ->
-        bindPainter(painter, scope)
-
+    setTimeout(()->
+      $scope.painter.canvasHeight = bbox.height
+      $scope.painter.canvasWidth = bbox.width
+      $scope.$apply()
+    ,1)
 
 bindPainter = (myPainter, scope) ->
   scope.painter['hasLoaded'] = true
-
   list = myPainter.PS.getAllChannels()
 
   for name in list

@@ -4,11 +4,8 @@
     <meta charset="UTF-8">
     <title></title>
     <link rel="stylesheet" href="../bower_components/angular-slider/angular-slider.min.css"/>
+    <link rel="stylesheet" href="../style/style.css"/>
     <style>
-        body{
-            background: #eee;
-        }
-
         canvas{
             background: #000;
             -webkit-box-shadow: 2px 2px 5px #ccc;
@@ -17,14 +14,12 @@
 </head>
 <body id="body" ng-controller="PainterCtrl">
     <form>
-      <img style="width:40px;" src="{{img.url}}" ng-repeat="img in painter.images"/>
-      <img style="display: none;" class="image" src="{{img.url}}" ng-repeat="img in painter.images"/>
+      <div class="thumb" ng-repeat="img in painter.images">
+      <img ng-src="{{img.url}}"/>
+        <img style="display: none;" class="image" ng-src="{{img.url}}"/>
+        <button class="image-close" ng-click="removeImage($index)">-</button>
+      </div>
       <button ng-click="start()">Start</button>
-      <label for="canvasWidth">Canvas Width</label>
-      <input ng-model="painter.canvasWidth" type="text"/><br />
-      <label for="canvasWidth">Canvas Height</label>
-      {{painter.canvasHeight}}
-      <input ng-model="painter.canvasHeight" type="text"/><br />
 
       <div ng-show="painter.hasLoaded">
       <button ng-click="stop()">Stop</button><br />
@@ -53,7 +48,7 @@
 
       </div>
     </form>
-    <canvas canvas-painter id="canvas" width="{{painter.canvasWidth}}px" height="{{painter.canvasHeight}}px"></canvas>
+    <canvas id="canvas" width="{{painter.canvasWidth}}px" height="{{painter.canvasHeight}}px"></canvas>
 </body>
 <script src="../bower_components/underscore/underscore-min.js"></script>
 <script src="../js/painter.js"></script>
