@@ -6,11 +6,9 @@ window.addEventListener('dragover', (event)->
   event.preventDefault()
 , false)
 
-painter.PS.setValue('arr', 'gui', [])
-
-painter.PS.subscribe('images','painter', (value)->
-  console.log painter.PS.getValue('images')
-)
+#painter.PS.subscribe('images','painter', (value)->
+#  console.log painter.PS.getValue('images')
+#)
 
 angular.module('PainterApp').controller 'PainterCtrl', ($scope) ->
   bbox = document.body.getBoundingClientRect()
@@ -34,11 +32,7 @@ angular.module('PainterApp').controller 'PainterCtrl', ($scope) ->
 
   window.addEventListener('drop', (event)->
     onImageDrop(event, (img)->
-      images = painter.PS.getValue('images')
       $scope.painter.images.push({url: img.src})
-      images.push(document.querySelectorAll('.image'))
-
-      painter.PS.setValue('images', 'gui', images)
       $scope.$apply();
     )
   , false)

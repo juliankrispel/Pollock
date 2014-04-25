@@ -38,6 +38,7 @@ class CImage extends Base
   init: () ->
     @canvas = document.createElement 'canvas'
     if @image != undefined
+    
       @width = @image.width
       @height = @image.height
     @canvas.width = @width
@@ -125,14 +126,13 @@ class TransformedImage extends CImage
 # the maximal width and height of images it contains
 class ImageSource extends Base
   public:
-    'images': 'domImages'
     'canvasWidth': 'width'
     'canvasHeight': 'height'
 
   defaults: 
     images: []
     domImages: []
-    width: 640
+    width: 460
     height: 400
 
   getRandomImageCanvas: ->
@@ -143,7 +143,6 @@ class ImageSource extends Base
 
 
   # img is CImage
-
   addImage: (img) ->
     @images.push new TransformedImage
       width: img.width
@@ -159,11 +158,6 @@ class ImageSource extends Base
         img.transheight = @height
         img.resetTransformation()
         img.applyTransformation()
-
-  init: ->
-    @PS.subscribe('images', 'ImageSource_domImages', (value)->
-      console.log 'gui has changed ImageSource.domImages', value
-    )
 
 # The painter is responsible for what is going to get drawn where
 

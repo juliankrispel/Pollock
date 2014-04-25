@@ -85,9 +85,7 @@ class Mat3
 
 
 class ImageTransform
-
   transformImage: (image, transformation, w, h) ->
-
     img = {
         width: w
         height: h
