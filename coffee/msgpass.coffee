@@ -86,12 +86,14 @@ class window.PublishSubscriber
         # To register everything in public, loop
         # through the declaration
         for publicVar, memberVar of obj['public']
-          paths = memberVar.split('.')
-          lastPath = paths.pop()
+          memberVar = [memberVar] if memberVar != undefined && !isArray(memberVar)
+          if isString(member) for member in memberVar
+            paths = member.split('.')
+            lastPath = paths.pop()
 
-          memberVar = useArrayAsDirectory(obj, paths)
+            memberVar = useArrayAsDirectory(obj, paths)
 
-          @publish(memberVar, lastPath, publicVar)
+            @publish(memberVar, lastPath, publicVar)
 
     getAllChannels: () ->
       chanlist = []

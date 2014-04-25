@@ -62,7 +62,9 @@ bindPainter = (myPainter, scope) ->
       )
       scope.painter[name] = myPainter.PS.getValue(name)
       scope.$watch 'painter.' + name, ()->
-        myPainter.PS.setValue(name, 'gui', scope.painter[name])
+        value = scope.painter[name]
+        value = parseInt(value) if !isNaN(value)
+        myPainter.PS.setValue(name, 'gui', value)
 
 
 onImageDrop = (event, callback)->

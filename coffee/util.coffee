@@ -43,6 +43,12 @@ extend = (obj) ->
         obj[prop] = source[prop]
   obj
 
+isArray = (obj) ->
+    Object.prototype.toString.call( obj ) == '[object Array]'
+
+isString = (obj) ->
+    typeof obj == 'string' || obj instanceof String
+
 useArrayAsDirectory = (obj, paths) ->
   # Because it can be declared as a string
   # 'brush.size.value': 'brushMinSize' we have
@@ -58,4 +64,3 @@ useArrayAsDirectory = (obj, paths) ->
         throw new Error('object ' + publicMember.constructor.name + ' has no member called ' + path)
     publicMember = publicMember[path]
   publicMember
-

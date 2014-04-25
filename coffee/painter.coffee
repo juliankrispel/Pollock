@@ -223,8 +223,11 @@ class MovingBrushPainter extends Painter
 
   update: ->
     # detect if canvas size has changed
-    @imgSrc.update() 
+    if @background.width != @width
+      @background = new CImage({width: @width, height: @height})
 
+    @imgSrc.update() 
+    
     for br in @brushes
       br.update()
     @
