@@ -191,7 +191,7 @@ class MovingBrushPainter extends Painter
   public: 
     'brushCount': 'brushCount'
     'canvasWidth': 'width'
-    'canvasHeight': 'height'   
+    'canvasHeight': 'height'
 
   start: =>
     # initialize background image
