@@ -12,6 +12,7 @@ window.addEventListener('dragover', (event)->
 
 angular.module('PainterApp').controller 'PainterCtrl', ($scope) ->
   bbox = document.body.getBoundingClientRect()
+  window.s = $scope
   $scope.painter = {
     canvasHeight: bbox.height
     canvasWidth: bbox.width
@@ -38,6 +39,7 @@ angular.module('PainterApp').controller 'PainterCtrl', ($scope) ->
   , false)
 
   $scope.start = ->
+    $scope.painterStarted = true
     if($scope.painter.images.length < 1)
       return false
 
