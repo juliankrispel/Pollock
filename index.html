@@ -26,7 +26,7 @@
 </div>
 <button class="open-controls" ng-show="hideControls" ng-click="hideControls=false">+</button>
 <form ng-class="{'animate-hide': !painter.hasLoaded || hideControls == true}" class="controls animate">
-    <button class="close-controls" ng-click="hideControls=true">&Cross;</button>
+    <button class="close-controls" ng-click="hideControls=true">X</button>
     <label for="minBrushSize">Brush Size</label>
     <div style="width: 400px; position: relative; display: block;">
         <slider floor="1" ceiling="50" step="1" precision="2" ng-model-low="painter.brushMinSize" ng-model-high="painter.brushMaxSize"></slider>
