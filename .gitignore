@@ -1,6 +1,5 @@
 .DS_Store
 node_modules
-js/*
 example/js/*
 bower_components
 components
