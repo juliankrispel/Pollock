@@ -3,6 +3,8 @@ module.exports = function(grunt){
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-testem');
     grunt.loadNpmTasks('grunt-contrib-connect');
+    grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-clean');
 
     grunt.initConfig({
         connect: {
@@ -19,6 +21,20 @@ module.exports = function(grunt){
             },
             main : {
                 src: [ 'tests/*.coffee' ]
+            }
+        },
+        clean: ['js/**'],
+        uglify: {
+            options: {
+                mangle: true
+            },
+            main: {
+                files: {
+                    'js/dept.min.js': [
+                        'bower_components/underscore/underscore-min.js',
+                        'bower_components/angular/angular.min.js', 
+                        'bower_components/angular-slider/angular-slider.min.js']
+                }
             }
         },
         coffee:{
@@ -61,6 +77,6 @@ module.exports = function(grunt){
         }
     });
     grunt.registerTask('default',[
-        'coffee', 'connect', 'watch'
+        'connect', 'clean', 'uglify', 'coffee', 'watch'
     ]);
-}
+};
